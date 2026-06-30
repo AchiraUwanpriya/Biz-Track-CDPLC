@@ -2319,7 +2319,7 @@ const SearchBar = ({ value, onChange, placeholder }) => (
 );
 
 /* ─── DGESatt (main component) ────────────────────────────────────────────── */
-const DGESatt = ({ data = [], loading = false }) => {
+const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const theme    = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const currentYear = new Date().getFullYear().toString();
@@ -2480,7 +2480,7 @@ const DGESatt = ({ data = [], loading = false }) => {
 };
 
 /* ─── Data Wrapper (exported) ─────────────────────────────────────────────── */
-export const CDLLocBaseAttendance = () => {
+export const CDLLocBaseAttendance = ({ hadDate } ) => {
   const [data,    setData]    = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -2491,7 +2491,7 @@ export const CDLLocBaseAttendance = () => {
       try {
         setLoading(true);
         setError(null);
-        const response  = await CommonService.GetCdllocbaseAttendance();
+        const response  = await CommonService.GetCdllocbaseAttendance(hadDate);
         const resultSet = response?.data?.ResultSet || [];
         const normalized = resultSet.map(normalizeRow);
         if (active) setData(normalized);
@@ -2503,7 +2503,7 @@ export const CDLLocBaseAttendance = () => {
     };
     fetchData();
     return () => { active = false; };
-  }, []);
+  },[hadDate]);
 
   if (error) {
     return (
@@ -2513,5 +2513,5 @@ export const CDLLocBaseAttendance = () => {
     );
   }
 
-  return <DGESatt data={data} loading={loading} />;
+  return <DGESatt data={data} loading={loading} hadDate={hadDate} />;
 };

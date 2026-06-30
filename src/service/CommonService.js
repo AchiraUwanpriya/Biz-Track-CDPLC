@@ -111,8 +111,14 @@ const UpdateDailyCollect = async (payload) => {
     });
 };
 
-const GetCdllocbaseAttendance = async () => {
-  return axios.get("Attendancedashboard/GetCdllocbaseAttendance").then((response) => {
+const GetCdllocbaseAttendance = async (hadDate) => {
+  return axios.get("Attendancedashboard/GetCdllocbaseAttendance", {
+      params: {
+         
+        p_had_date: hadDate
+      },
+    }).then((response) => {
+    
     return response;
   });
 };

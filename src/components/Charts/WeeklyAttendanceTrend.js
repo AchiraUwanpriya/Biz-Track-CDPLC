@@ -702,9 +702,9 @@ const RateCard = ({ label, rate, color = "#004AAD", sub }) => (
  
 
 const VIEWS = [
-  { key: "year",  label: "Year"  },
-  { key: "month", label: "Month" },
   { key: "week",  label: "Week"  },
+  { key: "month", label: "Month" },
+  { key: "year",  label: "Year"  },
   { key: "range", label: "Range" },
 ];
  
@@ -1037,7 +1037,7 @@ export function WeeklyAttendanceTrend({
   targetRate = 75,
 }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
-  const [view, setView] = useState("year");
+  const [view, setView] = useState("week");
   
   // ─── Date range state ──────────────────────────────────────────────────
   const [startDate, setStartDate] = useState(null);
@@ -1166,9 +1166,9 @@ export function WeeklyAttendanceTrend({
   };
 
   const titles = {
-    week:  { title: "CDL Weekly Attendance Trend",  sub: "Last 7 days attendance with rate overlay" },
-    month: { title: "CDL Monthly Attendance",       sub: `${new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })} - Daily attendance breakdown` },
-    year:  { title: "CDL Yearly Attendance",        sub: `Attendance from Jan 1 to ${new Date().toLocaleString('en-US', { month: 'long', day: 'numeric' })}` },
+    week:  { title: "CDL Weekly Attendance ",  },
+    month: { title: "CDL Monthly Attendance",       },
+    year:  { title: "CDL Yearly Attendance",         },
     range: { 
       title: "CDL Custom Range Attendance", 
       sub: startDate && endDate 
