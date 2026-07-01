@@ -934,7 +934,24 @@ import {
   Paper,
   useTheme,
   useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  IconButton,
+  InputAdornment,
+  Chip,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Users,
   CalendarOff,
@@ -1068,7 +1085,7 @@ const ArcGaugeSmall = ({ rate, color, trackColor }) => {
 };
 
 // ─── CdplcKpiCard (full-width) ────────────────────────────────────────────────
-export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick }) => {
+export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick, onMetricClick }) => {
   const cfg  = TYPE_CONFIG["CDPLC"];
   const rate = eligible > 0 ? Math.round((attendance / eligible) * 100) : 0;
 
@@ -1154,17 +1171,40 @@ export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick
                 <Box sx={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: "#e53935" }} />
                 <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#e53935", letterSpacing: "0.8px" }}>LIVE</Typography>
               </Box>
-              {liveRows.map(({ label, value, color, icon }) => (
-                <Box key={label} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Box sx={{ color, display: "flex", alignItems: "center", flexShrink: 0 }}>{icon}</Box>
-                    <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 600 }}>{label}</Typography>
+              {liveRows.map(({ label, value, color, icon }) => {
+                const isClickable = label === "Duty Off" || label === "OT Entered";
+                return (
+                  <Box 
+                    key={label} 
+                    onClick={(e) => {
+                      if (isClickable && onMetricClick) {
+                        e.stopPropagation();
+                        onMetricClick(label);
+                      }
+                    }}
+                    sx={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center",
+                      cursor: isClickable && onMetricClick ? "pointer" : "default",
+                      padding: "4px 0px",
+                      borderRadius: "4px",
+                      transition: "background-color 0.2s",
+                      "&:hover": {
+                        backgroundColor: isClickable && onMetricClick ? "rgba(3, 20, 250, 0.08)" : "transparent",
+                      }
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                      <Box sx={{ color, display: "flex", alignItems: "center", flexShrink: 0 }}>{icon}</Box>
+                      <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 600 }}>{label}</Typography>
+                    </Box>
+                    <Typography sx={{ fontSize: "13px", fontWeight: 700, color }}>
+                      {value != null ? value.toLocaleString() : "—"}
+                    </Typography>
                   </Box>
-                  <Typography sx={{ fontSize: "13px", fontWeight: 700, color }}>
-                    {value != null ? value.toLocaleString() : "—"}
-                  </Typography>
-                </Box>
-              ))}
+                );
+              })}
             </Box>
             <Box sx={{ flex: 1 }} />
           </Box>
@@ -1209,17 +1249,40 @@ export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick
               <Box sx={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: "#e53935" }} />
               <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#e53935", letterSpacing: "0.8px" }}>LIVE</Typography>
             </Box>
-            {liveRows.map(({ label, value, color, icon }) => (
-              <Box key={label} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                  <Box sx={{ color, display: "flex", alignItems: "center", flexShrink: 0 }}>{icon}</Box>
-                  <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 600 }}>{label}</Typography>
+            {liveRows.map(({ label, value, color, icon }) => {
+              const isClickable = label === "Duty Off" || label === "OT Entered";
+              return (
+                <Box 
+                  key={label} 
+                  onClick={(e) => {
+                    if (isClickable && onMetricClick) {
+                      e.stopPropagation();
+                      onMetricClick(label);
+                    }
+                  }}
+                  sx={{ 
+                    display: "flex", 
+                    justifyContent: "space-between", 
+                    alignItems: "center",
+                    cursor: isClickable && onMetricClick ? "pointer" : "default",
+                    padding: "6px 0px",
+                    borderRadius: "4px",
+                    transition: "background-color 0.2s",
+                    "&:hover": {
+                      backgroundColor: isClickable && onMetricClick ? "rgba(3, 20, 250, 0.08)" : "transparent",
+                    }
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <Box sx={{ color, display: "flex", alignItems: "center", flexShrink: 0 }}>{icon}</Box>
+                    <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 600 }}>{label}</Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: "13px", fontWeight: 700, color }}>
+                    {value != null ? value.toLocaleString() : "—"}
+                  </Typography>
                 </Box>
-                <Typography sx={{ fontSize: "13px", fontWeight: 700, color }}>
-                  {value != null ? value.toLocaleString() : "—"}
-                </Typography>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
 
           
@@ -1439,6 +1502,169 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
 
 
   const liveData = useCdplcLiveData();
+  
+  // Modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState("");
+  const [modalSearchTerm, setModalSearchTerm] = useState("");
+
+  const rawList = liveData?.rawList || [];
+
+  // Helper to detect employee fields dynamically
+  const detectEmployeeFields = (row) => {
+    if (!row) return {};
+    
+    let idKey = null;
+    let nameKey = null;
+    let dutyKey = null;
+    let otKey = null;
+    
+    const keys = Object.keys(row);
+    
+    const idPatterns = ['sno', 'serviceno', 'service_no', 'ep_no', 'epno', 'empno', 'emp_no', 'id', 'code', 'no'];
+    for (const pattern of idPatterns) {
+      const found = keys.find(k => {
+        const kl = k.toLowerCase();
+        return kl.includes(pattern) && !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(kl);
+      });
+      if (found) {
+        idKey = found;
+        break;
+      }
+    }
+    
+    const namePatterns = ['name', 'empname', 'employeename', 'full_name', 'fullname'];
+    for (const pattern of namePatterns) {
+      const found = keys.find(k => k.toLowerCase().includes(pattern));
+      if (found) {
+        nameKey = found;
+        break;
+      }
+    }
+    
+    const dutyPatterns = ['duty', 'status', 'off', 'active'];
+    for (const pattern of dutyPatterns) {
+      const found = keys.find(k => {
+        const kl = k.toLowerCase();
+        return kl.includes(pattern) && !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(kl);
+      });
+      if (found) {
+        dutyKey = found;
+        break;
+      }
+    }
+    
+    const otPatterns = ['ot', 'overtime', 'extra'];
+    for (const pattern of otPatterns) {
+      const found = keys.find(k => {
+        const kl = k.toLowerCase();
+        return kl.includes(pattern) && !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(kl);
+      });
+      if (found) {
+        otKey = found;
+        break;
+      }
+    }
+    
+    return { idKey, nameKey, dutyKey, otKey,
+      designationKey: (() => {
+        const desigPatterns = ['designation', 'desig', 'position', 'post', 'grade'];
+        for (const pattern of desigPatterns) {
+          const found = keys.find(k => k.toLowerCase().includes(pattern));
+          if (found) return found;
+        }
+        return null;
+      })(),
+      locationKey: (() => {
+        const locPatterns = ['location', 'branch', 'site', 'place', 'area', 'region'];
+        for (const pattern of locPatterns) {
+          const found = keys.find(k => k.toLowerCase().includes(pattern));
+          if (found) return found;
+        }
+        return null;
+      })(),
+      divisionKey: (() => {
+        const divPatterns = ['division', 'dept', 'department', 'section', 'unit', 'div'];
+        for (const pattern of divPatterns) {
+          const found = keys.find(k => k.toLowerCase().includes(pattern));
+          if (found) return found;
+        }
+        return null;
+      })(),
+    };
+  };
+
+  // Filtered employee list
+  const filteredEmployees = useMemo(() => {
+    if (!rawList || rawList.length === 0) return [];
+    
+    const firstRow = rawList[0];
+    const { idKey, nameKey, dutyKey, otKey } = detectEmployeeFields(firstRow);
+    
+    let list = rawList;
+    
+    // Exclude summary row if it doesn't have ID/Name
+    if (list.length > 0) {
+      const hasId = idKey ? list[0][idKey] : null;
+      const hasName = nameKey ? list[0][nameKey] : null;
+      if (!hasId && !hasName) {
+        list = list.slice(1);
+      }
+    }
+    
+    // Filter by metric
+    if (selectedMetric === "Duty Off") {
+      list = list.filter(row => {
+        if (dutyKey) {
+          const val = String(row[dutyKey]).toLowerCase();
+          return val.includes('off') || val === '1' || val === 'y' || val === 'yes' || val === 'true';
+        }
+        return Object.entries(row).some(([k, v]) => 
+          !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(k.toLowerCase()) &&
+          String(v).toLowerCase().includes('off')
+        );
+      });
+    } else if (selectedMetric === "OT Entered") {
+      list = list.filter(row => {
+        if (otKey) {
+          const val = String(row[otKey]).toLowerCase();
+          return val.includes('entered') || val === '1' || val === 'y' || val === 'yes' || val === 'true' || (Number(val) > 0 && !isNaN(Number(val)));
+        }
+        return Object.entries(row).some(([k, v]) => 
+          !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(k.toLowerCase()) &&
+          String(v).toLowerCase().includes('entered')
+        );
+      });
+    } else if (selectedMetric === "OT Not Entered") {
+      list = list.filter(row => {
+        if (otKey) {
+          const val = String(row[otKey]).toLowerCase();
+          return val.includes('not') || val === '0' || val === 'n' || val === 'no' || val === 'false' || val === '' || val === 'null';
+        }
+        const isEntered = Object.entries(row).some(([k, v]) => 
+          !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(k.toLowerCase()) &&
+          String(v).toLowerCase().includes('entered')
+        );
+        return !isEntered;
+      });
+    } else if (selectedMetric === "Live Employees") {
+      // All are live
+    }
+    
+    // Filter by search term
+    if (modalSearchTerm.trim()) {
+      const term = modalSearchTerm.toLowerCase();
+      list = list.filter(row => {
+        const idVal = idKey ? String(row[idKey] || "").toLowerCase() : "";
+        const nameVal = nameKey ? String(row[nameKey] || "").toLowerCase() : "";
+        return idVal.includes(term) || nameVal.includes(term);
+      });
+    }
+    
+    return list;
+  }, [rawList, selectedMetric, modalSearchTerm]);
+
+  const { idKey, nameKey, dutyKey, otKey, designationKey, locationKey, divisionKey } = rawList.length > 0 ? detectEmployeeFields(rawList[0]) : {};
    const filteredLocations = useMemo(() => {
     if (!searchTerm.trim()) return locations;
     
@@ -1508,6 +1734,11 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
           attendance={byType["CDPLC"]?.attendance || 0}
           liveData={liveData}
           onClick={onCardClick ? () => onCardClick("CDPLC") : undefined}
+          onMetricClick={(metric) => {
+            setSelectedMetric(metric);
+            setModalSearchTerm("");
+            setModalOpen(true);
+          }}
         />
       )}
 
@@ -1538,6 +1769,201 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
           )
         )}
       </Box>
+      
+      {/* Employee List Dialog Modal */}
+      <Dialog
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "12px",
+            boxShadow: "0 8px 32px rgba(0,74,173,0.18)",
+            background: "#fff",
+            m: { xs: 1, sm: 2 },
+            maxHeight: "85vh",
+          }
+        }}
+      >
+        {/* Header */}
+        <DialogTitle sx={{ p: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(0,74,173,0.08)" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography sx={{ fontWeight: 700, fontSize: "14px", color: "#004AAD" }}>
+              {selectedMetric || "Employee List"}
+            </Typography>
+            <Chip
+              label={filteredEmployees.length}
+              size="small"
+              sx={{
+                height: "20px",
+                fontSize: "11px",
+                fontWeight: 700,
+                backgroundColor: "rgba(0, 74, 173, 0.1)",
+                color: "#004AAD",
+                "& .MuiChip-label": { px: "6px" }
+              }}
+            />
+          </Box>
+          <IconButton
+            size="small"
+            onClick={() => setModalOpen(false)}
+            sx={{
+              p: "4px",
+              color: "text.secondary",
+              "&:hover": { color: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.08)" }
+            }}
+          >
+            <CloseIcon sx={{ fontSize: "18px" }} />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: "10px 12px", display: "flex", flexDirection: "column", gap: 1, overflow: "hidden" }}>
+          {/* Search bar */}
+          <TextField
+            placeholder="Search name or ID..."
+            value={modalSearchTerm}
+            onChange={(e) => setModalSearchTerm(e.target.value)}
+            variant="outlined"
+            size="small"
+            fullWidth
+            autoFocus
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: "16px", color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+              sx: {
+                fontSize: "13px",
+                borderRadius: "8px",
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(0,74,173,0.2)" },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#004AAD" },
+              }
+            }}
+          />
+
+          {/* Table */}
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            sx={{
+              maxHeight: "calc(85vh - 160px)",
+              border: "1px solid rgba(0, 74, 173, 0.08)",
+              borderRadius: "8px",
+              overflowY: "auto",
+              "&::-webkit-scrollbar": { width: "5px" },
+              "&::-webkit-scrollbar-thumb": { backgroundColor: "rgba(0,74,173,0.2)", borderRadius: "4px" },
+            }}
+          >
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px", width: "36px", textAlign: "center", px: "6px" }}>#</TableCell>
+                  <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Designation</TableCell>
+                  <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Location</TableCell>
+                  <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Division</TableCell>
+                  {dutyKey && <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Duty</TableCell>}
+                  {otKey && <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>OT</TableCell>}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredEmployees.length > 0 ? (
+                  filteredEmployees.map((row, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{
+                        "&:nth-of-type(even)": { backgroundColor: "rgba(0, 74, 173, 0.02)" },
+                        "&:hover": { backgroundColor: "rgba(0, 74, 173, 0.05)" },
+                      }}
+                    >
+                      <TableCell sx={{ textAlign: "center", color: "text.secondary", fontSize: "11px", py: "5px", px: "6px" }}>{index + 1}</TableCell>
+
+                      <TableCell sx={{ fontWeight: 600, fontSize: "12px", py: "5px", color: "#004AAD" }}>
+                        {idKey ? String(row[idKey] || "—") : "—"}
+                      </TableCell>
+
+                      <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+                        {nameKey ? String(row[nameKey] || "—") : "—"}
+                      </TableCell>
+
+                      <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+                        {designationKey ? String(row[designationKey] || "—") : "—"}
+                      </TableCell>
+
+                      <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+                        {locationKey ? String(row[locationKey] || "—") : "—"}
+                      </TableCell>
+
+                      <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+                        {divisionKey ? String(row[divisionKey] || "—") : "—"}
+                      </TableCell>
+
+                      {dutyKey && (
+                        <TableCell sx={{ py: "5px" }}>
+                          <Chip
+                            label={String(row[dutyKey] || "—")}
+                            size="small"
+                            sx={{
+                              height: "18px",
+                              fontSize: "10px",
+                              fontWeight: 600,
+                              "& .MuiChip-label": { px: "6px" },
+                              backgroundColor: String(row[dutyKey] || "").toLowerCase().includes('off')
+                                ? "rgba(245, 158, 11, 0.12)"
+                                : "rgba(16, 185, 129, 0.12)",
+                              color: String(row[dutyKey] || "").toLowerCase().includes('off')
+                                ? "#d97706"
+                                : "#059669"
+                            }}
+                          />
+                        </TableCell>
+                      )}
+
+                      {otKey && (
+                        <TableCell sx={{ py: "5px" }}>
+                          <Chip
+                            label={String(row[otKey] || "—")}
+                            size="small"
+                            sx={{
+                              height: "18px",
+                              fontSize: "10px",
+                              fontWeight: 600,
+                              "& .MuiChip-label": { px: "6px" },
+                              backgroundColor: String(row[otKey] || "").toLowerCase().includes('entered') || String(row[otKey] || "") === "1" || String(row[otKey] || "").toLowerCase() === "y"
+                                ? "rgba(16, 185, 129, 0.12)"
+                                : "rgba(239, 68, 68, 0.1)",
+                              color: String(row[otKey] || "").toLowerCase().includes('entered') || String(row[otKey] || "") === "1" || String(row[otKey] || "").toLowerCase() === "y"
+                                ? "#059669"
+                                : "#ef4444"
+                            }}
+                          />
+                        </TableCell>
+                      )}
+
+                      {!idKey && !nameKey && rawList.length > 0 &&
+                        Object.keys(rawList[0])
+                          .filter(k => !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(k.toLowerCase()))
+                          .map(k => (
+                            <TableCell key={k} sx={{ fontSize: "12px", py: "5px" }}>{String(row[k] || "—")}</TableCell>
+                          ))
+                      }
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} sx={{ textAlign: "center", py: 3, color: "text.secondary", fontSize: "12px" }}>
+                      No employees found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
