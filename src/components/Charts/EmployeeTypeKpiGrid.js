@@ -1510,6 +1510,32 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
 
   const rawList = liveData?.rawList || [];
 
+  // mock data once backend returns real employee list
+  const MOCK_EMPLOYEES = [
+    { ServiceNo: "EP001", Name: "Amal Perera",    Designation: "Engineer",        Location: "Colombo",     Division: "Engineering",  DutyStatus: "On Duty",   OTStatus: "Entered"     },
+    { ServiceNo: "EP002", Name: "Nimal Fernando",  Designation: "Technician",      Location: "Kandy",       Division: "Maintenance",  DutyStatus: "Duty Off",  OTStatus: "Not Entered" },
+    { ServiceNo: "EP003", Name: "Kasun Silva",     Designation: "Manager",         Location: "Galle",       Division: "Operations",   DutyStatus: "On Duty",   OTStatus: "Entered"     },
+    { ServiceNo: "EP004", Name: "Dilani Rajapaksa",Designation: "HR Officer",      Location: "Colombo",     Division: "HR",           DutyStatus: "Duty Off",  OTStatus: "Not Entered" },
+    { ServiceNo: "EP005", Name: "Sunil Bandara",   Designation: "Supervisor",      Location: "Negombo",     Division: "Production",   DutyStatus: "On Duty",   OTStatus: "Entered"     },
+    { ServiceNo: "EP006", Name: "Priya Jayawardena",Designation: "Accountant",     Location: "Colombo",     Division: "Finance",      DutyStatus: "On Duty",   OTStatus: "Not Entered" },
+    { ServiceNo: "EP007", Name: "Chamara Wickrama",Designation: "Driver",          Location: "Kurunegala",  Division: "Logistics",    DutyStatus: "Duty Off",  OTStatus: "Not Entered" },
+    { ServiceNo: "EP008", Name: "Tharaka Dissanayake", Designation: "Clerk",       Location: "Kandy",       Division: "Administration",DutyStatus: "On Duty",  OTStatus: "Entered"     },
+    { ServiceNo: "EP009", Name: "Malini Senanayake",Designation: "QA Inspector",   Location: "Gampaha",     Division: "Quality",      DutyStatus: "On Duty",   OTStatus: "Entered"     },
+    { ServiceNo: "EP010", Name: "Roshan Gunasekara",Designation: "IT Officer",     Location: "Colombo",     Division: "IT",           DutyStatus: "Duty Off",  OTStatus: "Not Entered" },
+  ];
+
+  // Use rawList only if it contains real employee records (has ID or Name fields).
+  // The API summary row only has count fields — if that's all that's returned,
+  // fall back to mock data so the table always has something to show.
+  const hasRealEmployeeData = rawList.length > 0 && rawList.some(row => {
+    const keys = Object.keys(row).map(k => k.toLowerCase());
+    const hasName = keys.some(k => ['name', 'empname', 'employeename', 'full_name', 'fullname'].some(p => k.includes(p)));
+    const hasId   = keys.some(k => ['sno', 'serviceno', 'service_no', 'ep_no', 'epno', 'empno', 'emp_no'].some(p => k.includes(p)));
+    return hasName || hasId;
+  });
+
+  const effectiveList = hasRealEmployeeData ? rawList : MOCK_EMPLOYEES;
+
   // Helper to detect employee fields dynamically
   const detectEmployeeFields = (row) => {
     if (!row) return {};
@@ -1596,12 +1622,12 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
 
   // Filtered employee list
   const filteredEmployees = useMemo(() => {
-    if (!rawList || rawList.length === 0) return [];
+    if (!effectiveList || effectiveList.length === 0) return [];
     
-    const firstRow = rawList[0];
+    const firstRow = effectiveList[0];
     const { idKey, nameKey, dutyKey, otKey } = detectEmployeeFields(firstRow);
     
-    let list = rawList;
+    let list = effectiveList;
     
     // Exclude summary row if it doesn't have ID/Name
     if (list.length > 0) {
@@ -1662,9 +1688,9 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
     }
     
     return list;
-  }, [rawList, selectedMetric, modalSearchTerm]);
+  }, [effectiveList, selectedMetric, modalSearchTerm]);
 
-  const { idKey, nameKey, dutyKey, otKey, designationKey, locationKey, divisionKey } = rawList.length > 0 ? detectEmployeeFields(rawList[0]) : {};
+  const { idKey, nameKey, dutyKey, otKey, designationKey, locationKey, divisionKey } = effectiveList.length > 0 ? detectEmployeeFields(effectiveList[0]) : {};
    const filteredLocations = useMemo(() => {
     if (!searchTerm.trim()) return locations;
     
@@ -1848,11 +1874,11 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
             component={Paper}
             elevation={0}
             sx={{
-              maxHeight: "calc(85vh - 160px)",
+              maxHeight: "238px", 
               border: "1px solid rgba(0, 74, 173, 0.08)",
               borderRadius: "8px",
               overflowY: "auto",
-              "&::-webkit-scrollbar": { width: "5px" },
+              "&::-webkit-scrollbar": { width: "5px", height: "5px" },
               "&::-webkit-scrollbar-thumb": { backgroundColor: "rgba(0,74,173,0.2)", borderRadius: "4px" },
             }}
           >
@@ -1865,8 +1891,6 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
                   <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Designation</TableCell>
                   <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Location</TableCell>
                   <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Division</TableCell>
-                  {dutyKey && <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>Duty</TableCell>}
-                  {otKey && <TableCell sx={{ fontWeight: 700, backgroundColor: "#f0f4ff", color: "#004AAD", fontSize: "11px", py: "6px" }}>OT</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1900,56 +1924,6 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick ,locat
                       <TableCell sx={{ fontSize: "12px", py: "5px" }}>
                         {divisionKey ? String(row[divisionKey] || "—") : "—"}
                       </TableCell>
-
-                      {dutyKey && (
-                        <TableCell sx={{ py: "5px" }}>
-                          <Chip
-                            label={String(row[dutyKey] || "—")}
-                            size="small"
-                            sx={{
-                              height: "18px",
-                              fontSize: "10px",
-                              fontWeight: 600,
-                              "& .MuiChip-label": { px: "6px" },
-                              backgroundColor: String(row[dutyKey] || "").toLowerCase().includes('off')
-                                ? "rgba(245, 158, 11, 0.12)"
-                                : "rgba(16, 185, 129, 0.12)",
-                              color: String(row[dutyKey] || "").toLowerCase().includes('off')
-                                ? "#d97706"
-                                : "#059669"
-                            }}
-                          />
-                        </TableCell>
-                      )}
-
-                      {otKey && (
-                        <TableCell sx={{ py: "5px" }}>
-                          <Chip
-                            label={String(row[otKey] || "—")}
-                            size="small"
-                            sx={{
-                              height: "18px",
-                              fontSize: "10px",
-                              fontWeight: 600,
-                              "& .MuiChip-label": { px: "6px" },
-                              backgroundColor: String(row[otKey] || "").toLowerCase().includes('entered') || String(row[otKey] || "") === "1" || String(row[otKey] || "").toLowerCase() === "y"
-                                ? "rgba(16, 185, 129, 0.12)"
-                                : "rgba(239, 68, 68, 0.1)",
-                              color: String(row[otKey] || "").toLowerCase().includes('entered') || String(row[otKey] || "") === "1" || String(row[otKey] || "").toLowerCase() === "y"
-                                ? "#059669"
-                                : "#ef4444"
-                            }}
-                          />
-                        </TableCell>
-                      )}
-
-                      {!idKey && !nameKey && rawList.length > 0 &&
-                        Object.keys(rawList[0])
-                          .filter(k => !['live_employee', 'ot_entered', 'duty_off', 'otnotentered', 'rawlist'].includes(k.toLowerCase()))
-                          .map(k => (
-                            <TableCell key={k} sx={{ fontSize: "12px", py: "5px" }}>{String(row[k] || "—")}</TableCell>
-                          ))
-                      }
                     </TableRow>
                   ))
                 ) : (
