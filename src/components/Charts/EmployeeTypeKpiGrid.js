@@ -1446,40 +1446,42 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
           "&:hover": { backgroundColor: "rgba(0, 74, 173, 0.05)" },
         }}
       >
-        <TableCell sx={{ fontWeight: 600, fontSize: "12px", py: "5px", color: "#004AAD" }}>
+        <TableCell sx={{ fontWeight: 600, fontSize: "12px", py: "5px", color: "#004AAD", width: { xs: "65px", sm: "80px" }, minWidth: { xs: "65px", sm: "80px" } }}>
           {row.id}
         </TableCell>
-        <TableCell sx={{ fontSize: "12px", py: "5px", display: "flex", alignItems: "center", gap: "6px" }}>
-          <Avatar
-            src={imageUrl}
-            alt={row.name}
-            sx={{
-              width: 32,
-              height: 32,
-              fontSize: "14px",
-              fontWeight: 600,
-              backgroundColor: "#004AAD",
-              color: "white",
-              border: "2px solid rgba(0,74,173,0.2)",
-              flexShrink: 0,
-            }}
-          >
-            {!imageUrl && !isLoading && row.name.charAt(0)}
-            {isLoading && <CircularProgress size={20} sx={{ color: "white" }} />}
-          </Avatar>
-          <Typography sx={{ fontSize: "12px", fontWeight: 500 }}>
-            {row.name}
-          </Typography>
+        <TableCell sx={{ fontSize: "12px", py: "5px", verticalAlign: "middle", width: { xs: "120px", sm: "150px" }, minWidth: { xs: "120px", sm: "150px" } }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: "4px", sm: "6px" } }}>
+            <Avatar
+              src={imageUrl}
+              alt={row.name}
+              sx={{
+                width: { xs: 26, sm: 32 },
+                height: { xs: 26, sm: 32 },
+                fontSize: { xs: "11px", sm: "14px" },
+                fontWeight: 600,
+                backgroundColor: "#004AAD",
+                color: "white",
+                border: "2px solid rgba(0,74,173,0.2)",
+                flexShrink: 0,
+              }}
+            >
+              {!imageUrl && !isLoading && row.name.charAt(0)}
+              {isLoading && <CircularProgress size={16} sx={{ color: "white" }} />}
+            </Avatar>
+            <Typography noWrap sx={{ fontSize: "12px", fontWeight: 500, minWidth: 0 }}>
+              {row.name}
+            </Typography>
+          </Box>
         </TableCell>
         {selectedMetric === "OT Entered" && (
-          <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+          <TableCell sx={{ fontSize: "12px", py: "5px", width: { xs: "90px", sm: "110px" }, minWidth: { xs: "90px", sm: "110px" }, verticalAlign: "middle", whiteSpace: "nowrap" }}>
             {row.start_time}
           </TableCell>
         )}
-        <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+        <TableCell sx={{ fontSize: "12px", py: "5px", width: { xs: "70px", sm: "100px" }, minWidth: { xs: "70px", sm: "100px" } }}>
           {row.location}
         </TableCell>
-        <TableCell sx={{ fontSize: "12px", py: "5px" }}>
+        <TableCell sx={{ fontSize: "12px", py: "5px", width: { xs: "70px", sm: "100px" }, minWidth: { xs: "70px", sm: "100px" } }}>
           {row.division}
         </TableCell>
       </TableRow>
@@ -1545,9 +1547,16 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
             borderRadius: "12px",
             boxShadow: "0 8px 32px rgba(0,74,173,0.18)",
             background: "#fff",
-            m: { xs: 1, sm: 2 },
+            m: { xs: 1, sm: 1.5, md: 2 },
             maxHeight: "90vh",
-            minHeight: "60vh",
+            minHeight: "400px",
+            width: "100%",
+            maxWidth: {
+              xs: "calc(100% - 16px)",
+              sm: "calc(100% - 24px)",
+              md: "calc(100% - 32px)",
+              lg: "850px"
+            }
           }
         }}
       >
@@ -1606,7 +1615,6 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
             variant="outlined"
             size="small"
             fullWidth
-            autoFocus
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -1646,7 +1654,17 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
               }
             }}
           >
-            <Table size="small" stickyHeader>
+            <Table
+              size="small"
+              stickyHeader
+              sx={{
+                tableLayout: "fixed",
+                width: "100%",
+                "& .MuiTableCell-root": {
+                  px: { xs: "6px", sm: "10px", md: "16px" },
+                }
+              }}
+            >
               <TableHead>
                 <TableRow>
                   <TableCell sx={{
@@ -1656,6 +1674,8 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
                     fontSize: "12px",
                     py: "8px",
                     borderBottom: "2px solid rgba(0,74,173,0.12)",
+                    width: { xs: "65px", sm: "80px" },
+                    minWidth: { xs: "65px", sm: "80px" },
                   }}>
                     Service No
                   </TableCell>
@@ -1666,6 +1686,9 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
                     fontSize: "12px",
                     py: "8px",
                     borderBottom: "2px solid rgba(0,74,173,0.12)",
+                    minWidth: { xs: "120px", sm: "150px" },
+                    width: { xs: "120px", sm: "150px" },
+                    whiteSpace: "nowrap",
                   }}>
                     Employee
                   </TableCell>
@@ -1677,6 +1700,9 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
                       fontSize: "12px",
                       py: "8px",
                       borderBottom: "2px solid rgba(0,74,173,0.12)",
+                      width: { xs: "90px", sm: "110px" },
+                      minWidth: { xs: "90px", sm: "110px" },
+                      whiteSpace: "nowrap",
                     }}>
                       Start Time
                     </TableCell>
@@ -1688,6 +1714,8 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
                     fontSize: "12px",
                     py: "8px",
                     borderBottom: "2px solid rgba(0,74,173,0.12)",
+                    width: { xs: "70px", sm: "100px" },
+                    minWidth: { xs: "70px", sm: "100px" },
                   }}>
                     Location
                   </TableCell>
@@ -1698,6 +1726,8 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
                     fontSize: "12px",
                     py: "8px",
                     borderBottom: "2px solid rgba(0,74,173,0.12)",
+                    width: { xs: "70px", sm: "100px" },
+                    minWidth: { xs: "70px", sm: "100px" },
                   }}>
                     Division
                   </TableCell>
