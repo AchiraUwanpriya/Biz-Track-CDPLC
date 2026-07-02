@@ -930,7 +930,7 @@ export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick
 
           {/* RIGHT COLUMN */}
           <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Box sx={{ px: "14px", py: "14px", display: "flex", flexDirection: "column", gap: "8px", justifyContent: "flex-start" }}>
+            <Box sx={{ px: "14px", py: "14px", display: "flex", flexDirection: "column", gap: "2px", justifyContent: "flex-start" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: "5px", mb: "2px" }}>
                 <Box sx={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: "#e53935" }} />
                 <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#e53935", letterSpacing: "0.8px" }}>LIVE</Typography>
@@ -951,7 +951,7 @@ export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick
                       justifyContent: "space-between",
                       alignItems: "center",
                       cursor: isClickable && onMetricClick ? "pointer" : "default",
-                      padding: "4px 0px",
+                      padding: "2px 0px",
                       borderRadius: "4px",
                       transition: "background-color 0.2s",
                       "&:hover": {
@@ -1008,7 +1008,7 @@ export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick
 
           <Divider orientation="vertical" flexItem sx={{ backgroundColor: "divider", my: "12px" }} />
 
-          <Box sx={{ px: "14px", py: "14px", display: "flex", flexDirection: "column", gap: "8px", justifyContent: "center" }}>
+          <Box sx={{ px: "14px", py: "14px", display: "flex", flexDirection: "column", gap: "2px", justifyContent: "center" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: "5px", mb: "2px" }}>
               <Box sx={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: "#e53935" }} />
               <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#e53935", letterSpacing: "0.8px" }}>LIVE</Typography>
@@ -1029,7 +1029,7 @@ export const CdplcKpiCard = ({ strength, eligible, attendance, liveData, onClick
                     justifyContent: "space-between",
                     alignItems: "center",
                     cursor: isClickable && onMetricClick ? "pointer" : "default",
-                    padding: "6px 0px",
+                    padding: "2px 0px",
                     borderRadius: "4px",
                     transition: "background-color 0.2s",
                     "&:hover": {
