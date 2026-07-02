@@ -79,18 +79,15 @@ const GetCDLWeekAttendance = async (hadDate) => {
 
 const GetCDLMonthlyAttendance = async () => {
   return axios
-    .get(`Attendancedashboard/GetCDLMonthlyAttendance`, {
-     
-    })
+    .get(`Attendancedashboard/GetCDLMonthlyAttendance`)
     .then((response) => {
       return response;
     });
 };
+
 const GetCDLYearlyAttendance = async () => {
   return axios
-    .get(`Attendancedashboard/GetCDLYearlyAttendance`, {
-      
-    })
+    .get(`Attendancedashboard/GetCDLYearlyAttendance`)
     .then((response) => {
       return response;
     });
@@ -107,9 +104,22 @@ const GetCDLCategoryAtt = async (hadDate) => {
       return response;
     });
 };
+
 const GetOTEntered = async () => {
   return axios
     .get(`Attendancedashboard/GetOTEntered`)
+    .then((response) => response);
+};
+
+const GetCDLOTEmployee = async () => {
+  return axios
+    .get(`Attendancedashboard/GetCDLOTEmployee`)
+    .then((response) => response);
+};
+
+const GetCDLDutyoffEmployee = async () => {
+  return axios
+    .get(`Attendancedashboard/GetCDLDutyoffEmployee`)
     .then((response) => response);
 };
 
@@ -124,4 +134,6 @@ export default {
   GetCDLMonthlyAttendance,
   GetCDLCategoryAtt,
   GetOTEntered,
+  GetCDLOTEmployee,
+  GetCDLDutyoffEmployee,
 };

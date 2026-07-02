@@ -658,7 +658,8 @@ import {
   Building2,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetOTEntered } from "../../action/Attendance";
+import { GetOTEntered, GetCDLOTEmployee, GetCDLDutyoffEmployee } from "../../action/Attendance";
+import axios from "axios";
 
 const normalizeType = (value) => {
   const s = (value || "").toString().trim().toLowerCase();
@@ -734,70 +735,31 @@ const useCdplcLiveData = () => {
   return otData;
 };
 
-const ATTENDANCE_API_BASE = "https://esystems.cdl.lk/backend/BizTrack/Attendancedashboard";
-
-
-const readAuthKey = () => {
-  const raw = sessionStorage.getItem("token");
-  if (!raw) return "";
-
-  try {
-    return JSON.parse(raw) || raw;
-  } catch {
-    return raw;
-  }
-};
-
-const fetchEmployeeList = async (endpoint) => {
-  const authKey = readAuthKey();
-
-  const response = await fetch(`${ATTENDANCE_API_BASE}/${endpoint}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(authKey && { "auth-key": authKey }),
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
-  }
-
-  const data = await response.json();
-  return Array.isArray(data?.ResultSet) ? data.ResultSet : [];
-};
-
-const fetchOTEnteredEmployees = () => fetchEmployeeList("GetCDLOTEmployee");
-const fetchDutyOffEmployees = () => fetchEmployeeList("GetCDLDutyoffEmployee");
-
-
 const fetchEmployeeImage = async (serviceNo) => {
   if (!serviceNo) return null;
-  
-  const authKey = readAuthKey();
-  const imageUrl = `https://esystems.cdl.lk/backend/BizTrack/home/GetUserImg?serviceNo=${serviceNo}`;
-  
+
+  const cleanAuthKey = (() => {
+    const raw = sessionStorage.getItem("token");
+    if (!raw) return "";
+    try { return JSON.parse(raw) || raw; } catch { return raw; }
+  })();
+
+  const imageUrl = `${axios.defaults.baseURL}home/GetUserImg?serviceNo=${serviceNo}&authKey=${encodeURIComponent(cleanAuthKey.replace(/"/g, ""))}`;
+
   try {
-    const response = await fetch(imageUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(authKey && { "auth-key": authKey }),
-      },
-    });
+    const response = await fetch(imageUrl, { method: "GET" });
 
     if (!response.ok) {
       console.warn(`Failed to fetch image for serviceNo: ${serviceNo}`);
       return null;
     }
 
-
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.startsWith("image/")) {
       const blob = await response.blob();
       return URL.createObjectURL(blob);
     }
-    
+
     return null;
   } catch (error) {
     console.error(`Error fetching image for ${serviceNo}:`, error);
@@ -1271,11 +1233,12 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
   const [selectedMetric, setSelectedMetric] = useState("");
   const [modalSearchTerm, setModalSearchTerm] = useState("");
 
-  const [otEmployees, setOtEmployees] = useState([]);
-  const [dutyOffEmployees, setDutyOffEmployees] = useState([]);
-  const [employeeListLoading, setEmployeeListLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { otEmployees, dutyOffEmployees, loading: employeeListLoading } = useSelector(
+    (state) => state.attendanceCard
+  );
   const [employeeListError, setEmployeeListError] = useState(null);
-  
+
   // ─── New state for employee images ──────────────────────────────────────────
   const [employeeImages, setEmployeeImages] = useState({});
   const [imageLoading, setImageLoading] = useState({});
@@ -1283,33 +1246,15 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
   useEffect(() => {
     if (!modalOpen) return;
 
-    let cancelled = false;
+    setEmployeeImages({});
+    setEmployeeListError(null);
 
-    const loadList = async () => {
-      setEmployeeListLoading(true);
-      setEmployeeListError(null);
-      setEmployeeImages({}); // Reset images when modal opens
-      try {
-        if (selectedMetric === "OT Entered") {
-          const list = await fetchOTEnteredEmployees();
-          if (!cancelled) setOtEmployees(list);
-        } else if (selectedMetric === "Duty Off") {
-          const list = await fetchDutyOffEmployees();
-          if (!cancelled) setDutyOffEmployees(list);
-        }
-      } catch (err) {
-        if (!cancelled) setEmployeeListError(err.message || "Failed to load employee list");
-      } finally {
-        if (!cancelled) setEmployeeListLoading(false);
-      }
-    };
-
-    loadList();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [modalOpen, selectedMetric]);
+    if (selectedMetric === "OT Entered") {
+      dispatch(GetCDLOTEmployee());
+    } else if (selectedMetric === "Duty Off") {
+      dispatch(GetCDLDutyoffEmployee());
+    }
+  }, [modalOpen, selectedMetric, dispatch]);
 
   useEffect(() => {
     const source = selectedMetric === "OT Entered" ? otEmployees : selectedMetric === "Duty Off" ? dutyOffEmployees : [];

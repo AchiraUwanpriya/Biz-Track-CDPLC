@@ -16,7 +16,9 @@ const initialState = {
   allAttendance: [],
   cdplcData: [],
   error: null,
-  otData: null, 
+  otData: null,
+  otEmployees: [],
+  dutyOffEmployees: [],
   msg: null,
   loading: false,
 };
@@ -47,6 +49,8 @@ export const GetAttendanceCard = (state = initialState, action) => {
         allAttendance: action.payload.allAttendance || state.allAttendance,
         cdplcData: action.payload.cdplcData || state.cdplcData,
         otData: action.payload.otData || state.otData,
+        otEmployees: action.payload.otEmployees || state.otEmployees,
+        dutyOffEmployees: action.payload.dutyOffEmployees || state.dutyOffEmployees,
         msg: null,
       };
     case ATTENDANCE_FAIL:

@@ -365,3 +365,47 @@ export const GetOTEntered = () => async (dispatch) => {
     dispatch({ type: ATTENDANCE_FAIL, payload: { msg: message } });
   }
 };
+
+export const GetCDLOTEmployee = () => async (dispatch) => {
+  dispatch({ type: ATTENDANCE_REQUEST });
+
+  try {
+    const data = await AttendanceService.GetCDLOTEmployee();
+    if (data.data.StatusCode === 200) {
+      dispatch({
+        type: ATTENDANCE_SUCCESS,
+        payload: {
+          otEmployees: Array.isArray(data.data.ResultSet) ? data.data.ResultSet : [],
+        },
+      });
+    } else {
+      dispatch({ type: ATTENDANCE_FAIL, payload: { msg: "Failed to fetch OT employee list" } });
+    }
+  } catch (error) {
+    const message =
+      (error.response?.data?.message) || error.message || error.toString();
+    dispatch({ type: ATTENDANCE_FAIL, payload: { msg: message } });
+  }
+};
+
+export const GetCDLDutyoffEmployee = () => async (dispatch) => {
+  dispatch({ type: ATTENDANCE_REQUEST });
+
+  try {
+    const data = await AttendanceService.GetCDLDutyoffEmployee();
+    if (data.data.StatusCode === 200) {
+      dispatch({
+        type: ATTENDANCE_SUCCESS,
+        payload: {
+          dutyOffEmployees: Array.isArray(data.data.ResultSet) ? data.data.ResultSet : [],
+        },
+      });
+    } else {
+      dispatch({ type: ATTENDANCE_FAIL, payload: { msg: "Failed to fetch duty off employee list" } });
+    }
+  } catch (error) {
+    const message =
+      (error.response?.data?.message) || error.message || error.toString();
+    dispatch({ type: ATTENDANCE_FAIL, payload: { msg: message } });
+  }
+};
