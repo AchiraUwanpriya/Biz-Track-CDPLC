@@ -1449,7 +1449,7 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
         <TableCell sx={{ fontWeight: 600, fontSize: "12px", py: "5px", color: "#004AAD", width: { xs: "65px", sm: "80px" }, minWidth: { xs: "65px", sm: "80px" } }}>
           {row.id}
         </TableCell>
-        <TableCell sx={{ fontSize: "12px", py: "5px", verticalAlign: "middle", width: { xs: "120px", sm: "150px" }, minWidth: { xs: "120px", sm: "150px" } }}>
+        <TableCell sx={{ fontSize: "12px", py: "5px", verticalAlign: "middle", width: { xs: "210px", sm: "250px" }, minWidth: { xs: "210px", sm: "250px" } }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: { xs: "4px", sm: "6px" } }}>
             <Avatar
               src={imageUrl}
@@ -1468,7 +1468,7 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
               {!imageUrl && !isLoading && row.name.charAt(0)}
               {isLoading && <CircularProgress size={16} sx={{ color: "white" }} />}
             </Avatar>
-            <Typography noWrap sx={{ fontSize: "12px", fontWeight: 500, minWidth: 0 }}>
+            <Typography sx={{ fontSize: "12px", fontWeight: 500, whiteSpace: "nowrap" }}>
               {row.name}
             </Typography>
           </Box>
@@ -1679,15 +1679,15 @@ export const EmployeeTypeKpiGrid = ({ allAttendance, loading, onCardClick, locat
                   }}>
                     Service No
                   </TableCell>
-                  <TableCell sx={{
+                  <TableCell align="center" sx={{
                     fontWeight: 700,
                     backgroundColor: "#f0f4ff",
                     color: "#004AAD",
                     fontSize: "12px",
                     py: "8px",
                     borderBottom: "2px solid rgba(0,74,173,0.12)",
-                    minWidth: { xs: "120px", sm: "150px" },
-                    width: { xs: "120px", sm: "150px" },
+                    minWidth: { xs: "210px", sm: "250px" },
+                    width: { xs: "210px", sm: "250px" },
                     whiteSpace: "nowrap",
                   }}>
                     Employee
