@@ -353,7 +353,6 @@ export const GetOTEntered = () => async (dispatch) => {
             dutyOff,
             otEntered,
             otNotEntered: Math.max(0, liveEmp - otEntered ),
-            rawList: data.data.ResultSet,
           },
         },
       });

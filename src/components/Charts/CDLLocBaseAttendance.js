@@ -2337,7 +2337,7 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const handleDivisionSelect = useCallback((div) => {
     setSelectedDivision(div);
     setExpandedRow(null);
-    setSearchTerm("");
+    //setSearchTerm("");
   }, []);
 
   const handleBack = useCallback(() => {

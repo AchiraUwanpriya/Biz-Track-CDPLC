@@ -536,6 +536,7 @@ import Personal from "./layouts/personal/personal";
 import CollectForm from "./layouts/CollectingForm/Dailycollectionsheet";
 import CollectChoice from "./layouts/CollectingForm/CollectChoice";
 import ExecutivePage from './layouts/CollectingForm/ExecutiveData';
+import Subordering from './layouts/sub_ordering/SubOrdering';
 
 // Import all approval component files
 import IwoApp from "./layouts/approvals/IwoApp";
@@ -671,6 +672,7 @@ function App() {
                       <Route element={<Jobs />} path="/jobs" />
                       <Route element={<CollectChoice />} path="/collectChoice" />
                       <Route element={<ExecutivePage />} path="/executive" /> 
+                      <Route element={<Subordering />} path="/subordering" /> 
                       <Route element={<CollectForm />} path="/collectForm" />
                       <Route
                         element={<MaintenancePage />}

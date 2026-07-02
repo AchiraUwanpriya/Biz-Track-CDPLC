@@ -5694,7 +5694,7 @@ const Reservations = () => {
   const reservationData = useSelector((state) => state.loadResDetails);
   const { loading, error } = reservationData || {};
   const loadResDetails = reservationData?.responseBody || [];
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const [currentUserServiceNo, setCurrentUserServiceNo] = useState("");
   const [showOnlyMyReservations, setShowOnlyMyReservations] = useState(false);
@@ -5711,7 +5711,7 @@ const Reservations = () => {
     new Date(new Date().setMonth(new Date().getMonth() - 1))
   );
   const [endDate, setEndDate] = useState(
-    new Date(new Date().setMonth(new Date().getMonth() + 6))
+    new Date(new Date().setMonth(new Date().getMonth() + 3))
   );
   const [caretakerModalOpen, setCaretakerModalOpen] = useState(false);
   const [selectedReservationForCaretaker, setSelectedReservationForCaretaker] = useState(null);

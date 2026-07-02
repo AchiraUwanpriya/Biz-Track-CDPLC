@@ -1490,6 +1490,69 @@ export default function HeaderComponent() {
           ) : (
             <></>
           )}
+
+          {/* Sub Ordering Attendance */}
+          {isComponentIdAvailable("EMOBCE0004") ? (
+            <Grow
+              in={isComponentIdAvailable("EMOBCE0004")}
+              style={{ transformOrigin: "0 0 0" }}
+              {...(isComponentIdAvailable("EMOBCE0004")
+                ? { timeout: 2500 }
+                : {})}
+            >
+              <Grid
+                item
+                xs={4}
+                sx={{
+                  padding: 1,
+                }}
+              >
+                <Card
+                  sx={{
+                    padding: 2,
+                    boxShadow: 0,
+                    borderRadius: 2,
+                    height: 110,
+                  }}
+                >
+                  <CardActionArea
+                    onClick={() => {
+                      navigate("/subordering");
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        height: 90,
+                      }}
+                    >
+                      <img
+                        className="d-block w-50"
+                        src={require("../../assets/icons/attendance.png")}
+                        alt="Sub Ordering"
+                        style={{ opacity: "70%", maxHeight: 70, maxWidth: 70 }}
+                      />
+                      <Typography
+                        align="center"
+                        gutterBottom
+                        fontSize={14}
+                        fontWeight={600}
+                        component="div"
+                        style={{ opacity: "40%" , marginTop: "8px" }}
+                      >
+                        Sub Ordering
+                      </Typography>
+                    </div>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            </Grow>
+          ) : (
+            <></>
+          )}
         </Grid>
       </Box>
     </>
