@@ -210,12 +210,13 @@ const formatTime24 = (time) => {
 
   return (
     <Box sx={{ 
-      maxWidth: 520, 
+      maxWidth: { xs: '100%', sm: 480, md: 520 }, 
       mx: 'auto', 
-      p: 2, 
+      p: { xs: 1, sm: 2 }, 
       bgcolor: '#f5f7fa', 
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      width: '100%'
     }}>
       <Paper elevation={3} sx={{ 
         borderRadius: 4, 
@@ -300,7 +301,8 @@ const formatTime24 = (time) => {
         <Divider />
 
         {/* Attendance Table */}
-        <TableContainer sx={{ maxHeight: 700, bgcolor: '#fafafa' }}>
+        
+        <TableContainer sx={{ maxHeight: 600, overflowY: 'auto', bgcolor: '#fafafa' }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
@@ -309,8 +311,10 @@ const formatTime24 = (time) => {
                   color: '#2623c5', 
                   bgcolor: '#f0f2f5',
                   borderBottom: '2px solid #2623c5',
-                  fontSize: '0.75rem',
-                  py: 1.5
+                  fontSize: '0.7rem',
+                  py: 0.75,
+                  px: 1,
+                  whiteSpace: 'nowrap'
                 }}>
                   DAY
                 </TableCell>
@@ -319,10 +323,12 @@ const formatTime24 = (time) => {
                   color: '#2623c5', 
                   bgcolor: '#f0f2f5',
                   borderBottom: '2px solid #2623c5',
-                  fontSize: '0.75rem',
-                  py: 1.5
+                  fontSize: '0.7rem',
+                  py: 0.75,
+                  px: 1,
+                  whiteSpace: 'nowrap'
                 }}>
-                  <AccessTimeIcon fontSize="small" sx={{ fontSize: 14, mr: 0.5 }} />
+                  <AccessTimeIcon fontSize="small" sx={{ fontSize: 12, mr: 0.5 }} />
                   IN
                 </TableCell>
                 <TableCell sx={{ 
@@ -330,11 +336,12 @@ const formatTime24 = (time) => {
                   color: '#2623c5', 
                   bgcolor: '#f0f2f5',
                   borderBottom: '2px solid #2623c5',
-                  fontSize: '0.75rem',
+                  fontSize: '0.7rem',
                   whiteSpace: 'nowrap',
-                  py: 1.5
+                  py: 0.75,
+                  px: 1
                 }}>
-                  <AccessTimeIcon fontSize="small" sx={{ fontSize: 14, mr: 0.5 }} />
+                  <AccessTimeIcon fontSize="small" sx={{ fontSize: 12, mr: 0.5 }} />
                   OUT
                 </TableCell>
                 <TableCell sx={{ 
@@ -342,21 +349,24 @@ const formatTime24 = (time) => {
                   color: '#2623c5', 
                   bgcolor: '#f0f2f5',
                   borderBottom: '2px solid #2623c5',
-                  fontSize: '0.75rem',
-                  py: 1.5,
+                  fontSize: '0.7rem',
+                  py: 0.75,
+                  px: 1,
+                  whiteSpace: 'nowrap'
                 }}>
-                  ClockNo IN/OUT
+                  Clock IN/OUT
                 </TableCell>
                 <TableCell sx={{ 
                   fontWeight: 700, 
                   color: '#2623c5', 
                   bgcolor: '#f0f2f5',
                   borderBottom: '2px solid #2623c5',
-                  fontSize: '0.75rem',
-                  py: 1.5,
+                  fontSize: '0.7rem',
+                  py: 0.75,
+                  px: 1,
                   whiteSpace: 'nowrap'
                 }}>
-                  <DirectionsCarIcon fontSize="small" sx={{ fontSize: 14, mr: 0.5 }} />
+                  <DirectionsCarIcon fontSize="small" sx={{ fontSize: 12, mr: 0.5 }} />
                   V-IN
                 </TableCell>
                 <TableCell sx={{ 
@@ -364,11 +374,12 @@ const formatTime24 = (time) => {
                   color: '#2623c5', 
                   bgcolor: '#f0f2f5',
                   borderBottom: '2px solid #2623c5',
-                  fontSize: '0.75rem',
-                  py: 1.5,
+                  fontSize: '0.7rem',
+                  py: 0.75,
+                  px: 1,
                   whiteSpace: 'nowrap'
                 }}>
-                  <DirectionsCarIcon fontSize="small" sx={{ fontSize: 14, mr: 0.5 }} />
+                  <DirectionsCarIcon fontSize="small" sx={{ fontSize: 12, mr: 0.5 }} />
                   V-OUT
                 </TableCell>
               </TableRow>
@@ -392,35 +403,33 @@ const formatTime24 = (time) => {
                     hover 
                     sx={getRowSx(row)}
                   >
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Chip 
-                          label={row.day}
-                          size="small"
-                          sx={{
-                            ...getDayChipColor(row),
-                            fontWeight: 700,
-                            fontSize: '0.7rem',
-                            minWidth: 50,
-                            height: 24,
-                            borderRadius: 1
-                          }}
-                        />
-                      </Box>
+                    <TableCell sx={{ py: 0.5, px: 1 }}>
+                      <Chip 
+                        label={row.day}
+                        size="small"
+                        sx={{
+                          ...getDayChipColor(row),
+                          fontWeight: 700,
+                          fontSize: '0.65rem',
+                          minWidth: 44,
+                          height: 20,
+                          borderRadius: 1
+                        }}
+                      />
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.72rem', py: 0.5, px: 1 }}>
                       {row.inTime}
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.72rem', py: 0.5, px: 1 }}>
                       {row.outTime}
                     </TableCell>
-                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.72rem', py: 0.5, px: 1 }}>
                       {row.clock}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.8rem' }}>
+                    <TableCell sx={{ fontSize: '0.72rem', py: 0.5, px: 1 }}>
                       {row.VIn}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.8rem' }}>
+                    <TableCell sx={{ fontSize: '0.72rem', py: 0.5, px: 1 }}>
                       {row.VOut}
                     </TableCell>
                   </TableRow>
