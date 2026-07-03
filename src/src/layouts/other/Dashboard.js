@@ -1648,19 +1648,7 @@ const Dashboard = () => {
           />
 
           {/* ── Date Display ── */}
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#64748b",
-              backgroundColor: "#ffffff",
-              padding: "6px 12px",
-              borderRadius: "20px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-              display: { xs: "none", sm: "block" },
-            }}
-          >
-            {isDataLoading ? "Loading..." : `Data for: ${selectedDate}`}
-          </Typography>
+          
         </Box>
       </Box>
 

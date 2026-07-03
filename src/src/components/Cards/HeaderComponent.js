@@ -1492,11 +1492,11 @@ export default function HeaderComponent() {
           )}
 
           {/* Sub Ordering Attendance */}
-          {isComponentIdAvailable("EMOBCE0004") ? (
+          {isComponentIdAvailable("EMOBCI0014") ? (
             <Grow
-              in={isComponentIdAvailable("EMOBCE0004")}
+              in={isComponentIdAvailable("EMOBCI0014")}
               style={{ transformOrigin: "0 0 0" }}
-              {...(isComponentIdAvailable("EMOBCE0004")
+              {...(isComponentIdAvailable("EMOBCI0014")
                 ? { timeout: 2500 }
                 : {})}
             >
@@ -1543,7 +1543,7 @@ export default function HeaderComponent() {
                         component="div"
                         style={{ opacity: "40%" , marginTop: "8px" }}
                       >
-                        Sub Ordering
+                        Subordinates
                       </Typography>
                     </div>
                   </CardActionArea>

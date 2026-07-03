@@ -2035,9 +2035,6 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
     setCameraError(null);
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        // Browsers refuse camera access entirely on non-HTTPS origins
-        // (except localhost) — this is the most common real-world cause
-        // of a blanket "can't access camera" report after deployment.
         const e = new Error("Camera API unavailable");
         e.name = "NotSupportedError";
         throw e;
@@ -2405,8 +2402,6 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                 sx={{
                   borderRadius: 2,
                   bgcolor: "white",
-                  // Let the selected value truncate gracefully instead of the
-                  // box collapsing to a sliver and showing "St…"
                   "& .MuiSelect-select": {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -2438,10 +2433,6 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
           {/* Scanner viewport – using the new Scanner component */}
           <Box sx={{ p: 1 }}>
             {cameraLoading ? (
-              // Wait for the permission/enumeration probe's getUserMedia call
-              // to fully release the camera before the Scanner starts its own
-              // stream — running both at once is what was causing "can't
-              // access camera" errors on some Android devices.
               <Box
                 sx={{
                   minHeight: "350px",
