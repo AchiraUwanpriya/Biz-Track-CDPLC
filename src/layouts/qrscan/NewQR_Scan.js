@@ -1755,8 +1755,2021 @@
 
 
 
+// import * as React from "react";
+// import { useState, useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { Scanner } from "@yudiel/react-qr-scanner";
+// import Button from "@mui/material/Button";
+// import { styled } from "@mui/material/styles";
+// import Dialog from "@mui/material/Dialog";
+// import DialogTitle from "@mui/material/DialogTitle";
+// import DialogContent from "@mui/material/DialogContent";
+// import DialogActions from "@mui/material/DialogActions";
+// import IconButton from "@mui/material/IconButton";
+// import CloseIcon from "@mui/icons-material/Close";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import DescriptionIcon from "@mui/icons-material/Description";
+// import { Divider } from "@mui/material";
+// import {
+//   Grid,
+//   Box,
+//   TextField,
+//   FormControl,
+//   Autocomplete,
+//   Select,
+//   MenuItem,
+//   InputLabel,
+//   Typography,
+//   Card,
+//   CardContent,
+//   CircularProgress,
+// } from "@mui/material";
+// import SendIcon from "@mui/icons-material/Send";
+// import { SendEWODetails, QRScan, GetEmployeeDetails } from "../../action/QRScan";
+// import QRService from "../../service/QRService";
+// import {
+//   Person,
+//   PhotoCamera,
+//   Monitor,
+//   Keyboard,
+//   Mouse,
+//   LaptopMac,
+//   Laptop,
+//   Memory,
+//   BatteryChargingFull,
+//   DesktopWindows,
+//   Hotel,
+//   ArrowForward,
+//   ArrowBack,
+//   CalendarToday,
+//   EventAvailable,
+//   EventBusy,
+// } from "@mui/icons-material";
+// import { LocalizationProvider } from "@mui/x-date-pickers";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import axios from "axios";
+
+// // Styled Dialog – prevents mobile layout collapse
+// const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+//   "& .MuiDialog-paper": {
+//     display: "flex",
+//     flexDirection: "column",
+//     maxHeight: "calc(100% - 32px)",
+//     width: "calc(100% - 32px)",
+//     maxWidth: "480px",
+//     margin: theme.spacing(2),
+//     borderRadius: "16px",
+//     overflow: "hidden",
+//     boxSizing: "border-box",
+//   },
+//   "& .MuiDialogContent-root": {
+//     padding: theme.spacing(2),
+//     flex: "1 1 auto",
+//     minHeight: 0,
+//     overflowY: "auto",
+//   },
+//   "& .MuiDialogActions-root": {
+//     padding: theme.spacing(2),
+//     flexShrink: 0,
+//   },
+//   // Narrow phones (≤400px wide, e.g. the 360–412px Android range in the screenshots)
+//   [theme.breakpoints.down(400)]: {
+//     "& .MuiDialog-paper": {
+//       width: "calc(100% - 16px)",
+//       margin: theme.spacing(1),
+//       maxHeight: "calc(100% - 16px)",
+//       borderRadius: "12px",
+//     },
+//     "& .MuiDialogContent-root": {
+//       padding: theme.spacing(1.5),
+//     },
+//     "& .MuiDialogActions-root": {
+//       padding: theme.spacing(1.5),
+//     },
+//   },
+// }));
+
+// // ─── Camera helpers ──────────────────────────────────────────────
+// function isBackCamera(device) {
+//   const lower = (device.label || "").toLowerCase();
+//   if (
+//     lower.includes("front") ||
+//     lower.includes("selfie") ||
+//     lower.includes("facing front") ||
+//     lower.includes("user facing") ||
+//     lower.includes("face")
+//   ) return false;
+
+//   if (
+//     lower.includes("back") ||
+//     lower.includes("rear") ||
+//     lower.includes("environment") ||
+//     lower.includes("facing back") ||
+//     lower.includes("wide") ||
+//     lower.includes("macro") ||
+//     lower.includes("tele") ||
+//     lower.includes("ultra") ||
+//     lower.includes("depth")
+//   ) return true;
+
+//   return true;
+// }
+
+// // function getCameraLabel(device, index) {
+// //   const raw = device.label || "";
+// //   if (!raw) return `Back Camera ${index + 1}`;
+
+// //   const lower = raw.toLowerCase();
+// //   if (lower.includes("ultra") && lower.includes("wide")) return "Ultra-Wide";
+// //   if (lower.includes("wide"))   return "Wide";
+// //   if (lower.includes("macro"))  return "Macro";
+// //   if (lower.includes("tele"))   return "Telephoto";
+// //   if (lower.includes("depth"))  return "Depth";
+
+// //   if (
+// //     lower.includes("back") ||
+// //     lower.includes("rear") ||
+// //     lower.includes("environment") ||
+// //     lower.includes("facing back")
+// //   ) return "Standard";
+
+// //   return raw.length > 28 ? raw.substring(0, 28) + "…" : raw;
+// // }
+
+
+// function getCameraLabel(device, index) {
+//   const raw = device.label || "";
+//   const camNo = index + 1;
+
+//   if (!raw) return `Back Camera ${camNo}`;
+
+//   const lower = raw.toLowerCase();
+
+//   if (lower.includes("ultra") && lower.includes("wide"))
+//     return `Ultra-Wide (Camera ${camNo})`;
+
+//   if (lower.includes("wide"))
+//     return `Wide (Camera ${camNo})`;
+
+//   if (lower.includes("macro"))
+//     return `Macro (Camera ${camNo})`;
+
+//   if (lower.includes("tele"))
+//     return `Telephoto (Camera ${camNo})`;
+
+//   if (lower.includes("depth"))
+//     return `Depth (Camera ${camNo})`;
+
+//   if (
+//     lower.includes("back") ||
+//     lower.includes("rear") ||
+//     lower.includes("environment") ||
+//     lower.includes("facing back")
+//   ) {
+//     return `Standard (Camera ${camNo})`;
+//   }
+
+//   return raw.length > 28
+//     ? `${raw.substring(0, 28)}… (${camNo})`
+//     : `${raw} (${camNo})`;
+// }
+
+// function scoreCameraForQR(device) {
+//   const lower = (device.label || "").toLowerCase();
+//   if (lower.includes("ultra"))  return 1;
+//   if (lower.includes("macro"))  return 4;
+//   if (lower.includes("depth"))  return 3;
+//   if (lower.includes("wide"))   return 5;
+//   if (lower.includes("tele"))   return 7;
+
+//   if (
+//     lower.includes("back") ||
+//     lower.includes("rear") ||
+//     lower.includes("environment") ||
+//     lower.includes("facing back")
+//   ) return 10;
+
+//   return 6;
+// }
+
+// function getCameraErrorMessage(err) {
+//   const name = err?.name || "";
+//   switch (name) {
+//     case "NotAllowedError":
+//     case "PermissionDeniedError":
+//       return "Camera permission was denied. Please allow camera access for this site in your browser settings, then tap Scan Again.";
+//     case "NotFoundError":
+//     case "DevicesNotFoundError":
+//       return "No camera was found on this device.";
+//     case "NotReadableError":
+//     case "TrackStartError":
+//       return "The camera is already in use by another app or browser tab. Close it, then tap Scan Again.";
+//     case "OverconstrainedError":
+//     case "ConstraintNotSatisfiedError":
+//       return "That lens is no longer available. Switching back to the default camera.";
+//     case "NotSupportedError":
+//     case "SecurityError":
+//       return "Camera access needs a secure (HTTPS) connection. Please contact support if this keeps happening.";
+//     default:
+//       return "Unable to access the camera. Please check permissions and tap Scan Again.";
+//   }
+// }
+
+// export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
+//   const { responseBody, isButtonVisible } = useSelector((state) => state.qr);
+//   const { data } = useSelector((state) => state.userbyServiceNo);
+//   const { employees, employeeLoading } = useSelector(
+//     (state) => state.employee || { employees: [], employeeLoading: false }
+//   );
+
+//   // ─── Camera state ──────────────────────────────────────────────
+//   const [availableCameras, setAvailableCameras] = useState([]);
+//   const [selectedCameraId, setSelectedCameraId] = useState(null);
+//   const [cameraLoading, setCameraLoading] = useState(false);
+//   const [cameraError, setCameraError] = useState(null);
+
+//   // ─── Scanner / Modal state ────────────────────────────────────
+//   const [qrCode, setQRCode] = useState("");
+//   const [openDetailsModal, setOpenDetailsModal] = useState(false);
+//   const [qrDetails, setQRDetails] = useState(null);
+//   const [issuedBy, setIssuedBy] = useState("");
+//   const [issuedDate, setIssuedDate] = useState(null);
+//   const [isScanning, setIsScanning] = useState(true);
+//   const [hasShownNoReservationMsg, setHasShownNoReservationMsg] = useState(false);
+
+//   // ─── Reservation state ────────────────────────────────────────
+//   const [reservationData, setReservationData] = useState([]);
+//   const [selectedReservation, setSelectedReservation] = useState(null);
+//   const [openReservationModal, setOpenReservationModal] = useState(false);
+//   const [reservationAction, setReservationAction] = useState("");
+//   const [reservationRemarks, setReservationRemarks] = useState("");
+//   const [processing, setProcessing] = useState(false);
+//   const [openReservationListModal, setOpenReservationListModal] = useState(false);
+//   const [filteredReservations, setFilteredReservations] = useState([]);
+
+//   // ─── EWO state ────────────────────────────────────────────────
+//   const [serviceNo, setServiceNo] = useState(data?.[0]?.ServiceNo || "");
+//   const [remarks, setRemarks] = useState("");
+
+//   const dispatch = useDispatch();
+
+//   useEffect(() => {
+//     setIssuedDate(new Date());
+//   }, []);
+
+//   useEffect(() => {
+//     dispatch(GetEmployeeDetails());
+//   }, [dispatch]);
+
+//   useEffect(() => {
+//     if (isOpen) {
+//       enumerateCameras();
+//     }
+//   }, [isOpen]);
+
+//   const enumerateCameras = async () => {
+//     setCameraLoading(true);
+//     setCameraError(null);
+//     try {
+//       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+//         const e = new Error("Camera API unavailable");
+//         e.name = "NotSupportedError";
+//         throw e;
+//       }
+
+//       const tempStream = await navigator.mediaDevices.getUserMedia({
+//         video: { facingMode: "environment" },
+//       });
+//       const defaultBackId =
+//         tempStream.getVideoTracks()[0]?.getSettings()?.deviceId || null;
+//       tempStream.getTracks().forEach((t) => t.stop());
+
+//       const all = (await navigator.mediaDevices.enumerateDevices()).filter(
+//         (d) => d.kind === "videoinput"
+//       );
+
+//       const hasAnyLabel = all.some((d) => d.label && d.label.trim() !== "");
+//       let backCams;
+
+//       if (hasAnyLabel) {
+//         backCams = all.filter(isBackCamera);
+//       } else {
+//         backCams = [];
+//         for (const device of all) {
+//           try {
+//             const s = await navigator.mediaDevices.getUserMedia({
+//               video: { deviceId: { exact: device.deviceId } },
+//             });
+//             const facing = s.getVideoTracks()[0]?.getSettings()?.facingMode;
+//             s.getTracks().forEach((t) => t.stop());
+//             if (facing !== "user") backCams.push(device);
+//           } catch {
+//             // ignore
+//           }
+//         }
+//         if (backCams.length === 0 && defaultBackId) {
+//           const def = all.find((d) => d.deviceId === defaultBackId);
+//           if (def) backCams.push(def);
+//         }
+//       }
+
+//       setAvailableCameras(backCams);
+
+//       setSelectedCameraId((prev) => {
+//         if (prev) return prev;
+//         if (defaultBackId && backCams.find((c) => c.deviceId === defaultBackId)) {
+//           return defaultBackId;
+//         }
+//         const sorted = [...backCams].sort(
+//           (a, b) => scoreCameraForQR(b) - scoreCameraForQR(a)
+//         );
+//         return sorted[0]?.deviceId || null;
+//       });
+//     } catch (err) {
+//       console.warn("Camera enumeration failed:", err);
+//       setSelectedCameraId(null);
+//       setCameraError(getCameraErrorMessage(err));
+//     } finally {
+//       setCameraLoading(false);
+//     }
+//   };
+
+//   const buildVideoConstraints = () => {
+//     if (selectedCameraId) {
+//       return { deviceId: { exact: selectedCameraId } };
+//     }
+//     return { facingMode: "environment" };
+//   };
+
+//   const handleClose = () => {
+//     dispatch({ type: "IS_CLOSE" });
+//     setOpenDetailsModal(false);
+//     setOpenReservationModal(false);
+//     setOpenReservationListModal(false);
+//     setIsScanning(true);
+//     setHasShownNoReservationMsg(false);
+//   };
+
+//   const handleCloseDetailsModal = () => {
+//     setOpenDetailsModal(false);
+//   };
+
+//   const handleCloseReservationModal = () => {
+//     setOpenReservationModal(false);
+//     setSelectedReservation(null);
+//     setReservationRemarks("");
+//     setProcessing(false);
+//   };
+
+//   const handleCloseReservationListModal = () => {
+//     setOpenReservationListModal(false);
+//     setFilteredReservations([]);
+//   };
+
+//   // ─── API calls ─────────────────────────────────────────────────
+//   const markCheckStatus = async (reservationNo, checkStatus) => {
+//     const response = await axios.get(
+//       `/Reservation/MarkCheckStatus?P_RESERVATION_NO=${reservationNo}&P_CHECK_STATUS=${checkStatus}`
+//     );
+//     return response.data;
+//   };
+
+//   const addCaretFeedback = async (reservationNo, caretReport, caretStatus) => {
+//     const response = await axios.get(
+//       `/Reservation/AddCaretFeedback?P_RESERVATION_NO=${reservationNo}&P_CARET_STATUS=${caretStatus}`
+//     );
+//     return response.data;
+//   };
+
+//   const loadReservationData = async (serviceNumber) => {
+//     try {
+//       const response = await QRService.LoadResDetailsByServiceNo(serviceNumber);
+//       if (response.data.StatusCode === 200) {
+//         const all = response.data.ResultSet || [];
+//         setReservationData(all);
+//         return all;
+//       }
+//     } catch (error) {
+//       console.error("Error fetching reservation data:", error);
+//     }
+//     return [];
+//   };
+
+//   const formatDateForComparison = (dateString) => {
+//     if (!dateString) return null;
+//     try {
+//       const date = new Date(dateString);
+//       if (!isNaN(date.getTime())) {
+//         return date.toLocaleDateString("en-US", {
+//           month: "numeric",
+//           day: "numeric",
+//           year: "numeric",
+//         });
+//       }
+//     } catch {
+//       // ignore
+//     }
+//     return null;
+//   };
+
+//   const findMatchingReservation = (reservations, qrPrefix, currentDateString) => {
+//     const matches = [];
+//     reservations.forEach((res) => {
+//       const checkIn = formatDateForComparison(res.Res_Check_In);
+//       const checkOut = formatDateForComparison(res.Res_Check_Out);
+//       const status = res.Res_CheckStatus;
+//       let action = "";
+
+//       if (qrPrefix === "I" && checkIn === currentDateString && !status) {
+//         action = "checkin";
+//       } else if (qrPrefix === "O" && checkOut === currentDateString && status === "I") {
+//         action = "checkout";
+//       } else if (qrPrefix === "B") {
+//         if (checkIn === currentDateString && !status) action = "checkin";
+//         else if (checkOut === currentDateString && status === "I") action = "checkout";
+//       }
+
+//       if (action) matches.push({ ...res, action });
+//     });
+//     return matches;
+//   };
+
+//   const handleConfirmReservationAction = async () => {
+//     if (!selectedReservation) return;
+//     setProcessing(true);
+//     const reservationNo = selectedReservation.Res_no;
+//     const prefix =
+//       qrCode === "NEHBI001" ? "I" : qrCode === "NEHBO001" ? "O" : "B";
+
+//     try {
+//       if (reservationAction === "checkin") {
+//         const r = await markCheckStatus(reservationNo, "I");
+//         if (r?.StatusCode === 200) {
+//           toast.success("Check-in successful!");
+//           handleCloseReservationModal();
+//           handleClose();
+//         } else {
+//           toast.error(r?.Message || "Check-in failed.");
+//         }
+//       } else if (reservationAction === "checkout") {
+//         const r = await markCheckStatus(reservationNo, "O");
+//         if (r?.StatusCode === 200) {
+//           if (prefix === "B") {
+//             const r2 = await addCaretFeedback(
+//               reservationNo,
+//               reservationRemarks || "Checked out",
+//               "B"
+//             );
+//             if (r2?.StatusCode === 200) {
+//               toast.success("Check-out and caret feedback submitted!");
+//             } else {
+//               toast.warning("Check-out successful but caret feedback failed.");
+//             }
+//           } else {
+//             toast.success("Check-out successful!");
+//           }
+//           handleCloseReservationModal();
+//           handleClose();
+//         } else {
+//           toast.error(r?.Message || "Check-out failed.");
+//         }
+//       }
+//     } catch (error) {
+//       toast.error("An error occurred: " + (error.message || "Please try again."));
+//     } finally {
+//       setProcessing(false);
+//     }
+//   };
+
+//   // ─── Scan handler ──────────────────────────────────────────────
+//   const handleScan = async (scanData) => {
+//     if (!scanData || !isScanning) return;
+//     setIsScanning(false);
+
+//     const scannedText = scanData.text.trim();
+//     setQRCode(scannedText);
+
+//     if (
+//       scannedText === "NEHBI001" ||
+//       scannedText === "NEHBO001" ||
+//       scannedText === "NEHBO002"
+//     ) {
+//       const qrPrefix =
+//         scannedText === "NEHBI001" ? "I" : scannedText === "NEHBO001" ? "O" : "B";
+//       const serviceNumber = data?.[0]?.ServiceNo;
+
+//       if (!serviceNumber) {
+//         toast.error("Service number not found");
+//         return;
+//       }
+
+//       const all = await loadReservationData(serviceNumber);
+//       if (all && all.length > 0) {
+//         const today = new Date().toLocaleDateString("en-US", {
+//           month: "numeric",
+//           day: "numeric",
+//           year: "numeric",
+//         });
+//         const matches = findMatchingReservation(all, qrPrefix, today);
+
+//         if (matches.length === 1) {
+//           setReservationAction(matches[0].action);
+//           setSelectedReservation(matches[0]);
+//           setOpenReservationModal(true);
+//         } else if (matches.length > 1) {
+//           setFilteredReservations(matches);
+//           setOpenReservationListModal(true);
+//         } else if (!hasShownNoReservationMsg) {
+//           toast.error("No reservations found for today");
+//           setHasShownNoReservationMsg(true);
+//         }
+//       } else if (!hasShownNoReservationMsg) {
+//         toast.error("No reservations found for this service number");
+//         setHasShownNoReservationMsg(true);
+//       }
+//       return;
+//     }
+
+//     if (/^\d+$/.test(scannedText)) {
+//       dispatch(QRScan(parseInt(scannedText), data[0]?.ServiceNo));
+//       return;
+//     }
+
+//     if (/[A-Za-z]/.test(scannedText)) {
+//       try {
+//         const response = await QRService.GetEWODetails(scannedText);
+//         if (response.data.StatusCode === 200) {
+//           setQRDetails(response.data.ResultSet);
+//           setOpenDetailsModal(true);
+//           dispatch({ type: "IS_CLOSE" });
+//         }
+//       } catch (error) {
+//         console.error("Error fetching QR details:", error);
+//       }
+//     }
+//   };
+
+//   const handleError = (error) => console.error(error);
+
+//   const handleSelectReservation = (reservation) => {
+//     setSelectedReservation(reservation);
+//     setReservationAction(reservation.action);
+//     setOpenReservationListModal(false);
+//     setOpenReservationModal(true);
+//   };
+
+//   const handleSendDoc = () => {
+//     if (responseBody?.EwoNo && serviceNo) {
+//       dispatch(SendEWODetails(responseBody.EwoNo, serviceNo, remarks));
+//       toast.success("Document information submitted successfully!");
+//       handleClose();
+//     } else {
+//       toast.error("Missing required dispatch fields.");
+//     }
+//   };
+
+//   // ─── Render ─────────────────────────────────────────────────────
+//   return (
+//     <div>
+//       {/* ────────────── QR Scanner Modal ────────────────────────── */}
+//       <BootstrapDialog
+//         onClose={handleClose}
+//         aria-labelledby="scanner-dialog-title"
+//         open={isOpen}
+//       >
+//         <DialogTitle
+//           id="scanner-dialog-title"
+//           sx={{
+//             m: 0,
+//             p: 2,
+//             display: "flex",
+//             justifyContent: "space-between",
+//             alignItems: "center",
+//             flexShrink: 0,
+//           }}
+//         >
+//           <Typography variant="h6" sx={{ fontWeight: 600 }}>
+//             Scan Your QR Code
+//           </Typography>
+//           <IconButton
+//             aria-label="close"
+//             onClick={handleClose}
+//             sx={{ color: (theme) => theme.palette.grey[500] }}
+//           >
+//             <CloseIcon />
+//           </IconButton>
+//         </DialogTitle>
+
+//         <DialogContent dividers sx={{ p: 0 }}>
+//           {/* Camera selector */}
+//           <Box
+//             sx={{
+//               px: { xs: 1.5, sm: 2 },
+//               pt: 1.5,
+//               pb: 1,
+//               bgcolor: "#f8fafc",
+//               borderBottom: "1px solid #e2e8f0",
+//               display: "flex",
+//               alignItems: "center",
+//               gap: 1,
+//               minWidth: 0,
+//             }}
+//           >
+//             <PhotoCamera
+//               sx={{ color: "#64748b", fontSize: 20, flexShrink: 0 }}
+//             />
+//             <FormControl size="small" fullWidth sx={{ minWidth: 0 }}>
+//               <InputLabel id="camera-select-label">Lens</InputLabel>
+//               <Select
+//                 labelId="camera-select-label"
+//                 label="Lens"
+//                 value={
+//                   cameraLoading
+//                     ? "__loading__"
+//                     : selectedCameraId || "__default__"
+//                 }
+//                 onChange={(e) => {
+//                   const val = e.target.value;
+//                   if (val === "__loading__" || val === "__default__") return;
+//                   setSelectedCameraId(val);
+//                   setIsScanning(true);
+//                   setCameraError(null);
+//                 }}
+//                 disabled={cameraLoading}
+//                 sx={{
+//                   borderRadius: 2,
+//                   bgcolor: "white",
+//                   "& .MuiSelect-select": {
+//                     overflow: "hidden",
+//                     textOverflow: "ellipsis",
+//                     whiteSpace: "nowrap",
+//                     minWidth: 0,
+//                   },
+//                 }}
+//                 MenuProps={{
+//                   PaperProps: { style: { maxWidth: "90vw" } },
+//                 }}
+//               >
+//                 {cameraLoading && (
+//                   <MenuItem value="__loading__" disabled>
+//                     Detecting lenses…
+//                   </MenuItem>
+//                 )}
+//                 {!cameraLoading && availableCameras.length === 0 && (
+//                   <MenuItem value="__default__">Default (Rear Camera)</MenuItem>
+//                 )}
+//                 {availableCameras.map((cam, idx) => (
+//                   <MenuItem key={cam.deviceId} value={cam.deviceId}>
+//                     {getCameraLabel(cam, idx)}
+//                   </MenuItem>
+//                 ))}
+//               </Select>
+//             </FormControl>
+//           </Box>
+
+//           {/* Scanner viewport – using the new Scanner component */}
+//           <Box sx={{ p: 1 }}>
+//             {cameraLoading ? (
+//               <Box
+//                 sx={{
+//                   minHeight: "350px",
+//                   display: "flex",
+//                   flexDirection: "column",
+//                   alignItems: "center",
+//                   justifyContent: "center",
+//                   gap: 1.5,
+//                 }}
+//               >
+//                 <CircularProgress size={32} />
+//                 <Typography variant="body2" color="text.secondary">
+//                   Preparing camera…
+//                 </Typography>
+//               </Box>
+//             ) : cameraError ? (
+//               <Box
+//                 sx={{
+//                   minHeight: "350px",
+//                   display: "flex",
+//                   flexDirection: "column",
+//                   alignItems: "center",
+//                   justifyContent: "center",
+//                   gap: 2,
+//                   px: 3,
+//                   textAlign: "center",
+//                 }}
+//               >
+//                 <Typography variant="body2" sx={{ color: "#b91c1c" }}>
+//                   {cameraError}
+//                 </Typography>
+//                 <Button
+//                   variant="outlined"
+//                   size="small"
+//                   onClick={enumerateCameras}
+//                   sx={{ textTransform: "none", borderRadius: 2 }}
+//                 >
+//                   Try Again
+//                 </Button>
+//               </Box>
+//             ) : (
+//               <Scanner
+//                 key={selectedCameraId || "default"}
+//                 onScan={(detectedCodes) => {
+//                   if (detectedCodes && detectedCodes.length > 0) {
+//                     handleScan({ text: detectedCodes[0].rawValue });
+//                   }
+//                 }}
+//                 onError={(error) => {
+//                   console.error("Scanner error:", error);
+//                   const message = getCameraErrorMessage(error);
+//                   toast.error(message);
+//                   // A specific lens can become invalid (unplugged/OS revoked
+//                   // it) — fall back to the default camera instead of leaving
+//                   // the view dead.
+//                   if (
+//                     selectedCameraId &&
+//                     (error?.name === "OverconstrainedError" ||
+//                       error?.name === "NotReadableError")
+//                   ) {
+//                     setSelectedCameraId(null);
+//                   } else {
+//                     setCameraError(message);
+//                   }
+//                 }}
+//                 formats={["qr_code"]}
+//                 constraints={{
+//                   ...buildVideoConstraints(),
+//                   advanced: [{ focusMode: "continuous" }],
+//                 }}
+//                 paused={!isScanning}
+//                 components={{ finder: true, torch: false, zoom: false, onOff: false, audio: false }}
+//                 styles={{ container: { width: "100%", minHeight: "350px" }, finderBorder: 3 }}
+//               />
+//             )}
+//           </Box>
+//         </DialogContent>
+
+//         <DialogActions
+//           sx={{
+//             p: 2,
+//             display: "flex",
+//             flexDirection: "row",
+//             gap: 1.5,
+//             flexWrap: "nowrap",
+//           }}
+//         >
+//           <Button
+//             variant="outlined"
+//             onClick={() => {
+//               setIsScanning(true);
+//               setHasShownNoReservationMsg(false);
+//               if (cameraError) {
+//                 enumerateCameras();
+//               }
+//             }}
+//             fullWidth
+//             sx={{
+//               textTransform: "none",
+//               borderRadius: 2,
+//               minHeight: "44px",
+//               height: "auto",
+//               lineHeight: 1.3,
+//               px: 1,
+//               fontSize: { xs: "0.8rem", sm: "0.875rem" },
+//             }}
+//           >
+//             Scan Again
+//           </Button>
+//           <Button
+//             color="inherit"
+//             variant="contained"
+//             onClick={handleClose}
+//             fullWidth
+//             sx={{
+//               textTransform: "none",
+//               borderRadius: 2,
+//               minHeight: "44px",
+//               height: "auto",
+//               lineHeight: 1.3,
+//               px: 1,
+//               fontSize: { xs: "0.8rem", sm: "0.875rem" },
+//               bgcolor: "#cbd5e1",
+//               "&:hover": { bgcolor: "#94a3b8" },
+//             }}
+//           >
+//             Close
+//           </Button>
+//         </DialogActions>
+//       </BootstrapDialog>
+
+//       {/* ────────────── EWO Details Modal ───────────────────────── */}
+//       <BootstrapDialog
+//         onClose={handleClose}
+//         aria-labelledby="ewo-details-title"
+//         open={isOpenDetailScreen}
+//       >
+//         {/* Header – Blue background with icon and EWO No */}
+//         <Box
+//           sx={{
+//             backgroundColor: "#1976d2",
+//             px: { xs: 2, sm: 3 },
+//             py: 2,
+//             display: "flex",
+//             alignItems: "center",
+//             justifyContent: "space-between",
+//             gap: 1,
+//             flexShrink: 0,
+//           }}
+//         >
+//           <Box
+//             sx={{
+//               display: "flex",
+//               alignItems: "center",
+//               gap: 1.5,
+//               minWidth: 0,
+//               flex: 1,
+//             }}
+//           >
+//             <Box
+//               sx={{
+//                 bgcolor: "rgba(255,255,255,0.2)",
+//                 p: 1,
+//                 borderRadius: 2,
+//                 display: "flex",
+//                 flexShrink: 0,
+//               }}
+//             >
+//               <DescriptionIcon sx={{ color: "white" }} />
+//             </Box>
+//             <Box sx={{ minWidth: 0 }}>
+//               <Typography
+//                 variant="h6"
+//                 sx={{ color: "white", fontWeight: 600, whiteSpace: "nowrap" }}
+//               >
+//                 EWO Details
+//               </Typography>
+//               <Typography
+//                 variant="body2"
+//                 sx={{
+//                   color: "rgba(255,255,255,0.8)",
+//                   whiteSpace: "nowrap",
+//                   overflow: "hidden",
+//                   textOverflow: "ellipsis",
+//                 }}
+//               >
+//                 EWO No: {responseBody?.EwoNo || "N/A"}
+//               </Typography>
+//             </Box>
+//           </Box>
+//           <IconButton
+//             onClick={handleClose}
+//             sx={{ color: "white", flexShrink: 0 }}
+//           >
+//             <CloseIcon />
+//           </IconButton>
+//         </Box>
+
+//         {/* Content */}
+//         <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+//           {/* Status badge – yellow with checkmark */}
+//           <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+//             <Box
+//               sx={{
+//                 px: 3,
+//                 py: 1.5,
+//                 borderRadius: "24px",
+//                 display: "flex",
+//                 alignItems: "center",
+//                 gap: 1.5,
+//                 bgcolor: responseBody?.StatusBckcolor || "#fef08a",
+//                 color: responseBody?.StatusTxtcolor || "#854d0e",
+//                 border: "1px solid",
+//                 borderColor: responseBody?.StatusBckcolor || "#fde68a",
+//                 boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+//               }}
+//             >
+//               <CheckCircleIcon sx={{ fontSize: 20 }} />
+//               <Typography variant="subtitle1" fontWeight={600}>
+//                 {responseBody?.EwoStatus || "Forwarded for Costing"}
+//               </Typography>
+//             </Box>
+//           </Box>
+
+//           {/* Financial Summary – two cards */}
+//           <Box
+//             sx={{
+//               background: "#f8fafc",
+//               borderRadius: 3,
+//               p: 2.5,
+//               mb: 3,
+//               border: "1px solid #e2e8f0",
+//             }}
+//           >
+//             <Typography
+//               variant="caption"
+//               sx={{
+//                 color: "#64748b",
+//                 fontWeight: 600,
+//                 textTransform: "uppercase",
+//                 letterSpacing: 1,
+//                 display: "block",
+//                 mb: 2,
+//               }}
+//             >
+//               FINANCIAL SUMMARY
+//             </Typography>
+//             <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+//               <Grid item xs={6}>
+//                 <Box
+//                   sx={{
+//                     bgcolor: "white",
+//                     borderRadius: 2,
+//                     p: { xs: 1, sm: 1.5 },
+//                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+//                     textAlign: "center",
+//                     minWidth: 0,
+//                   }}
+//                 >
+//                   <Typography
+//                     variant="caption"
+//                     color="text.secondary"
+//                     display="block"
+//                   >
+//                     Estimated Amount
+//                   </Typography>
+//                   <Typography
+//                     variant="h6"
+//                     fontWeight={700}
+//                     color="text.primary"
+//                     sx={{
+//                       fontSize: { xs: "1rem", sm: "1.25rem" },
+//                       overflow: "hidden",
+//                       textOverflow: "ellipsis",
+//                     }}
+//                   >
+//                     {responseBody?.EstimatedAmount || "0.00"}
+//                   </Typography>
+//                 </Box>
+//               </Grid>
+//               <Grid item xs={6}>
+//                 <Box
+//                   sx={{
+//                     bgcolor: "white",
+//                     borderRadius: 2,
+//                     p: { xs: 1, sm: 1.5 },
+//                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+//                     textAlign: "center",
+//                     minWidth: 0,
+//                   }}
+//                 >
+//                   <Typography
+//                     variant="caption"
+//                     color="text.secondary"
+//                     display="block"
+//                   >
+//                     Billed Amount
+//                   </Typography>
+//                   <Typography
+//                     variant="h6"
+//                     fontWeight={700}
+//                     sx={{
+//                       color: "#059669",
+//                       fontSize: { xs: "1rem", sm: "1.25rem" },
+//                       overflow: "hidden",
+//                       textOverflow: "ellipsis",
+//                     }}
+//                   >
+//                     {responseBody?.BilledAmount || "0.00"}
+//                   </Typography>
+//                 </Box>
+//               </Grid>
+//             </Grid>
+//           </Box>
+
+//           {/* Personnel */}
+//           <Box sx={{ mb: 3 }}>
+//             <Typography
+//               variant="caption"
+//               sx={{
+//                 color: "#64748b",
+//                 fontWeight: 600,
+//                 textTransform: "uppercase",
+//                 letterSpacing: 1,
+//                 display: "block",
+//                 mb: 1.5,
+//               }}
+//             >
+//               PERSONNEL
+//             </Typography>
+//             {[
+//               {
+//                 label: "Authorized By",
+//                 value:
+//                   responseBody?.AuthorizeBy ||
+//                   responseBody?.AuthorizePerson ||
+//                   "N/A",
+//               },
+//               {
+//                 label: "Approved By",
+//                 value: responseBody?.ApprovedBy || "N/A",
+//               },
+//               {
+//                 label: "Evaluated By",
+//                 value: responseBody?.EvaluationBy || "N/A",
+//               },
+//             ].map((item, index) => (
+//               <Box
+//                 key={index}
+//                 sx={{
+//                   display: "flex",
+//                   justifyContent: "space-between",
+//                   alignItems: "center",
+//                   py: 1.5,
+//                   borderBottom: index < 2 ? "1px solid #f0f0f0" : "none",
+//                 }}
+//               >
+//                 <Typography variant="body2" color="text.secondary" fontWeight={500}>
+//                   {item.label}
+//                 </Typography>
+//                 <Typography
+//                   variant="body2"
+//                   fontWeight={500}
+//                   sx={{ textAlign: "right" }}
+//                 >
+//                   {item.value}
+//                 </Typography>
+//               </Box>
+//             ))}
+//           </Box>
+
+//           {/* Divider with RECEIPT DETAILS */}
+//           <Box sx={{ position: "relative", my: 3 }}>
+//             <Divider sx={{ borderStyle: "dashed", borderColor: "#e2e8f0" }} />
+//             <Typography
+//               variant="caption"
+//               sx={{
+//                 position: "absolute",
+//                 top: "50%",
+//                 left: "50%",
+//                 transform: "translate(-50%, -50%)",
+//                 bgcolor: "white",
+//                 px: 2,
+//                 color: "#94a3b8",
+//                 textTransform: "uppercase",
+//                 fontWeight: 500,
+//                 letterSpacing: 0.5,
+//               }}
+//             >
+//               RECEIPT DETAILS
+//             </Typography>
+//           </Box>
+
+//           {/* Receiver info – blue box */}
+//           <Box
+//             sx={{
+//               bgcolor: "#eff6ff",
+//               borderRadius: 3,
+//               p: 2,
+//               mb: 3,
+//               border: "1px solid #bfdbfe",
+//             }}
+//           >
+//             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1.5 }}>
+//               <Box
+//                 sx={{
+//                   bgcolor: "#dbeafe",
+//                   p: 1,
+//                   borderRadius: "50%",
+//                   display: "flex",
+//                 }}
+//               >
+//                 <Person sx={{ color: "#2563eb", fontSize: 20 }} />
+//               </Box>
+//               <Box>
+//                 <Typography variant="caption" sx={{ color: "#2563eb", fontWeight: 500 }}>
+//                   Received By
+//                 </Typography>
+//                 <Typography variant="body1" fontWeight={600}>
+//                   {data?.[0]?.ReportName || "N/A"}
+//                 </Typography>
+//               </Box>
+//             </Box>
+//             <Box sx={{ bgcolor: "white", borderRadius: 2, px: 2, py: 1.5 }}>
+//               <Typography variant="caption" color="text.secondary" display="block">
+//                 Service Number
+//               </Typography>
+//               <Typography
+//                 variant="body2"
+//                 fontWeight={500}
+//                 sx={{ fontFamily: "monospace" }}
+//               >
+//                 {data?.[0]?.ServiceNo || "N/A"}
+//               </Typography>
+//             </Box>
+//           </Box>
+
+//           {/* Issued By */}
+//           <FormControl fullWidth sx={{ mb: 2.5 }}>
+//             <Autocomplete
+//               options={employees || []}
+//               getOptionLabel={(option) =>
+//                 `${option.EmpName} (${option.ServiceNo})`
+//               }
+//               value={
+//                 employees?.find((emp) => emp.ServiceNo === serviceNo) || null
+//               }
+//               onChange={(event, newValue) => {
+//                 setIssuedBy(newValue ? newValue.EmpName : "");
+//                 setServiceNo(newValue ? newValue.ServiceNo : "");
+//               }}
+//               renderInput={(params) => (
+//                 <TextField
+//                   {...params}
+//                   label="Issued By"
+//                   variant="outlined"
+//                   fullWidth
+//                   sx={{
+//                     "& .MuiOutlinedInput-root": {
+//                       borderRadius: 2,
+//                     },
+//                   }}
+//                 />
+//               )}
+//               renderOption={(props, option) => (
+//                 <li {...props}>
+//                   <Box
+//                     sx={{
+//                       display: "flex",
+//                       justifyContent: "space-between",
+//                       width: "100%",
+//                     }}
+//                   >
+//                     <Typography fontWeight={500}>{option.EmpName}</Typography>
+//                     <Typography variant="body2" color="text.secondary">
+//                       {option.ServiceNo}
+//                     </Typography>
+//                   </Box>
+//                 </li>
+//               )}
+//               disabled={employeeLoading}
+//               loading={employeeLoading}
+//               noOptionsText={employeeLoading ? "Loading..." : "No employees found"}
+//               disablePortal
+//             />
+//           </FormControl>
+
+//           {/* Remarks */}
+//           <TextField
+//             label="Remarks"
+//             fullWidth
+//             multiline
+//             rows={2}
+//             value={remarks}
+//             onChange={(e) => setRemarks(e.target.value)}
+//             sx={{
+//               mb: 2.5,
+//               "& .MuiOutlinedInput-root": { borderRadius: 2 },
+//             }}
+//           />
+
+//           {/* Issued Date */}
+//           <LocalizationProvider dateAdapter={AdapterDateFns}>
+//             <DateTimePicker
+//               label="Issued Date"
+//               value={issuedDate}
+//               onChange={(newValue) => setIssuedDate(newValue)}
+//               renderInput={(params) => (
+//                 <TextField
+//                   {...params}
+//                   fullWidth
+//                   sx={{
+//                     "& .MuiOutlinedInput-root": {
+//                       borderRadius: 2,
+//                     },
+//                   }}
+//                 />
+//               )}
+//             />
+//           </LocalizationProvider>
+//         </DialogContent>
+
+//         {/* Footer actions – Close on left, Send Doc on right */}
+//         <Box
+//           sx={{
+//             px: { xs: 2, sm: 3 },
+//             py: 2,
+//             bgcolor: "#ffffff",
+//             borderTop: "1px solid #e2e8f0",
+//             display: "flex",
+//             alignItems: "stretch",
+//             gap: 1.5,
+//             flexShrink: 0,
+//           }}
+//         >
+//           <Button
+//             variant="outlined"
+//             startIcon={<CloseIcon />}
+//             onClick={handleClose}
+//             fullWidth
+//             sx={{
+//               borderRadius: 2,
+//               height: "48px",
+//               minHeight: "48px",
+//               px: 2,
+//               textTransform: "none",
+//               fontWeight: 600,
+//               whiteSpace: "nowrap",
+//               flexDirection: "row",
+//               borderColor: "#cbd5e1",
+//               color: "#475569",
+//               "& .MuiButton-startIcon": { marginRight: 0.75 },
+//               "&:hover": {
+//                 borderColor: "#94a3b8",
+//                 backgroundColor: "#f8fafc",
+//               },
+//             }}
+//           >
+//             Close
+//           </Button>
+//           {isButtonVisible && (
+//             <Button
+//               variant="contained"
+//               endIcon={<SendIcon />}
+//               onClick={handleSendDoc}
+//               fullWidth
+//               sx={{
+//                 borderRadius: 2,
+//                 height: "48px",
+//                 minHeight: "48px",
+//                 px: 2,
+//                 textTransform: "none",
+//                 fontWeight: 600,
+//                 whiteSpace: "nowrap",
+//                 flexDirection: "row",
+//                 backgroundColor: "#1976d2",
+//                 boxShadow: "0 4px 14px rgba(25, 118, 210, 0.3)",
+//                 "& .MuiButton-endIcon": { marginLeft: 0.75 },
+//                 "&:hover": {
+//                   backgroundColor: "#1565c0",
+//                   boxShadow: "0 4px 20px rgba(25, 118, 210, 0.4)",
+//                 },
+//               }}
+//             >
+//               Send Doc
+//             </Button>
+//           )}
+//         </Box>
+//       </BootstrapDialog>
+
+//       {/* ────────────── Reservation Action Modal ────────────────── */}
+//       <BootstrapDialog
+//         onClose={handleCloseReservationModal}
+//         open={openReservationModal}
+//       >
+//         <DialogTitle
+//           sx={{
+//             m: 0,
+//             p: 2,
+//             display: "flex",
+//             justifyContent: "space-between",
+//             alignItems: "center",
+//             gap: 1,
+//           }}
+//         >
+//           <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+//             {reservationAction === "checkin" ? (
+//               <ArrowForward sx={{ color: "#4caf50", flexShrink: 0 }} />
+//             ) : (
+//               <ArrowBack sx={{ color: "#f44336", flexShrink: 0 }} />
+//             )}
+//             <Typography
+//               variant="h6"
+//               sx={{ fontWeight: 600, fontSize: { xs: "1rem", sm: "1.25rem" } }}
+//             >
+//               {reservationAction === "checkin" ? "Check In" : "Check Out"} – Reservation
+//             </Typography>
+//           </Box>
+//           <IconButton
+//             aria-label="close"
+//             onClick={handleCloseReservationModal}
+//             sx={{ color: (theme) => theme.palette.grey[500], flexShrink: 0 }}
+//           >
+//             <CloseIcon />
+//           </IconButton>
+//         </DialogTitle>
+//         <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
+//           {selectedReservation && (
+//             <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+//               {/* Reservation Summary Card */}
+//               <Grid item xs={12}>
+//                 <Card
+//                   sx={{
+//                     background:
+//                       reservationAction === "checkin"
+//                         ? "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)"
+//                         : "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+//                     borderRadius: 3,
+//                     border:
+//                       reservationAction === "checkin"
+//                         ? "1px solid #a5d6a7"
+//                         : "1px solid #ef9a9a",
+//                   }}
+//                 >
+//                   <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+//                     <Box
+//                       sx={{
+//                         display: "flex",
+//                         alignItems: "center",
+//                         justifyContent: "space-between",
+//                         gap: 1,
+//                         mb: 2,
+//                         flexWrap: "wrap",
+//                       }}
+//                     >
+//                       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
+//                         <Hotel
+//                           sx={{
+//                             fontSize: { xs: 30, sm: 40 },
+//                             color: reservationAction === "checkin" ? "#388e3c" : "#d32f2f",
+//                             flexShrink: 0,
+//                           }}
+//                         />
+//                         <Typography
+//                           variant="h6"
+//                           fontWeight={700}
+//                           sx={{ fontSize: { xs: "1rem", sm: "1.25rem" }, wordBreak: "break-word" }}
+//                         >
+//                           Reservation #{selectedReservation.Res_no}
+//                         </Typography>
+//                       </Box>
+//                       <Box
+//                         sx={{
+//                           bgcolor: reservationAction === "checkin" ? "#4caf50" : "#f44336",
+//                           color: "white",
+//                           px: 1.5,
+//                           py: 0.5,
+//                           borderRadius: "20px",
+//                           fontWeight: 600,
+//                           fontSize: "0.75rem",
+//                           whiteSpace: "nowrap",
+//                         }}
+//                       >
+//                         {reservationAction === "checkin" ? "CHECK IN" : "CHECK OUT"}
+//                       </Box>
+//                     </Box>
+
+//                     <Divider sx={{ my: 1.5 }} />
+
+//                     <Grid container spacing={1.5}>
+//                       <Grid item xs={6}>
+//                         <Typography variant="caption" color="text.secondary" fontWeight={500} display="block">
+//                           Service No
+//                         </Typography>
+//                         <Typography variant="body2" fontWeight={600} sx={{ wordBreak: "break-word" }}>
+//                           {selectedReservation.Res_Service_no || "N/A"}
+//                         </Typography>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Typography variant="caption" color="text.secondary" fontWeight={500} display="block">
+//                           Bungalow
+//                         </Typography>
+//                         <Typography variant="body2" fontWeight={600} sx={{ wordBreak: "break-word" }}>
+//                           {selectedReservation.Res_Bang_Id === "1"
+//                             ? "Main Bungalow"
+//                             : selectedReservation.Res_Bang_Id === "2"
+//                             ? "Lower Garden Suite"
+//                             : "N/A"}
+//                         </Typography>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Typography variant="caption" color="text.secondary" fontWeight={500} display="block">
+//                           Check-in Date
+//                         </Typography>
+//                         <Typography variant="body2" fontWeight={600}>
+//                           {selectedReservation.Res_Check_In
+//                             ? new Date(selectedReservation.Res_Check_In).toLocaleDateString()
+//                             : "N/A"}
+//                         </Typography>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Typography variant="caption" color="text.secondary" fontWeight={500} display="block">
+//                           Check-out Date
+//                         </Typography>
+//                         <Typography variant="body2" fontWeight={600}>
+//                           {selectedReservation.Res_Check_Out
+//                             ? new Date(selectedReservation.Res_Check_Out).toLocaleDateString()
+//                             : "N/A"}
+//                         </Typography>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Typography variant="caption" color="text.secondary" fontWeight={500} display="block">
+//                           Adults
+//                         </Typography>
+//                         <Typography variant="body2" fontWeight={600}>
+//                           {selectedReservation.Res_AdultCount || "0"}
+//                         </Typography>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Typography variant="caption" color="text.secondary" fontWeight={500} display="block">
+//                           Children
+//                         </Typography>
+//                         <Typography variant="body2" fontWeight={600}>
+//                           {selectedReservation.Res_ChildCount || "0"}
+//                         </Typography>
+//                       </Grid>
+//                     </Grid>
+//                   </CardContent>
+//                 </Card>
+//               </Grid>
+
+//               {/* Current Date Display */}
+//               <Grid item xs={12}>
+//                 <Box
+//                   sx={{
+//                     bgcolor: "#e3f2fd",
+//                     p: { xs: 1.5, sm: 2 },
+//                     borderRadius: 2,
+//                     display: "flex",
+//                     alignItems: "center",
+//                     justifyContent: "space-between",
+//                     gap: 1,
+//                     flexWrap: "wrap",
+//                   }}
+//                 >
+//                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+//                     <CalendarToday sx={{ color: "#1976d2", fontSize: 20 }} />
+//                     <Typography variant="body2" fontWeight={600}>
+//                       {reservationAction === "checkin" ? "Check-in Date" : "Check-out Date"}
+//                     </Typography>
+//                   </Box>
+//                   <Typography variant="body1" fontWeight={700} color="primary" sx={{ fontSize: { xs: "0.9rem", sm: "1.1rem" } }}>
+//                     {new Date().toLocaleDateString("en-US", {
+//                       year: "numeric",
+//                       month: "long",
+//                       day: "numeric",
+//                     })}
+//                   </Typography>
+//                 </Box>
+//               </Grid>
+
+//               {reservationAction === "checkout" && (
+//                 <Grid item xs={12}>
+//                   <TextField
+//                     label="Caret/Feedback Remarks"
+//                     fullWidth
+//                     multiline
+//                     rows={2}
+//                     value={reservationRemarks}
+//                     onChange={(e) => setReservationRemarks(e.target.value)}
+//                     sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+//                   />
+//                 </Grid>
+//               )}
+//             </Grid>
+//           )}
+//         </DialogContent>
+//         <DialogActions
+//           sx={{ p: 2, display: "flex", flexDirection: "row", gap: 1.5 }}
+//         >
+//           <Button
+//             variant="outlined"
+//             onClick={handleCloseReservationModal}
+//             disabled={processing}
+//             fullWidth
+//             sx={{ textTransform: "none", borderRadius: 2, height: "44px" }}
+//           >
+//             Cancel
+//           </Button>
+//           <Button
+//             variant="contained"
+//             onClick={handleConfirmReservationAction}
+//             disabled={processing}
+//             fullWidth
+//             sx={{
+//               textTransform: "none",
+//               borderRadius: 2,
+//               height: "44px",
+//               bgcolor: reservationAction === "checkin" ? "#4caf50" : "#f44336",
+//               "&:hover": {
+//                 bgcolor: reservationAction === "checkin" ? "#388e3c" : "#d32f2f",
+//               },
+//               "&.Mui-disabled": {
+//                 bgcolor: reservationAction === "checkin" ? "#a5d6a7" : "#ef9a9a",
+//               },
+//             }}
+//           >
+//             {processing
+//               ? "Processing…"
+//               : reservationAction === "checkin"
+//               ? "Confirm Check In"
+//               : "Confirm Check Out"}
+//           </Button>
+//         </DialogActions>
+//       </BootstrapDialog>
+
+//       {/* ────────────── Multiple Reservations List ──────────────── */}
+//       <BootstrapDialog
+//         onClose={handleCloseReservationListModal}
+//         open={openReservationListModal}
+//       >
+//         <DialogTitle
+//           sx={{
+//             m: 0,
+//             p: 2,
+//             display: "flex",
+//             justifyContent: "space-between",
+//             alignItems: "center",
+//             gap: 1,
+//           }}
+//         >
+//           <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+//             <Hotel sx={{ color: "#2196f3", flexShrink: 0 }} />
+//             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: { xs: "1rem", sm: "1.25rem" } }}>
+//               Select Reservation
+//             </Typography>
+//           </Box>
+//           <IconButton
+//             aria-label="close"
+//             onClick={handleCloseReservationListModal}
+//             sx={{ color: (theme) => theme.palette.grey[500], flexShrink: 0 }}
+//           >
+//             <CloseIcon />
+//           </IconButton>
+//         </DialogTitle>
+//         <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
+//           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+//             Multiple reservations found for today. Please select one:
+//           </Typography>
+
+//           <Grid container spacing={1.5}>
+//             {filteredReservations.map((res, index) => (
+//               <Grid item xs={12} key={res.Res_no || index}>
+//                 <Card
+//                   onClick={() => handleSelectReservation(res)}
+//                   sx={{
+//                     cursor: "pointer",
+//                     transition: "all 0.2s",
+//                     border: "2px solid",
+//                     borderColor: res.action === "checkin" ? "#c8e6c9" : "#ffcdd2",
+//                     "&:hover": {
+//                       boxShadow: 3,
+//                       borderColor: res.action === "checkin" ? "#4caf50" : "#f44336",
+//                     },
+//                   }}
+//                 >
+//                   <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+//                     <Box
+//                       sx={{
+//                         display: "flex",
+//                         alignItems: "center",
+//                         justifyContent: "space-between",
+//                         gap: 1,
+//                         flexWrap: "wrap",
+//                       }}
+//                     >
+//                       <Box sx={{ minWidth: 0 }}>
+//                         <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: { xs: "0.95rem", sm: "1.1rem" } }}>
+//                           Reservation #{res.Res_no}
+//                         </Typography>
+//                         <Typography variant="body2" color="text.secondary">
+//                           Service No: {res.Res_Service_no || "N/A"}
+//                         </Typography>
+//                       </Box>
+//                       <Box
+//                         sx={{
+//                           bgcolor: res.action === "checkin" ? "#4caf50" : "#f44336",
+//                           color: "white",
+//                           px: 1.5,
+//                           py: 0.5,
+//                           borderRadius: "20px",
+//                           fontWeight: 600,
+//                           fontSize: "0.75rem",
+//                           display: "flex",
+//                           alignItems: "center",
+//                           gap: 0.5,
+//                           whiteSpace: "nowrap",
+//                         }}
+//                       >
+//                         {res.action === "checkin" ? (
+//                           <>
+//                             <ArrowForward sx={{ fontSize: 14 }} /> Check In
+//                           </>
+//                         ) : (
+//                           <>
+//                             <ArrowBack sx={{ fontSize: 14 }} /> Check Out
+//                           </>
+//                         )}
+//                       </Box>
+//                     </Box>
+
+//                     <Divider sx={{ my: 1.5 }} />
+
+//                     <Grid container spacing={1.5}>
+//                       <Grid item xs={6}>
+//                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+//                           <EventAvailable sx={{ color: "#4caf50", fontSize: 16, flexShrink: 0 }} />
+//                           <Box sx={{ minWidth: 0 }}>
+//                             <Typography variant="caption" color="text.secondary" display="block">
+//                               Check-in
+//                             </Typography>
+//                             <Typography variant="body2" fontWeight={500}>
+//                               {res.Res_Check_In
+//                                 ? new Date(res.Res_Check_In).toLocaleDateString()
+//                                 : "N/A"}
+//                             </Typography>
+//                           </Box>
+//                         </Box>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+//                           <EventBusy sx={{ color: "#f44336", fontSize: 16, flexShrink: 0 }} />
+//                           <Box sx={{ minWidth: 0 }}>
+//                             <Typography variant="caption" color="text.secondary" display="block">
+//                               Check-out
+//                             </Typography>
+//                             <Typography variant="body2" fontWeight={500}>
+//                               {res.Res_Check_Out
+//                                 ? new Date(res.Res_Check_Out).toLocaleDateString()
+//                                 : "N/A"}
+//                             </Typography>
+//                           </Box>
+//                         </Box>
+//                       </Grid>
+//                     </Grid>
+//                   </CardContent>
+//                 </Card>
+//               </Grid>
+//             ))}
+//           </Grid>
+//         </DialogContent>
+//         <DialogActions sx={{ p: 2 }}>
+//           <Button
+//             variant="contained"
+//             color="inherit"
+//             onClick={handleCloseReservationListModal}
+//             fullWidth
+//             sx={{
+//               textTransform: "none",
+//               borderRadius: 2,
+//               height: "44px",
+//               bgcolor: "#cbd5e1",
+//             }}
+//           >
+//             Close Menu
+//           </Button>
+//         </DialogActions>
+//       </BootstrapDialog>
+
+//       {/* ────────────── QR Code Details Modal (asset / device scan) ────────────────── */}
+//       <BootstrapDialog
+//         onClose={handleCloseDetailsModal}
+//         open={openDetailsModal}
+//       >
+//         <DialogTitle
+//           sx={{
+//             m: 0,
+//             p: 2,
+//             display: "flex",
+//             justifyContent: "space-between",
+//             alignItems: "center",
+//             gap: 1,
+//           }}
+//         >
+//           <Typography variant="h6" sx={{ fontWeight: 600, fontSize: { xs: "1rem", sm: "1.25rem" } }}>
+//             CDPLC QR
+//           </Typography>
+//           <IconButton
+//             aria-label="close"
+//             onClick={handleCloseDetailsModal}
+//             sx={{ color: (theme) => theme.palette.grey[500], flexShrink: 0 }}
+//           >
+//             <CloseIcon />
+//           </IconButton>
+//         </DialogTitle>
+//         <DialogContent dividers sx={{ p: { xs: 1.5, sm: 2 } }}>
+//           <Grid container spacing={1.5}>
+//             {/* QR Code Details */}
+//             <Grid item xs={12}>
+//               <Card
+//                 sx={{
+//                   border: "1px solid #b1a9a9",
+//                   borderRadius: 4,
+//                   p: { xs: 1.5, sm: 2 },
+//                 }}
+//               >
+//                 <CardContent sx={{ p: { xs: 1, sm: 1.5 } }}>
+//                   <Box
+//                     sx={{
+//                       display: "flex",
+//                       alignItems: "center",
+//                       justifyContent: "space-between",
+//                       gap: 1,
+//                       mb: 2,
+//                     }}
+//                   >
+//                     <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: "1rem", sm: "1.125rem" }, minWidth: 0 }}>
+//                       QR Code Details
+//                     </Typography>
+
+//                     {/* Device icon based on QR code letter */}
+//                     <Box sx={{ flexShrink: 0, display: "flex" }}>
+//                       {qrCode?.includes("S") && <Monitor sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("K") && <Keyboard sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("M") && <Mouse sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("L") && <LaptopMac sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("U") && <BatteryChargingFull sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("P") && <DesktopWindows sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("O") && <Memory sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                       {qrCode?.includes("C") && <DesktopWindows sx={{ fontSize: { xs: 36, sm: 50 } }} />}
+//                     </Box>
+//                   </Box>
+
+//                   {(() => {
+//                     let deviceData = {
+//                       Code: "N/A",
+//                       Sno: "N/A",
+//                       Make: "N/A",
+//                       Device: "N/A",
+//                       Model: "N/A",
+//                       Status: "N/A",
+//                     };
+
+//                     if (qrCode?.includes("S")) {
+//                       deviceData = {
+//                         Device: "Screen",
+//                         Code: qrDetails?.ICT_ScreenModels?.[0]?.Mon_Code,
+//                         Sno: qrDetails?.ICT_ScreenModels?.[0]?.Mon_Sno,
+//                         Make: qrDetails?.ICT_ScreenModels?.[0]?.Mon_Make,
+//                         Model: qrDetails?.ICT_ScreenModels?.[0]?.Mon_Model,
+//                         Status: qrDetails?.ICT_ScreenModels?.[0]?.Mon_Status,
+//                       };
+//                     } else if (qrCode?.includes("K")) {
+//                       deviceData = {
+//                         Device: "Keyboard",
+//                         Code: qrDetails?.Key_Code,
+//                         Sno: qrDetails?.Key_Sno,
+//                         Make: qrDetails?.Key_Make,
+//                         Model: qrDetails?.Key_Model,
+//                         Status: qrDetails?.Key_Status,
+//                       };
+//                     } else if (qrCode?.includes("M")) {
+//                       deviceData = {
+//                         Device: "Mouse",
+//                         Code: qrDetails?.Mou_Code,
+//                         Make: qrDetails?.Mou_Make,
+//                         Sno: qrDetails?.Mou_Sno,
+//                         Model: qrDetails?.Mou_Model,
+//                         Status: qrDetails?.Mou_Status,
+//                       };
+//                     } else if (qrCode?.includes("L")) {
+//                       deviceData = {
+//                         Device: "Laptop",
+//                         Code: qrDetails?.Lap_Code,
+//                         Sno: qrDetails?.Lap_Sno,
+//                         Make: qrDetails?.Lap_Make,
+//                         Model: qrDetails?.Lap_Model,
+//                         Status: qrDetails?.Lap_Status,
+//                       };
+//                     } else if (qrCode?.includes("P")) {
+//                       deviceData = {
+//                         Device: "Computer",
+//                         Code: qrDetails?.Com_Code,
+//                         Sno: qrDetails?.Mac_Sno,
+//                         Make: qrDetails?.Mac_Make,
+//                         Model: qrDetails?.Mac_Model,
+//                         Status: qrDetails?.Mac_Status,
+//                       };
+//                     } else if (qrCode?.includes("C")) {
+//                       deviceData = {
+//                         Device: "Machine",
+//                         Code: qrDetails?.Mac_Code,
+//                         Sno: qrDetails?.Mac_Sno,
+//                         Make: qrDetails?.Mac_Make,
+//                         Model: qrDetails?.Mac_Model,
+//                         Status: qrDetails?.Mac_Status,
+//                       };
+//                     } else if (qrCode?.includes("U")) {
+//                       deviceData = {
+//                         Device: "UPS",
+//                         Code: qrDetails?.Ups_Code,
+//                         Sno: qrDetails?.Ups_Sno,
+//                         Make: qrDetails?.Ups_Make,
+//                         Model: qrDetails?.Ups_Model,
+//                         Status: qrDetails?.Ups_Status,
+//                       };
+//                     }
+
+//                     const rows = [
+//                       ["QR Code", deviceData.Code],
+//                       ["Serial No", deviceData.Sno],
+//                       ["Device", deviceData.Device],
+//                       ["Make", deviceData.Make],
+//                       ["Model", deviceData.Model],
+//                       [
+//                         "Status",
+//                         deviceData.Status === "A"
+//                           ? "Active"
+//                           : deviceData.Status === "I"
+//                           ? "Inactive"
+//                           : deviceData.Status === "D"
+//                           ? "Disposable"
+//                           : "N/A",
+//                       ],
+//                     ];
+
+//                     return (
+//                       <Grid container spacing={1.25}>
+//                         {rows.map(([label, value]) => (
+//                           <React.Fragment key={label}>
+//                             <Grid item xs={5} sm={6}>
+//                               <Typography variant="body2" fontWeight="bold">
+//                                 {label}:
+//                               </Typography>
+//                             </Grid>
+//                             <Grid item xs={7} sm={6}>
+//                               <Typography
+//                                 variant="body2"
+//                                 sx={{ wordBreak: "break-word" }}
+//                               >
+//                                 {value || "N/A"}
+//                               </Typography>
+//                             </Grid>
+//                           </React.Fragment>
+//                         ))}
+//                       </Grid>
+//                     );
+//                   })()}
+//                 </CardContent>
+//               </Card>
+//             </Grid>
+
+//             {/* Associated User Details */}
+//             <Grid item xs={12}>
+//               <Card
+//                 sx={{
+//                   border: "1px solid #b1a9a9",
+//                   borderRadius: 4,
+//                   p: { xs: 1.5, sm: 2 },
+//                 }}
+//               >
+//                 <CardContent sx={{ p: { xs: 1, sm: 1.5 } }}>
+//                   <Box
+//                     sx={{
+//                       display: "flex",
+//                       alignItems: "center",
+//                       justifyContent: "space-between",
+//                       gap: 1,
+//                       mb: 2,
+//                     }}
+//                   >
+//                     <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: "1rem", sm: "1.125rem" }, minWidth: 0 }}>
+//                       Associated User Details
+//                     </Typography>
+//                     <Person sx={{ fontSize: { xs: 36, sm: 50 }, flexShrink: 0 }} />
+//                   </Box>
+
+//                   <Grid container spacing={1.25}>
+//                     {[
+//                       ["Service No", qrDetails?.Service_No],
+//                       ["Name", qrDetails?.Emp_Name],
+//                       ["Computer Name", qrDetails?.Com_Name],
+//                       ["Email Address", qrDetails?.Emp_Email],
+//                       ["Extension", qrDetails?.Emp_Exte],
+//                       ["Location Code", qrDetails?.Com_Loc],
+//                       ["Location Name", qrDetails?.Com_LocName],
+//                       [
+//                         "Status",
+//                         qrDetails?.Status === "A"
+//                           ? "Active"
+//                           : qrDetails?.Status === "I"
+//                           ? "Inactive"
+//                           : qrDetails?.Status === "D"
+//                           ? "Disposable"
+//                           : "N/A",
+//                       ],
+//                     ].map(([label, value]) => (
+//                       <React.Fragment key={label}>
+//                         <Grid item xs={5} sm={6}>
+//                           <Typography variant="body2" fontWeight="bold">
+//                             {label}:
+//                           </Typography>
+//                         </Grid>
+//                         <Grid item xs={7} sm={6}>
+//                           <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+//                             {value || "N/A"}
+//                           </Typography>
+//                         </Grid>
+//                       </React.Fragment>
+//                     ))}
+//                   </Grid>
+//                 </CardContent>
+//               </Card>
+//             </Grid>
+
+//             {/* Other Associated Devices */}
+//             <Grid item xs={12}>
+//               <Card
+//                 sx={{
+//                   border: "1px solid #b1a9a9",
+//                   borderRadius: 4,
+//                   p: { xs: 1.5, sm: 2 },
+//                 }}
+//               >
+//                 <CardContent sx={{ p: { xs: 1, sm: 1.5 } }}>
+//                   <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: "1rem", sm: "1.125rem" }, mb: 2 }}>
+//                     Other Associated Devices
+//                   </Typography>
+
+//                   {[
+//                     { title: "Laptop", prefix: "Lap", icon: <Laptop /> },
+//                     { title: "Machine", prefix: "Mac", icon: <Memory /> },
+//                     { title: "Keyboard", prefix: "Key", icon: <Keyboard /> },
+//                     { title: "Mouse", prefix: "Mou", icon: <Mouse /> },
+//                   ].map((device, index) => {
+//                     const deviceCode = qrDetails?.[`${device.prefix}_Code`] || "N/A";
+//                     if (deviceCode === "N/A") return null;
+
+//                     return (
+//                       <Box
+//                         key={index}
+//                         sx={{
+//                           border: "1px solid #e2e8f0",
+//                           p: { xs: 1.5, sm: 2 },
+//                           mb: 1.5,
+//                           borderRadius: 3,
+//                         }}
+//                       >
+//                         <Box
+//                           sx={{
+//                             display: "flex",
+//                             alignItems: "center",
+//                             justifyContent: "space-between",
+//                             mb: 1,
+//                           }}
+//                         >
+//                           <Typography variant="subtitle1" fontWeight="bold">
+//                             {device.title}
+//                           </Typography>
+//                           {device.icon}
+//                         </Box>
+//                         <Grid container spacing={1.25}>
+//                           {[
+//                             [`${device.title} Code`, deviceCode],
+//                             [`${device.title} Serial No`, qrDetails?.[`${device.prefix}_Sno`]],
+//                             [`${device.title} Make`, qrDetails?.[`${device.prefix}_Make`]],
+//                             [`${device.title} Model`, qrDetails?.[`${device.prefix}_Model`]],
+//                             [
+//                               `${device.title} Status`,
+//                               qrDetails?.[`${device.prefix}_Status`] === "A"
+//                                 ? "Active"
+//                                 : qrDetails?.[`${device.prefix}_Status`] === "I"
+//                                 ? "Inactive"
+//                                 : qrDetails?.[`${device.prefix}_Status`] === "D"
+//                                 ? "Disposable"
+//                                 : "N/A",
+//                             ],
+//                           ].map(([label, value]) => (
+//                             <React.Fragment key={label}>
+//                               <Grid item xs={5} sm={6}>
+//                                 <Typography variant="body2" fontWeight="bold">
+//                                   {label}:
+//                                 </Typography>
+//                               </Grid>
+//                               <Grid item xs={7} sm={6}>
+//                                 <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+//                                   {value || "N/A"}
+//                                 </Typography>
+//                               </Grid>
+//                             </React.Fragment>
+//                           ))}
+//                         </Grid>
+//                       </Box>
+//                     );
+//                   })}
+//                 </CardContent>
+//               </Card>
+//             </Grid>
+//           </Grid>
+//         </DialogContent>
+//         <DialogActions sx={{ p: 2 }}>
+//           <Button
+//             variant="contained"
+//             onClick={handleCloseDetailsModal}
+//             fullWidth
+//             sx={{ textTransform: "none", borderRadius: 2, height: "44px" }}
+//           >
+//             Close
+//           </Button>
+//         </DialogActions>
+//       </BootstrapDialog>
+//     </div>
+//   );
+// }
+
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import Button from "@mui/material/Button";
@@ -1791,7 +3804,6 @@ import { SendEWODetails, QRScan, GetEmployeeDetails } from "../../action/QRScan"
 import QRService from "../../service/QRService";
 import {
   Person,
-  PhotoCamera,
   Monitor,
   Keyboard,
   Mouse,
@@ -1878,27 +3890,10 @@ function isBackCamera(device) {
   return true;
 }
 
-// function getCameraLabel(device, index) {
-//   const raw = device.label || "";
-//   if (!raw) return `Back Camera ${index + 1}`;
-
-//   const lower = raw.toLowerCase();
-//   if (lower.includes("ultra") && lower.includes("wide")) return "Ultra-Wide";
-//   if (lower.includes("wide"))   return "Wide";
-//   if (lower.includes("macro"))  return "Macro";
-//   if (lower.includes("tele"))   return "Telephoto";
-//   if (lower.includes("depth"))  return "Depth";
-
-//   if (
-//     lower.includes("back") ||
-//     lower.includes("rear") ||
-//     lower.includes("environment") ||
-//     lower.includes("facing back")
-//   ) return "Standard";
-
-//   return raw.length > 28 ? raw.substring(0, 28) + "…" : raw;
-// }
-
+function isAndroid() {
+  if (typeof window === "undefined" || !navigator) return false;
+  return /android/i.test(navigator.userAgent);
+}
 
 function getCameraLabel(device, index) {
   const raw = device.label || "";
@@ -1937,22 +3932,214 @@ function getCameraLabel(device, index) {
     : `${raw} (${camNo})`;
 }
 
-function scoreCameraForQR(device) {
+// ─── FIXED SCORING ──────────────────────────────────────────────
+// scoreCameraForQR(device, index, totalCams)
+//
+// On iPhones and high-end Androids the camera labels are descriptive
+// (e.g. "Back Camera", "Ultra Wide Camera") so keyword matching works
+// well. On budget Androids the browser often returns completely generic
+// labels like "camera2 0, facing back" for every rear lens, so keyword
+// matching alone can't distinguish the main sensor from the wide/ultra
+// module. In that case we use the device INDEX as a reliable tiebreaker:
+//
+//   index 0  →  typically the ultra-wide or wide-angle lens on budget
+//               Android phones (lowest priority for QR scanning).
+//   index 1  →  almost always the true main/standard sensor. Scored
+//               highest when labels give no other hint.
+//   index 2+ →  telephoto or auxiliary; decent but not ideal.
+//
+// This matches empirical reports: iPhones work fine (descriptive labels),
+// high-end Androids work fine (descriptive labels or index irrelevant
+// because keywords match), budget Androids now correctly pick index 1.
+function scoreCameraForQR(device, index = 0, totalCams = 1) {
+  if (!isAndroid()) {
+    const lower = (device.label || "").toLowerCase();
+    if (lower.includes("ultra"))  return 1;
+    if (lower.includes("macro"))  return 4;
+    if (lower.includes("depth"))  return 3;
+    if (lower.includes("wide"))   return 5;
+    if (lower.includes("tele"))   return 7;
+
+    if (
+      lower.includes("back") ||
+      lower.includes("rear") ||
+      lower.includes("environment") ||
+      lower.includes("facing back")
+    ) return 10;
+
+    return 6;
+  }
+
   const lower = (device.label || "").toLowerCase();
-  if (lower.includes("ultra"))  return 1;
-  if (lower.includes("macro"))  return 4;
-  if (lower.includes("depth"))  return 3;
-  if (lower.includes("wide"))   return 5;
-  if (lower.includes("tele"))   return 7;
 
-  if (
-    lower.includes("back") ||
-    lower.includes("rear") ||
+  // ── Explicit "problem" lens keywords ────────────────────────────
+  const isUltraWide = lower.includes("ultra") && lower.includes("wide");
+  const isMacro     = lower.includes("macro");
+  const isDepth     = lower.includes("depth");
+
+  if (isUltraWide) return 1;
+  if (isMacro)     return 2;
+  if (isDepth)     return 3;
+
+  // ── Check for explicit *type* qualifier in the label ─────────────
+  // Budget Androids emit generic labels like "camera2 0, facing back"
+  // and "camera2 1, facing back" — every rear lens gets "facing back"
+  // with NO type indicator. If we just check for "back/rear" those
+  // cameras all score 10, the index branch never fires, and the wide
+  // lens (index 0, which the browser returns as defaultBackId) wins.
+  //
+  // A *descriptive* label has a type qualifier beyond the direction:
+  //   ✓ "Back Camera"        → hasTypeQualifier (just "back" alone counts)
+  //   ✓ "Rear Main Camera"   → hasTypeQualifier ("main")
+  //   ✓ "Wide Camera"        → hasTypeQualifier ("wide") — but isWideOnly
+  //   ✗ "camera2 0, facing back" → NO type qualifier → fall to index
+  const hasTypeQualifier =
+    lower.includes("main")      ||
+    lower.includes("primary")   ||
+    lower.includes("standard")  ||
+    lower.includes("telephoto") ||
+    lower.includes("tele")      ||
+    lower.includes("wide")      ||
+    lower.includes("ultra")     ||
+    lower.includes("macro")     ||
+    lower.includes("depth")     ||
+    // "Back Camera" / "Rear Camera" — the direction IS the type name
+    // when it appears as a standalone word, not buried in "camera2 N, facing back"
+    /\b(back|rear)\b camera/i.test(device.label || "") ||
+    /\bcamera\b.{0,8}\b(back|rear)\b/i.test(device.label || "");
+
+  const isExplicitMain =
+    lower.includes("main")    ||
+    lower.includes("primary") ||
+    lower.includes("standard");
+
+  const isExplicitBack =
+    lower.includes("back")        ||
+    lower.includes("rear")        ||
     lower.includes("environment") ||
-    lower.includes("facing back")
-  ) return 10;
+    lower.includes("facing back");
 
-  return 6;
+  // "wide" without any back/main context → it's only a wide lens label
+  const isWideOnly =
+    lower.includes("wide") && !isExplicitBack && !isExplicitMain;
+
+  if (isExplicitMain && !isWideOnly)             return 12; // "Main Camera" etc.
+  if (isWideOnly)                                return 4;  // "Wide" only
+  if (lower.includes("tele") || lower.includes("telephoto")) return 7;
+
+  // ── Generic "facing back" label — use INDEX as the decider ───────
+  // "camera2 0, facing back" / "camera2 1, facing back":
+  //   hasTypeQualifier is false, so we fall here.
+  // "Back Camera" also reaches here but its regex above sets
+  //   hasTypeQualifier = true, so it gets score 10 via this branch:
+  if (isExplicitBack && hasTypeQualifier) return 10; // descriptive rear label
+
+  // Generic rear label OR truly unlabeled → rely on device list index.
+  // On budget Androids the OS orders cameras as:
+  //   index 0 → ultra-wide / wide (fixed-focus, bad for QR)
+  //   index 1 → main sensor     (autofocus, ideal for QR)
+  //   index 2+→ telephoto / aux
+  if (totalCams > 1) {
+    if (index === 0) return 5;  // likely wide → avoid
+    if (index === 1) return 9;  // likely main → prefer
+    return 7;                   // telephoto / other secondary
+  }
+
+  return 6; // single camera — take it
+}
+
+// A lens is considered "risky" for close-focus QR scanning if it's
+// an ultra-wide/macro/depth module — these are the ones that tend
+// to be fixed-focus or short-throw on budget hardware.
+function isRiskyLensForQR(device) {
+  const lower = (device.label || "").toLowerCase();
+  const isUltraWide = lower.includes("ultra") && lower.includes("wide");
+  return isUltraWide || lower.includes("macro") || lower.includes("depth");
+}
+
+// ─── CAPABILITY-BASED CAMERA DETECTION (no labels needed) ────────────
+//
+// Modern Chrome on Android reports real hardware info via
+// MediaStreamTrack.getCapabilities().  We open each candidate camera
+// for ~100 ms, read its capabilities, then close the stream.  This is
+// far more reliable than label parsing because it queries the actual
+// sensor, not a string the OEM happened to choose.
+//
+// Key signals:
+//   zoom.min  < 1.0  →  lens can zoom *out* past 1× → it IS a wide /
+//                        ultra-wide module.  Main sensors start at 1×.
+//   focusMode includes "continuous"  →  autofocus is supported.
+//                        Fixed-focus wide lenses often only report
+//                        "none" or "manual".
+//
+// Browsers that don't implement getCapabilities() (Firefox, old Safari)
+// return an empty object — we fall back to label+index scoring.
+async function getCameraCapabilities(deviceId) {
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { deviceId: { exact: deviceId } },
+    });
+    const track = stream.getVideoTracks()[0];
+    if (!track) return {};
+
+    // Primary source: track.getCapabilities() — supported in Chrome 59+
+    const trackCaps =
+      typeof track.getCapabilities === "function"
+        ? track.getCapabilities()
+        : {};
+
+    // Secondary source: ImageCapture.getPhotoCapabilities()
+    // This often exposes zoom range even when track.getCapabilities()
+    // doesn't.  Supported in Chrome on Android since ~Chrome 59.
+    let imageZoom = null;
+    try {
+      if (typeof ImageCapture !== "undefined") {
+        const ic = new ImageCapture(track);
+        const photoCaps = await ic.getPhotoCapabilities();
+        if (photoCaps?.zoom?.min !== undefined) {
+          imageZoom = photoCaps.zoom; // { min, max, step }
+        }
+      }
+    } catch { /* ImageCapture not supported or permission error */ }
+
+    // Merge: prefer ImageCapture zoom if track.getCapabilities didn't
+    // expose it (some Chrome versions only expose it via ImageCapture).
+    const merged = { ...trackCaps };
+    if (imageZoom && !merged.zoom) {
+      merged.zoom = imageZoom;
+    }
+
+    return merged;
+  } catch {
+    return {};
+  } finally {
+    // Always close the stream before returning — Android cannot have
+    // two camera streams open at the same time.
+    stream?.getTracks().forEach((t) => t.stop());
+  }
+}
+
+// Returns a 0-10 score purely from hardware capabilities.
+// Returns null when the browser doesn't expose capabilities at all.
+function scoreByCapabilities(caps) {
+  if (!caps || Object.keys(caps).length === 0) return null; // unsupported
+
+  const zoomMin = caps.zoom?.min;          // undefined on some browsers
+  const focusModes = caps.focusMode ?? []; // string[]
+
+  const hasContinuousAF = focusModes.includes("continuous");
+
+  // Wide / ultra-wide: can zoom below 1× (e.g. 0.5×)
+  if (typeof zoomMin === "number" && zoomMin < 0.95) {
+    // It IS a wide lens.  Still give a small bonus if it has AF
+    // (some wide lenses are usable in a pinch).
+    return hasContinuousAF ? 2 : 1;
+  }
+
+  // Main / standard sensor (zoom starts at 1× or zoom info absent)
+  if (hasContinuousAF) return 10; // best case: main sensor with AF
+  return 6;                        // main-ish, no AF info
 }
 
 function getCameraErrorMessage(err) {
@@ -1978,6 +4165,10 @@ function getCameraErrorMessage(err) {
   }
 }
 
+// How long (ms) to wait on a "risky" lens before nudging the user to
+// switch to a better one. Only fires once per lens selection.
+const RISKY_LENS_NUDGE_DELAY = 4000;
+
 export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
   const { responseBody, isButtonVisible } = useSelector((state) => state.qr);
   const { data } = useSelector((state) => state.userbyServiceNo);
@@ -1990,6 +4181,8 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
   const [selectedCameraId, setSelectedCameraId] = useState(null);
   const [cameraLoading, setCameraLoading] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const nudgeTimerRef = useRef(null);
+  const hasNudgedForLensRef = useRef(null);
 
   // ─── Scanner / Modal state ────────────────────────────────────
   const [qrCode, setQRCode] = useState("");
@@ -2030,6 +4223,48 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
     }
   }, [isOpen]);
 
+  // Nudge users off a risky (ultra-wide/macro/depth) lens if scanning
+  // has been going on for a while without a successful read. Fires
+  // once per lens selection so it doesn't spam the user.
+  useEffect(() => {
+    if (nudgeTimerRef.current) {
+      clearTimeout(nudgeTimerRef.current);
+      nudgeTimerRef.current = null;
+    }
+
+    if (!isOpen || !isScanning || !selectedCameraId) return;
+
+    const currentCam = availableCameras.find(
+      (c) => c.deviceId === selectedCameraId
+    );
+    if (!currentCam || !isRiskyLensForQR(currentCam)) return;
+    if (hasNudgedForLensRef.current === selectedCameraId) return;
+
+    nudgeTimerRef.current = setTimeout(() => {
+      const better = [...availableCameras]
+        .filter((c) => c.deviceId !== selectedCameraId)
+        .sort((a, b) => scoreCameraForQR(b) - scoreCameraForQR(a))[0];
+
+      hasNudgedForLensRef.current = selectedCameraId;
+
+      if (better) {
+        toast.info(
+          "Having trouble focusing? Try switching to the Standard lens for QR scanning.",
+          { autoClose: 6000 }
+        );
+      } else {
+        toast.info(
+          "Hold the QR code a bit further away — this lens may need more distance to focus.",
+          { autoClose: 6000 }
+        );
+      }
+    }, RISKY_LENS_NUDGE_DELAY);
+
+    return () => {
+      if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current);
+    };
+  }, [isOpen, isScanning, selectedCameraId, availableCameras]);
+
   const enumerateCameras = async () => {
     setCameraLoading(true);
     setCameraError(null);
@@ -2040,17 +4275,22 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
         throw e;
       }
 
-      const tempStream = await navigator.mediaDevices.getUserMedia({
+      // ── Step 1: unlock labels + get browser's default back camera ──
+      const unlockStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
       });
       const defaultBackId =
-        tempStream.getVideoTracks()[0]?.getSettings()?.deviceId || null;
-      tempStream.getTracks().forEach((t) => t.stop());
+        unlockStream.getVideoTracks()[0]?.getSettings()?.deviceId || null;
+      unlockStream.getTracks().forEach((t) => t.stop());
 
+      // ── Step 2: collect all video inputs ──────────────────────────
       const all = (await navigator.mediaDevices.enumerateDevices()).filter(
         (d) => d.kind === "videoinput"
       );
 
+      // ── Step 3: identify back-facing cameras ──────────────────────
+      // Use labels when available; fall back to opening each camera
+      // briefly and checking the facingMode setting.
       const hasAnyLabel = all.some((d) => d.label && d.label.trim() !== "");
       let backCams;
 
@@ -2066,9 +4306,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
             const facing = s.getVideoTracks()[0]?.getSettings()?.facingMode;
             s.getTracks().forEach((t) => t.stop());
             if (facing !== "user") backCams.push(device);
-          } catch {
-            // ignore
-          }
+          } catch { /* ignore inaccessible cameras */ }
         }
         if (backCams.length === 0 && defaultBackId) {
           const def = all.find((d) => d.deviceId === defaultBackId);
@@ -2078,16 +4316,63 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
 
       setAvailableCameras(backCams);
 
-      setSelectedCameraId((prev) => {
-        if (prev) return prev;
-        if (defaultBackId && backCams.find((c) => c.deviceId === defaultBackId)) {
-          return defaultBackId;
+      if (backCams.length === 0) {
+        setSelectedCameraId(defaultBackId);
+        return;
+      }
+
+      if (isAndroid()) {
+        // ── Android-specific logic (Sequential hardware capability probing) ──
+        const capabilityResults = [];
+        for (const [idx, cam] of backCams.entries()) {
+          const caps     = await getCameraCapabilities(cam.deviceId);
+          const capScore = scoreByCapabilities(caps);
+          capabilityResults.push({ cam, idx, caps, capScore });
         }
-        const sorted = [...backCams].sort(
-          (a, b) => scoreCameraForQR(b) - scoreCameraForQR(a)
-        );
-        return sorted[0]?.deviceId || null;
-      });
+
+        const capSupported = capabilityResults.some((r) => r.capScore !== null);
+        let selectedId;
+
+        if (capSupported) {
+          const scored = capabilityResults
+            .filter((r) => r.capScore !== null)
+            .sort((a, b) => b.capScore - a.capScore);
+          selectedId = scored[0]?.cam.deviceId || defaultBackId;
+        } else {
+          // Fallback to scoreCameraForQR label/index check
+          const total = backCams.length;
+          const scored = backCams.map((cam, idx) => ({
+            cam,
+            score: scoreCameraForQR(cam, idx, total),
+          }));
+          scored.sort((a, b) => b.score - a.score);
+          const best = scored[0]?.cam;
+
+          const defaultDevice = backCams.find((c) => c.deviceId === defaultBackId);
+          const defaultIdx    = backCams.indexOf(defaultDevice);
+          const defaultScores  = scoreCameraForQR(defaultDevice, defaultIdx, total);
+          const bestIdx        = best ? backCams.indexOf(best) : 0;
+          const bestScore      = scoreCameraForQR(best, bestIdx, total);
+
+          selectedId =
+            defaultDevice && defaultScores >= bestScore
+              ? defaultBackId
+              : best?.deviceId || defaultBackId || null;
+        }
+        setSelectedCameraId((prev) => prev || selectedId);
+      } else {
+        // ── iOS and PC previous standard process ─────────────────────
+        setSelectedCameraId((prev) => {
+          if (prev) return prev;
+          if (defaultBackId && backCams.find((c) => c.deviceId === defaultBackId)) {
+            return defaultBackId;
+          }
+          const sorted = [...backCams].sort(
+            (a, b) => scoreCameraForQR(b) - scoreCameraForQR(a)
+          );
+          return sorted[0]?.deviceId || null;
+        });
+      }
     } catch (err) {
       console.warn("Camera enumeration failed:", err);
       setSelectedCameraId(null);
@@ -2098,10 +4383,25 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
   };
 
   const buildVideoConstraints = () => {
-    if (selectedCameraId) {
-      return { deviceId: { exact: selectedCameraId } };
+    // Pin to the chosen lens when we have a deviceId; otherwise ask
+    // the browser for any environment-facing camera.
+    const base = selectedCameraId
+      ? { deviceId: { exact: selectedCameraId } }
+      : { facingMode: "environment" };
+
+    if (isAndroid()) {
+      // 1080 × 1080 gives the decoder plenty of pixels without pushing
+      // frame-rate below a usable level on mid-range hardware.
+      // Using `ideal` (not `exact`) so the browser falls back gracefully
+      // on cameras that don't support those dimensions.
+      return {
+        ...base,
+        width:  { ideal: 1280 },
+        height: { ideal: 720  },
+      };
     }
-    return { facingMode: "environment" };
+
+    return base;
   };
 
   const handleClose = () => {
@@ -2249,6 +4549,13 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
     if (!scanData || !isScanning) return;
     setIsScanning(false);
 
+    // A successful decode means the current lens works fine — clear
+    // any pending "switch lens" nudge and don't re-nudge for this lens.
+    if (nudgeTimerRef.current) {
+      clearTimeout(nudgeTimerRef.current);
+      nudgeTimerRef.current = null;
+    }
+
     const scannedText = scanData.text.trim();
     setQRCode(scannedText);
 
@@ -2364,72 +4671,6 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
         </DialogTitle>
 
         <DialogContent dividers sx={{ p: 0 }}>
-          {/* Camera selector */}
-          <Box
-            sx={{
-              px: { xs: 1.5, sm: 2 },
-              pt: 1.5,
-              pb: 1,
-              bgcolor: "#f8fafc",
-              borderBottom: "1px solid #e2e8f0",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              minWidth: 0,
-            }}
-          >
-            <PhotoCamera
-              sx={{ color: "#64748b", fontSize: 20, flexShrink: 0 }}
-            />
-            <FormControl size="small" fullWidth sx={{ minWidth: 0 }}>
-              <InputLabel id="camera-select-label">Lens</InputLabel>
-              <Select
-                labelId="camera-select-label"
-                label="Lens"
-                value={
-                  cameraLoading
-                    ? "__loading__"
-                    : selectedCameraId || "__default__"
-                }
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "__loading__" || val === "__default__") return;
-                  setSelectedCameraId(val);
-                  setIsScanning(true);
-                  setCameraError(null);
-                }}
-                disabled={cameraLoading}
-                sx={{
-                  borderRadius: 2,
-                  bgcolor: "white",
-                  "& .MuiSelect-select": {
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    minWidth: 0,
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: { style: { maxWidth: "90vw" } },
-                }}
-              >
-                {cameraLoading && (
-                  <MenuItem value="__loading__" disabled>
-                    Detecting lenses…
-                  </MenuItem>
-                )}
-                {!cameraLoading && availableCameras.length === 0 && (
-                  <MenuItem value="__default__">Default (Rear Camera)</MenuItem>
-                )}
-                {availableCameras.map((cam, idx) => (
-                  <MenuItem key={cam.deviceId} value={cam.deviceId}>
-                    {getCameraLabel(cam, idx)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-
           {/* Scanner viewport – using the new Scanner component */}
           <Box sx={{ p: 1 }}>
             {cameraLoading ? (
@@ -2501,7 +4742,20 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                 formats={["qr_code"]}
                 constraints={{
                   ...buildVideoConstraints(),
-                  advanced: [{ focusMode: "continuous" }],
+                  ...(isAndroid()
+                    ? {
+                        advanced: [
+                          { focusMode: "continuous" },
+                          { zoom: 1 },
+                          { focusDistance: 0.3 },
+                        ],
+                      }
+                    : {
+                        // Previous iOS standard constraints:
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        advanced: [{ focusMode: "continuous" }],
+                      }),
                 }}
                 paused={!isScanning}
                 components={{ finder: true, torch: false, zoom: false, onOff: false, audio: false }}
