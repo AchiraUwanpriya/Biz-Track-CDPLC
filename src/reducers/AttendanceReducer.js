@@ -7,6 +7,7 @@ import {
 const initialState = {
   requestBody: null,
   responseBody: [],
+  subOrderingAttendance: [],
   divisionData: [],
   weeklyAttendance: [],
   monthlyAttendance: [],
@@ -36,6 +37,8 @@ export const GetAttendanceCard = (state = initialState, action) => {
         ...state,
         loading: false,
         responseBody: action.payload.responseBody || state.responseBody,
+        subOrderingAttendance:
+          action.payload.subOrderingAttendance || state.subOrderingAttendance,
         divisionData: action.payload.divisionData || state.divisionData,
         weeklyAttendance:
           action.payload.weeklyAttendance || state.weeklyAttendance,
@@ -59,6 +62,7 @@ export const GetAttendanceCard = (state = initialState, action) => {
         loading: false,
         msg: action.payload.msg,
         responseBody: [],
+        subOrderingAttendance: [],
       };
     default:
       return state;

@@ -410,5 +410,42 @@ export const GetCDLDutyoffEmployee = () => async (dispatch) => {
   }
 };
 
+export const GetsubOrderingAttendanceCard = (month, sno) => async (dispatch) => {
+  dispatch({
+    type: ATTENDANCE_REQUEST,
+  });
+
+  try {
+    const data = await AttendanceService.GetsubOrderingAttendanceCard(month, sno);
+    if (data.data.StatusCode === 200) {
+      dispatch({
+        type: ATTENDANCE_SUCCESS,
+        payload: {
+          subOrderingAttendance: data.data.ResultSet || [],
+        },
+      });
+    } else {
+      dispatch({
+        type: ATTENDANCE_FAIL,
+        payload: {
+          msg: "No data found or invalid response.",
+        },
+      });
+    }
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    dispatch({
+      type: ATTENDANCE_FAIL,
+      payload: {
+        msg: message,
+      },
+    });
+  }
+};
+
+
 
 

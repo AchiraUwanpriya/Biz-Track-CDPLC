@@ -123,6 +123,19 @@ const GetCDLDutyoffEmployee = async () => {
     .then((response) => response);
 };
 
+const GetsubOrderingAttendanceCard = async (month, sno) => {
+  return axios
+    .get(`Attendance/GetsubOrderingAttendanceCard`, {
+      params: {
+        P_MONTH: month,
+        p_sno: sno,
+      },
+    })
+    .then((response) => {
+      return response;
+    });
+};
+
 
 
 export default {
@@ -138,4 +151,5 @@ export default {
   GetOTEntered,
   GetCDLOTEmployee,
   GetCDLDutyoffEmployee,
+  GetsubOrderingAttendanceCard,
 };

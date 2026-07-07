@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetsubOrderingAttendanceCard } from '../../action/Attendance';
 import {
   Box,
   Paper,
@@ -30,9 +32,12 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 
 const AttendanceCard = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [records, setRecords] = useState([]);
+  const dispatch = useDispatch();
+  const { subOrderingAttendance: records = [], loading, msg } = useSelector(
+    (state) => state.attendanceCard
+  );
+
+  const [localError, setLocalError] = useState(null);
   const [month, setMonth] = useState('');
   const [sno, setSno] = useState('2004867'); 
 
@@ -69,63 +74,23 @@ const AttendanceCard = () => {
     setMonth(`${year}-${monthNum}`);
   }, []);
 
-  const readAuthKey = () => {
-    const raw = sessionStorage.getItem('token');
-    if (!raw) return '';
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed || raw;
-    } catch (err) {
-      return raw;
-    }
-  };
-
-  const fetchAttendance = async () => {
+  const fetchAttendance = () => {
     if (!month || !sno) {
-      setError('Please enter both Month and Service No.');
+      setLocalError('Please enter both Month and Service No.');
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const url = `https://esystems.cdl.lk/backend/BizTrack/Attendance/GetsubOrderingAttendanceCard?P_MONTH=${month}&p_sno=${sno}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'auth-key': readAuthKey(),
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.StatusCode === 200 && data.ResultSet) {
-        setRecords(data.ResultSet);
-      } else {
-        setError('No data found or invalid response.');
-        setRecords([]);
-      }
-    } catch (err) {
-      setError(err.message || 'Failed to fetch attendance data.');
-      setRecords([]);
-    } finally {
-      setLoading(false);
-    }
+    setLocalError(null);
+    dispatch(GetsubOrderingAttendanceCard(month, sno));
   };
-
 
   useEffect(() => {
     if (month && sno) {
       fetchAttendance();
     }
   }, [month, sno]); 
+
+  const error = localError || msg;
 
 const formatTime24 = (time) => {
   if (!time || time === "—") return "—";
