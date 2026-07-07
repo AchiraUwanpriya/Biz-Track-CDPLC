@@ -856,9 +856,8 @@ export default function HeaderComponent() {
     };
 
     fetchAds();
-    fetchPendingEwoCount(); // Fetch EWO count on mount
-
-    // Optional: Refresh count every 30 seconds
+    fetchPendingEwoCount(); 
+ 
     const interval = setInterval(fetchPendingEwoCount, 30000);
     
     return () => clearInterval(interval);

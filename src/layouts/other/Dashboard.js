@@ -1432,10 +1432,10 @@ const Dashboard = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // ─── Central Date State ──────────────────────────────────────────────────────
+  
   const [selectedDate, setSelectedDate] = useState(() => {
-    // Try to get from localStorage, fallback to today
-    const saved = localStorage.getItem("dashboard_selected_date");
-    return saved || new Date().toISOString().split("T")[0];
+   // const saved = localStorage.getItem("dashboard_selected_date");
+    return new Date().toISOString().split("T")[0];
   });
 
   const {
@@ -1486,14 +1486,14 @@ const Dashboard = () => {
   // ─── Handle Date Change ─────────────────────────────────────────────────────
   const handleDateApply = (newDate) => {
     setSelectedDate(newDate);
-    localStorage.setItem("dashboard_selected_date", newDate);
+    //localStorage.setItem("dashboard_selected_date", newDate);
     fetchDashboardData(newDate);
   };
 
   const handleDateClear = () => {
     const today = new Date().toISOString().split("T")[0];
     setSelectedDate(today);
-    localStorage.setItem("dashboard_selected_date", today);
+    //localStorage.setItem("dashboard_selected_date", today);
     fetchDashboardData(today);
   };
 

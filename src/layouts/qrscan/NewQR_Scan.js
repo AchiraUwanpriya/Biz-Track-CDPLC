@@ -305,7 +305,7 @@
 //       if (reservationAction === "checkin") {
 //         console.log("Processing check-in for reservation:", reservationNo);
 
-         
+
 //         result1 = await markCheckStatus(reservationNo, "I");
 //         console.log("Check-in API response:", result1);
 
@@ -322,12 +322,12 @@
 //         console.log("QR Prefix:", actualPrefix);
 
 //         if (actualPrefix === "O" || actualPrefix === "B") {
-        
+
 //           result1 = await markCheckStatus(reservationNo, "O");
 //           console.log("Check-out API response:", result1);
 
 //           if (result1 && result1.StatusCode === 200) {
-             
+
 //             if (actualPrefix === "B") {
 //               result2 = await addCaretFeedback(reservationNo, reservationRemarks || "Checked out", "B");
 //               console.log("Caret feedback API response:", result2);
@@ -432,7 +432,7 @@
 //     // ---------------- I / O / B RESERVATION QR ----------------
 
 //     if (scannedText === "NEHBI001" || scannedText === "NEHBO001" || scannedText === "NEHBO002") {
-       
+
 //       let qrPrefix;
 //       if (scannedText === "NEHBI001") {
 //         qrPrefix = "I";
@@ -442,7 +442,7 @@
 //         qrPrefix = "B";
 //       }
 
-       
+
 //       const serviceNumber = data?.[0]?.ServiceNo;  
 
 //       if (!serviceNumber) {
@@ -1835,7 +1835,6 @@
 //     padding: theme.spacing(2),
 //     flexShrink: 0,
 //   },
-//   // Narrow phones (≤400px wide, e.g. the 360–412px Android range in the screenshots)
 //   [theme.breakpoints.down(400)]: {
 //     "& .MuiDialog-paper": {
 //       width: "calc(100% - 16px)",
@@ -1939,11 +1938,11 @@
 
 // function scoreCameraForQR(device) {
 //   const lower = (device.label || "").toLowerCase();
-//   if (lower.includes("ultra"))  return 1;
-//   if (lower.includes("macro"))  return 4;
-//   if (lower.includes("depth"))  return 3;
-//   if (lower.includes("wide"))   return 5;
-//   if (lower.includes("tele"))   return 7;
+//   if (lower.includes("ultra")) return 1;
+//   if (lower.includes("macro")) return 4;
+//   if (lower.includes("depth")) return 3;
+//   if (lower.includes("wide")) return 5;
+//   if (lower.includes("tele")) return 7;
 
 //   if (
 //     lower.includes("back") ||
@@ -2067,7 +2066,7 @@
 //             s.getTracks().forEach((t) => t.stop());
 //             if (facing !== "user") backCams.push(device);
 //           } catch {
-//             // ignore
+
 //           }
 //         }
 //         if (backCams.length === 0 && defaultBackId) {
@@ -3139,8 +3138,8 @@
 //                           {selectedReservation.Res_Bang_Id === "1"
 //                             ? "Main Bungalow"
 //                             : selectedReservation.Res_Bang_Id === "2"
-//                             ? "Lower Garden Suite"
-//                             : "N/A"}
+//                               ? "Lower Garden Suite"
+//                               : "N/A"}
 //                         </Typography>
 //                       </Grid>
 //                       <Grid item xs={6}>
@@ -3263,8 +3262,8 @@
 //             {processing
 //               ? "Processing…"
 //               : reservationAction === "checkin"
-//               ? "Confirm Check In"
-//               : "Confirm Check Out"}
+//                 ? "Confirm Check In"
+//                 : "Confirm Check Out"}
 //           </Button>
 //         </DialogActions>
 //       </BootstrapDialog>
@@ -3572,10 +3571,10 @@
 //                         deviceData.Status === "A"
 //                           ? "Active"
 //                           : deviceData.Status === "I"
-//                           ? "Inactive"
-//                           : deviceData.Status === "D"
-//                           ? "Disposable"
-//                           : "N/A",
+//                             ? "Inactive"
+//                             : deviceData.Status === "D"
+//                               ? "Disposable"
+//                               : "N/A",
 //                       ],
 //                     ];
 
@@ -3644,10 +3643,10 @@
 //                         qrDetails?.Status === "A"
 //                           ? "Active"
 //                           : qrDetails?.Status === "I"
-//                           ? "Inactive"
-//                           : qrDetails?.Status === "D"
-//                           ? "Disposable"
-//                           : "N/A",
+//                             ? "Inactive"
+//                             : qrDetails?.Status === "D"
+//                               ? "Disposable"
+//                               : "N/A",
 //                       ],
 //                     ].map(([label, value]) => (
 //                       <React.Fragment key={label}>
@@ -3725,10 +3724,10 @@
 //                               qrDetails?.[`${device.prefix}_Status`] === "A"
 //                                 ? "Active"
 //                                 : qrDetails?.[`${device.prefix}_Status`] === "I"
-//                                 ? "Inactive"
-//                                 : qrDetails?.[`${device.prefix}_Status`] === "D"
-//                                 ? "Disposable"
-//                                 : "N/A",
+//                                   ? "Inactive"
+//                                   : qrDetails?.[`${device.prefix}_Status`] === "D"
+//                                     ? "Disposable"
+//                                     : "N/A",
 //                             ],
 //                           ].map(([label, value]) => (
 //                             <React.Fragment key={label}>
@@ -3767,6 +3766,14 @@
 //     </div>
 //   );
 // }
+
+
+
+
+
+
+
+
 
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
@@ -3824,7 +3831,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
 
-// Styled Dialog – prevents mobile layout collapse
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     display: "flex",
@@ -3847,7 +3854,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(2),
     flexShrink: 0,
   },
-  // Narrow phones (≤400px wide, e.g. the 360–412px Android range in the screenshots)
+ 
   [theme.breakpoints.down(400)]: {
     "& .MuiDialog-paper": {
       width: "calc(100% - 16px)",
@@ -3931,26 +3938,6 @@ function getCameraLabel(device, index) {
     ? `${raw.substring(0, 28)}… (${camNo})`
     : `${raw} (${camNo})`;
 }
-
-// ─── FIXED SCORING ──────────────────────────────────────────────
-// scoreCameraForQR(device, index, totalCams)
-//
-// On iPhones and high-end Androids the camera labels are descriptive
-// (e.g. "Back Camera", "Ultra Wide Camera") so keyword matching works
-// well. On budget Androids the browser often returns completely generic
-// labels like "camera2 0, facing back" for every rear lens, so keyword
-// matching alone can't distinguish the main sensor from the wide/ultra
-// module. In that case we use the device INDEX as a reliable tiebreaker:
-//
-//   index 0  →  typically the ultra-wide or wide-angle lens on budget
-//               Android phones (lowest priority for QR scanning).
-//   index 1  →  almost always the true main/standard sensor. Scored
-//               highest when labels give no other hint.
-//   index 2+ →  telephoto or auxiliary; decent but not ideal.
-//
-// This matches empirical reports: iPhones work fine (descriptive labels),
-// high-end Androids work fine (descriptive labels or index irrelevant
-// because keywords match), budget Androids now correctly pick index 1.
 function scoreCameraForQR(device, index = 0, totalCams = 1) {
   if (!isAndroid()) {
     const lower = (device.label || "").toLowerCase();
@@ -3981,18 +3968,6 @@ function scoreCameraForQR(device, index = 0, totalCams = 1) {
   if (isMacro)     return 2;
   if (isDepth)     return 3;
 
-  // ── Check for explicit *type* qualifier in the label ─────────────
-  // Budget Androids emit generic labels like "camera2 0, facing back"
-  // and "camera2 1, facing back" — every rear lens gets "facing back"
-  // with NO type indicator. If we just check for "back/rear" those
-  // cameras all score 10, the index branch never fires, and the wide
-  // lens (index 0, which the browser returns as defaultBackId) wins.
-  //
-  // A *descriptive* label has a type qualifier beyond the direction:
-  //   ✓ "Back Camera"        → hasTypeQualifier (just "back" alone counts)
-  //   ✓ "Rear Main Camera"   → hasTypeQualifier ("main")
-  //   ✓ "Wide Camera"        → hasTypeQualifier ("wide") — but isWideOnly
-  //   ✗ "camera2 0, facing back" → NO type qualifier → fall to index
   const hasTypeQualifier =
     lower.includes("main")      ||
     lower.includes("primary")   ||
@@ -4003,8 +3978,7 @@ function scoreCameraForQR(device, index = 0, totalCams = 1) {
     lower.includes("ultra")     ||
     lower.includes("macro")     ||
     lower.includes("depth")     ||
-    // "Back Camera" / "Rear Camera" — the direction IS the type name
-    // when it appears as a standalone word, not buried in "camera2 N, facing back"
+
     /\b(back|rear)\b camera/i.test(device.label || "") ||
     /\bcamera\b.{0,8}\b(back|rear)\b/i.test(device.label || "");
 
@@ -4023,57 +3997,31 @@ function scoreCameraForQR(device, index = 0, totalCams = 1) {
   const isWideOnly =
     lower.includes("wide") && !isExplicitBack && !isExplicitMain;
 
-  if (isExplicitMain && !isWideOnly)             return 12; // "Main Camera" etc.
-  if (isWideOnly)                                return 4;  // "Wide" only
+  if (isExplicitMain && !isWideOnly)             return 12; 
+  if (isWideOnly)                                return 4; 
   if (lower.includes("tele") || lower.includes("telephoto")) return 7;
 
-  // ── Generic "facing back" label — use INDEX as the decider ───────
-  // "camera2 0, facing back" / "camera2 1, facing back":
-  //   hasTypeQualifier is false, so we fall here.
-  // "Back Camera" also reaches here but its regex above sets
-  //   hasTypeQualifier = true, so it gets score 10 via this branch:
-  if (isExplicitBack && hasTypeQualifier) return 10; // descriptive rear label
 
-  // Generic rear label OR truly unlabeled → rely on device list index.
-  // On budget Androids the OS orders cameras as:
-  //   index 0 → ultra-wide / wide (fixed-focus, bad for QR)
-  //   index 1 → main sensor     (autofocus, ideal for QR)
-  //   index 2+→ telephoto / aux
+  if (isExplicitBack && hasTypeQualifier) return 10;
+
+  
   if (totalCams > 1) {
-    if (index === 0) return 5;  // likely wide → avoid
-    if (index === 1) return 9;  // likely main → prefer
-    return 7;                   // telephoto / other secondary
+    if (index === 0) return 5;  
+    if (index === 1) return 9;  
+    return 7;                  
   }
 
-  return 6; // single camera — take it
+  return 6; 
 }
 
-// A lens is considered "risky" for close-focus QR scanning if it's
-// an ultra-wide/macro/depth module — these are the ones that tend
-// to be fixed-focus or short-throw on budget hardware.
+
 function isRiskyLensForQR(device) {
   const lower = (device.label || "").toLowerCase();
   const isUltraWide = lower.includes("ultra") && lower.includes("wide");
   return isUltraWide || lower.includes("macro") || lower.includes("depth");
 }
 
-// ─── CAPABILITY-BASED CAMERA DETECTION (no labels needed) ────────────
-//
-// Modern Chrome on Android reports real hardware info via
-// MediaStreamTrack.getCapabilities().  We open each candidate camera
-// for ~100 ms, read its capabilities, then close the stream.  This is
-// far more reliable than label parsing because it queries the actual
-// sensor, not a string the OEM happened to choose.
-//
-// Key signals:
-//   zoom.min  < 1.0  →  lens can zoom *out* past 1× → it IS a wide /
-//                        ultra-wide module.  Main sensors start at 1×.
-//   focusMode includes "continuous"  →  autofocus is supported.
-//                        Fixed-focus wide lenses often only report
-//                        "none" or "manual".
-//
-// Browsers that don't implement getCapabilities() (Firefox, old Safari)
-// return an empty object — we fall back to label+index scoring.
+
 async function getCameraCapabilities(deviceId) {
   let stream;
   try {
@@ -4083,15 +4031,13 @@ async function getCameraCapabilities(deviceId) {
     const track = stream.getVideoTracks()[0];
     if (!track) return {};
 
-    // Primary source: track.getCapabilities() — supported in Chrome 59+
+ 
     const trackCaps =
       typeof track.getCapabilities === "function"
         ? track.getCapabilities()
         : {};
 
-    // Secondary source: ImageCapture.getPhotoCapabilities()
-    // This often exposes zoom range even when track.getCapabilities()
-    // doesn't.  Supported in Chrome on Android since ~Chrome 59.
+   
     let imageZoom = null;
     try {
       if (typeof ImageCapture !== "undefined") {
@@ -4101,10 +4047,9 @@ async function getCameraCapabilities(deviceId) {
           imageZoom = photoCaps.zoom; // { min, max, step }
         }
       }
-    } catch { /* ImageCapture not supported or permission error */ }
+    } catch { }
 
-    // Merge: prefer ImageCapture zoom if track.getCapabilities didn't
-    // expose it (some Chrome versions only expose it via ImageCapture).
+  
     const merged = { ...trackCaps };
     if (imageZoom && !merged.zoom) {
       merged.zoom = imageZoom;
@@ -4114,32 +4059,29 @@ async function getCameraCapabilities(deviceId) {
   } catch {
     return {};
   } finally {
-    // Always close the stream before returning — Android cannot have
-    // two camera streams open at the same time.
+
     stream?.getTracks().forEach((t) => t.stop());
   }
 }
 
-// Returns a 0-10 score purely from hardware capabilities.
-// Returns null when the browser doesn't expose capabilities at all.
-function scoreByCapabilities(caps) {
-  if (!caps || Object.keys(caps).length === 0) return null; // unsupported
 
-  const zoomMin = caps.zoom?.min;          // undefined on some browsers
-  const focusModes = caps.focusMode ?? []; // string[]
+function scoreByCapabilities(caps) {
+  if (!caps || Object.keys(caps).length === 0) return null; 
+
+  const zoomMin = caps.zoom?.min;          
+  const focusModes = caps.focusMode ?? []; 
 
   const hasContinuousAF = focusModes.includes("continuous");
 
-  // Wide / ultra-wide: can zoom below 1× (e.g. 0.5×)
+  
   if (typeof zoomMin === "number" && zoomMin < 0.95) {
-    // It IS a wide lens.  Still give a small bonus if it has AF
-    // (some wide lenses are usable in a pinch).
+
     return hasContinuousAF ? 2 : 1;
   }
 
-  // Main / standard sensor (zoom starts at 1× or zoom info absent)
-  if (hasContinuousAF) return 10; // best case: main sensor with AF
-  return 6;                        // main-ish, no AF info
+ 
+  if (hasContinuousAF) return 10; 
+  return 6;                        
 }
 
 function getCameraErrorMessage(err) {
@@ -4165,8 +4107,7 @@ function getCameraErrorMessage(err) {
   }
 }
 
-// How long (ms) to wait on a "risky" lens before nudging the user to
-// switch to a better one. Only fires once per lens selection.
+
 const RISKY_LENS_NUDGE_DELAY = 4000;
 
 export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
@@ -4223,9 +4164,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
     }
   }, [isOpen]);
 
-  // Nudge users off a risky (ultra-wide/macro/depth) lens if scanning
-  // has been going on for a while without a successful read. Fires
-  // once per lens selection so it doesn't spam the user.
+
   useEffect(() => {
     if (nudgeTimerRef.current) {
       clearTimeout(nudgeTimerRef.current);
@@ -4288,9 +4227,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
         (d) => d.kind === "videoinput"
       );
 
-      // ── Step 3: identify back-facing cameras ──────────────────────
-      // Use labels when available; fall back to opening each camera
-      // briefly and checking the facingMode setting.
+      
       const hasAnyLabel = all.some((d) => d.label && d.label.trim() !== "");
       let backCams;
 
@@ -4322,7 +4259,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
       }
 
       if (isAndroid()) {
-        // ── Android-specific logic (Sequential hardware capability probing) ──
+      
         const capabilityResults = [];
         for (const [idx, cam] of backCams.entries()) {
           const caps     = await getCameraCapabilities(cam.deviceId);
@@ -4339,7 +4276,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
             .sort((a, b) => b.capScore - a.capScore);
           selectedId = scored[0]?.cam.deviceId || defaultBackId;
         } else {
-          // Fallback to scoreCameraForQR label/index check
+          
           const total = backCams.length;
           const scored = backCams.map((cam, idx) => ({
             cam,
@@ -4383,17 +4320,13 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
   };
 
   const buildVideoConstraints = () => {
-    // Pin to the chosen lens when we have a deviceId; otherwise ask
-    // the browser for any environment-facing camera.
+   
     const base = selectedCameraId
       ? { deviceId: { exact: selectedCameraId } }
       : { facingMode: "environment" };
 
     if (isAndroid()) {
-      // 1080 × 1080 gives the decoder plenty of pixels without pushing
-      // frame-rate below a usable level on mid-range hardware.
-      // Using `ideal` (not `exact`) so the browser falls back gracefully
-      // on cameras that don't support those dimensions.
+      
       return {
         ...base,
         width:  { ideal: 1280 },
@@ -4549,8 +4482,6 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
     if (!scanData || !isScanning) return;
     setIsScanning(false);
 
-    // A successful decode means the current lens works fine — clear
-    // any pending "switch lens" nudge and don't re-nudge for this lens.
     if (nudgeTimerRef.current) {
       clearTimeout(nudgeTimerRef.current);
       nudgeTimerRef.current = null;
@@ -4726,9 +4657,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                   console.error("Scanner error:", error);
                   const message = getCameraErrorMessage(error);
                   toast.error(message);
-                  // A specific lens can become invalid (unplugged/OS revoked
-                  // it) — fall back to the default camera instead of leaving
-                  // the view dead.
+                  
                   if (
                     selectedCameraId &&
                     (error?.name === "OverconstrainedError" ||
@@ -4751,7 +4680,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                         ],
                       }
                     : {
-                        // Previous iOS standard constraints:
+                       
                         width: { ideal: 1280 },
                         height: { ideal: 720 },
                         advanced: [{ focusMode: "continuous" }],

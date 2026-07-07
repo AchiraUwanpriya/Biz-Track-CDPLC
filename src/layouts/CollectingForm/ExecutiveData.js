@@ -3165,7 +3165,7 @@ export default function ExecutivePage() {
                             marginTop: 2,
                           }}
                         >
-                          <strong style={{ color: "#0369a1" }}>Remark:</strong>
+                          <strong style={{ color: "#0369a1" }}>Chaser Remark:</strong>
                           <span style={{ color: "#0c4a6e", marginLeft: 6 }}>
                             {item.remark}
                           </span>
