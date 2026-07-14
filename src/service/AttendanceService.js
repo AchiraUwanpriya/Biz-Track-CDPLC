@@ -137,7 +137,6 @@ const GetsubOrderingAttendanceCard = async (month, sno) => {
 };
 
 
-
 export default {
   GetAttendanceCard,
   GetCdlBasedDivison,

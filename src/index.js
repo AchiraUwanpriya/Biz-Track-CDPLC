@@ -13,9 +13,8 @@ import { AuthContextProvider } from "./context/AuthContext";
 
 axios.defaults.baseURL = "https://esystems.cdl.lk/backend/BizTrack/";
 
-// axios.defaults.baseURL = "http://localhost:51976/";
 
-//axios.defaults.baseURL = "/";
+// axios.defaults.baseURL = "http://localhost:51976/";
 //  axios.defaults.baseURL = "https://esystems.cdl.lk/backend-test/BizTrack/";
 // axios.defaults.baseURL = "http://172.30.30.110:5000/";
 //  axios.defaults.headers.post["Content-Type"] = "application/json";

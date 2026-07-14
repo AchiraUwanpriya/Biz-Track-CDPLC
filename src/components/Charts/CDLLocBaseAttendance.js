@@ -2040,7 +2040,7 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
 
                 {/* Column headers */}
                 <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5, px: 1.5, py: 0.7, bgcolor: "#e8f0fe" }}>
-                  {["Svc No", "Name", "Designation", "IN Time", "Status"].map((h) => (
+                  {["Svc No", "Name", "Designation", "IN ", "OUT "].map((h) => (
                     <Typography key={h} sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#004AAD" }}>{h}</Typography>
                   ))}
                 </Box>
@@ -2067,12 +2067,7 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
                       <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#1e293b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.repname || "-"}</Typography>
                       <Typography sx={{ fontSize: "0.6rem", color: "#64748b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.des || "-"}</Typography>
                       <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.inn : "NR"}</Typography>
-                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {p
-                          ? <CheckCircle sx={{ fontSize: 14, color: "#16a34a" }} />
-                          : <Cancel     sx={{ fontSize: 14, color: "#dc2626" }} />
-                        }
-                      </Box>
+                      <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.pout : "NR"}</Typography>
                     </Box>
                   );
                 })}
@@ -2239,7 +2234,7 @@ const DetailDrawer = ({ open, onClose, data, onEmployeeClick }) => {
       </Box>
       <Box sx={{ overflowY: "auto", flex: 1, px: 2, py: 1.5 }}>
         <Box sx={{ display: "grid", gridTemplateColumns: "0.8fr 1.4fr 1fr 0.8fr 0.6fr", gap: 0.5, px: 1, py: 0.8, bgcolor: "#e8f0fe", borderRadius: "8px", mb: 1, position: "sticky", top: 0, zIndex: 1 }}>
-          {["Svc No", "Name", "Designation", "IN Time", "Status"].map((h) => (
+          {["Svc No", "Name", "Designation", "IN Tie", "Status"].map((h) => (
             <Typography key={h} sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#004AAD" }}>{h}</Typography>
           ))}
         </Box>

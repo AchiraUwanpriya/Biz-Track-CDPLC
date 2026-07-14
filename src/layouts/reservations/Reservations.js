@@ -5710,9 +5710,18 @@ const Reservations = () => {
   const [startDate, setStartDate] = useState(
     new Date(new Date().setMonth(new Date().getMonth() - 1))
   );
-  const [endDate, setEndDate] = useState(
-    new Date(new Date().setMonth(new Date().getMonth() + 3))
+  // const [endDate, setEndDate] = useState(
+  //   new Date(new Date().setMonth(new Date().getMonth() + 3))
+  // );
+
+  const [endDate, setEndDate] = useState(() => {
+  const today = new Date();
+  return new Date(
+    today.getFullYear(),
+    today.getMonth() + 4, 
+    0                     
   );
+});
   const [caretakerModalOpen, setCaretakerModalOpen] = useState(false);
   const [selectedReservationForCaretaker, setSelectedReservationForCaretaker] = useState(null);
   const [guestDetailsModalOpen, setGuestDetailsModalOpen] = useState(false);

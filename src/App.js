@@ -554,6 +554,7 @@ import MaintenancePage from "../src/components/Cards/maintenance";
 import Caregiver from "../src/components/Cards/CareGiver";
 import Manager from "../src/layouts/reservations/Managers";
 import ProtectedDashboardRoute from "./route/ProtectedDashboardRoute";
+import AttendanceEntry from "./layouts/mark_attendance/AttendanceEntry"
 
 
 // import useMediaQuery from "@material-ui/core/useMediaQuery";
@@ -688,6 +689,7 @@ function App() {
                       <Route element={<Reservations1 />} path="/reservations" />
                       <Route element={<Caregiver />} path="/caretaker-view" />
                       <Route element={<Personal />} path="/personal" />
+                      <Route element={<AttendanceEntry />} path="/attendance-entry" />
                       {/* Add new approval routes */}
                       <Route element={<IwoApp />} path="/approvals/iwo" />
                       <Route element={<EwoApp />} path="/approvals/ewo" />

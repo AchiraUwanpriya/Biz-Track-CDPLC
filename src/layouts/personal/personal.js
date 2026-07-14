@@ -18,6 +18,13 @@ const Approvals = () => {
       path: "/Attendance",
       icon: "attendance.png",
     },
+
+    {
+      id: "EMOBCI0002",
+      label: "InOut",
+      path: "/attendance-entry",
+      icon: "arrived.png",
+    },
     
     { id: "EMOBCI0003", label: "Leave", path: "/Leave", icon: "exit.png" },
     // {
