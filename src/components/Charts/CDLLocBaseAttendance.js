@@ -1271,6 +1271,7 @@
 
 import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import CommonService from "../../service/CommonService";
+import { useSelector } from "react-redux";
 import {
   Avatar, Box, Button, Chip, Collapse, Dialog, DialogContent, IconButton, Paper,
   SwipeableDrawer, Table, TableBody, TableCell, TableContainer,
@@ -1280,8 +1281,18 @@ import {
   Business, CheckCircle, Close, KeyboardArrowDown, KeyboardArrowUp,
   Cancel, LocationOn, Visibility, AccountTree, ArrowBack,
   Person, Email, Phone, Work, CalendarToday, AttachMoney,
-  ReceiptLong, AccessTime, InfoOutlined, EventNote, Search,
+  ReceiptLong, AccessTime, InfoOutlined, EventNote, Search, GridView,
 } from "@mui/icons-material";
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as ChartTooltip,
+} from "recharts";
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 const isPresent = (emp) => emp.inn && emp.inn !== "NR" && emp.inn !== "";
@@ -1904,6 +1915,52 @@ const DivisionLevelChart = ({ data, onDivisionClick }) => {
     </Box>
   );
 };
+
+/* ─── STEP 1: Division Cards (alternative view) ───────────────────────────── */
+const DivisionStep = ({ divisions, data, onSelect }) => {
+  const divStats = divisions.map((div) => {
+    const emps    = data.filter((d) => d.division === div);
+    const present = emps.filter(isPresent).length;
+    const locs    = [...new Set(emps.map((e) => e.loc))].length;
+    const rate    = emps.length > 0 ? Math.round((present / emps.length) * 100) : 0;
+    const rateColor = rate >= 80 ? "#16a34a" : rate >= 60 ? "#d97706" : "#dc2626";
+    return { div, total: emps.length, present, locs, rate, rateColor };
+  });
+
+  return (
+    <Box>
+      <Typography sx={{ mb: 1.5, fontWeight: 600, color: "#64748b", fontSize: "0.8rem" }}>
+        Select a division to view locations
+      </Typography>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        {divStats.map(({ div, total, present, locs, rate, rateColor }) => (
+          <Box key={div} onClick={() => onSelect(div)}
+            sx={{
+              display: "flex", alignItems: "center", gap: 1.5,
+              px: 2, py: 1.25, border: "1.5px solid #e2e8f0",
+              borderRadius: "12px", cursor: "pointer", bgcolor: "#fff",
+              transition: "all 0.18s ease",
+              "&:hover": { borderColor: "#004AAD", bgcolor: "#f0f5ff" },
+            }}
+          >
+            <Avatar sx={{ width: 34, height: 34, bgcolor: "#e8f0fe", flexShrink: 0 }}>
+              <AccountTree sx={{ fontSize: 17, color: "#004AAD" }} />
+            </Avatar>
+            <Typography sx={{ flex: 1, fontWeight: 700, fontSize: "0.85rem", color: "#1e293b", lineHeight: 1.3, wordBreak: "break-word" }}>
+              {div}
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexShrink: 0 }}>
+              <Chip label={`${locs} loc`} size="small" sx={{ height: 22, fontSize: "0.68rem", fontWeight: 600, bgcolor: "#e8f0fe", color: "#004AAD" }} />
+              <Chip label={`${present}/${total}`} size="small" sx={{ height: 22, fontSize: "0.68rem", fontWeight: 600, bgcolor: "#dcfce7", color: "#16a34a" }} />
+              <Chip label={`${rate}%`} size="small" sx={{ height: 22, fontSize: "0.68rem", fontWeight: 700, bgcolor: `${rateColor}18`, color: rateColor, minWidth: 42 }} />
+              <KeyboardArrowDown sx={{ fontSize: 18, color: "#94a3b8", transform: "rotate(-90deg)" }} />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+};
 /* ─── InlineLocationChart (existing) ──────────────────────────── */
 const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
   const [expandedLoc, setExpandedLoc] = useState(null);
@@ -2090,17 +2147,404 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
   );
 };
 
-/* ─── Division Cards (alternative view) ───────────────────────────────────── */
-const DivisionStep = ({ divisions, data, onSelect }) => {
-  const divStats = divisions.map((div) => {
-    const emps    = data.filter((d) => d.division === div);
-    const present = emps.filter(isPresent).length;
-    const locs    = [...new Set(emps.map((e) => e.loc))].length;
-    const rate    = emps.length > 0 ? Math.round((present / emps.length) * 100) : 0;
-    const rateColor = rate >= 80 ? "#16a34a" : rate >= 60 ? "#d97706" : "#dc2626";
-    return { div, total: emps.length, present, locs, rate, rateColor };
+/* ─── Helpers for Chart aggregation ───────────────────────────────────────── */
+const getWeekNumber = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+};
+
+const getWeekStart = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+};
+
+const getYear = (date) => {
+  return date.getFullYear();
+};
+
+const aggregateByPeriod = (data, keyFn, labelFn, sortKeyFn) => {
+  const groups = {};
+  data.forEach(item => {
+    const date = new Date(item.AttDate || item.attDate || item.ATTDATE || item.Date || item.date);
+    if (isNaN(date.getTime())) return;
+    const key = keyFn(date);
+    if (!groups[key]) {
+      groups[key] = {
+        key,
+        sortKey: sortKeyFn(date),
+        label: labelFn(date),
+        repDate: date,
+        eligibleSum: 0,
+        attendanceSum: 0,
+        count: 0,
+      };
+    }
+    groups[key].eligibleSum += parseInt(item.Eligible || item.eligible || item.ELIGIBLE || 0);
+    groups[key].attendanceSum += parseInt(item.Attendance || item.attendance || item.ATTENDANCE || 0);
+    groups[key].count += 1;
   });
 
+  return Object.values(groups)
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .map(g => {
+      const avgEligible = g.count ? g.eligibleSum / g.count : 0;
+      const avgAttendance = g.count ? g.attendanceSum / g.count : 0;
+      const rate = avgEligible ? Math.round((avgAttendance / avgEligible) * 100) : 0;
+      return {
+        name: g.label,
+        eligible: Math.round(avgEligible),
+        attendance: Math.round(avgAttendance),
+        remaining: Math.max(0, Math.round(avgEligible) - Math.round(avgAttendance)),
+        rate,
+        fullDate: g.repDate.toISOString(),
+        periodDays: g.count,
+        hasData: true
+      };
+    });
+};
+
+const formatYLeft = (v) => {
+  if (v >= 1000) {
+    return `${(v / 1000).toFixed(1).replace(".0", "")}k`;
+  }
+  return v;
+};
+
+const formatYRight = (v) => `${v}%`;
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const attendance = payload.find(p => p.dataKey === "attendance")?.value || 0;
+    const remaining = payload.find(p => p.dataKey === "remaining")?.value || 0;
+    const eligible = attendance + remaining;
+    const rateVal = payload.find(p => p.dataKey === "rate")?.value;
+
+    return (
+      <Box
+        sx={{
+          backgroundColor: "#ffffff",
+          border: "1px solid #e2e8f0",
+          padding: "10px 14px",
+          borderRadius: "10px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+        }}
+      >
+        <Typography sx={{ fontSize: 12, fontWeight: 700, color: "#1e293b", mb: 0.5 }}>
+          {label}
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center", mb: 0.3 }}>
+          <Box sx={{ width: 8, height: 8, backgroundColor: "#3b82f6", borderRadius: "50%" }} />
+          <Typography sx={{ fontSize: 11, color: "#64748b" }}>
+            Attendance: <span style={{ color: "#1e293b", fontWeight: 700 }}>{attendance}</span>
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center", mb: 0.3 }}>
+          <Box sx={{ width: 8, height: 8, backgroundColor: "#bfdbfe", borderRadius: "50%" }} />
+          <Typography sx={{ fontSize: 11, color: "#64748b" }}>
+            Eligible: <span style={{ color: "#1e293b", fontWeight: 700 }}>{eligible}</span>
+          </Typography>
+        </Box>
+        {rateVal !== undefined && rateVal !== null && (
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center", mt: 0.5, pt: 0.5, borderTop: "0.5px solid #e2e8f0" }}>
+            <Box sx={{ width: 8, height: 8, backgroundColor: "#f59e0b", borderRadius: "50%" }} />
+            <Typography sx={{ fontSize: 11, color: "#64748b" }}>
+              Rate %: <span style={{ color: "#f59e0b", fontWeight: 800 }}>{rateVal}%</span>
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    );
+  }
+  return null;
+};
+
+const LegendDot = ({ color, label }) => (
+  <Box sx={{ display: "flex", gap: 0.8, alignItems: "center" }}>
+    <Box sx={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: color }} />
+    <Typography sx={{ fontSize: 11, color: "#64748b", fontWeight: 500 }}>{label}</Typography>
+  </Box>
+);
+
+const ChartLegend = () => (
+  <Box sx={{ display: "flex", gap: 3, justifyContent: "center", mt: 2, pt: 1.5, borderTop: "0.5px solid #f1f5f9" }}>
+    <LegendDot color="#3b82f6" label="Attendance" />
+    <LegendDot color="#bfdbfe" label="Eligible" />
+    <LegendDot color="#f59e0b" label="Rate %" />
+  </Box>
+);
+
+/* ─── CDLOverallTrendChart - Overall CDPLC trend chart ────────────────────────── */
+const CDLOverallTrendChart = () => {
+  const [chartPeriod, setChartPeriod] = useState("month"); // "week" | "month" | "year"
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const {
+    weeklyAttendance,
+    monthlyAttendance,
+    yearlyAttendance,
+  } = useSelector((state) => state.attendanceCard);
+
+  // Helper function to process data based on current period
+  const chartData = useMemo(() => {
+    if (chartPeriod === "month") {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const currentMonth = new Date().getMonth();
+      
+      let lastEligible = 1400;
+      const rawMonths = monthlyAttendance || [];
+      rawMonths.forEach(item => {
+        const eligible = parseInt(item.Eligible || item.eligible || item.ELIGIBLE || 0);
+        if (eligible > 0) lastEligible = eligible;
+      });
+
+      return months.map((m, index) => {
+        const item = rawMonths.find(item => {
+          const monthVal = item.Month || item.month || item.MONTH || item.AttMonth || "";
+          let monthIndex = -1;
+          if (typeof monthVal === "string") {
+            const valLower = monthVal.toLowerCase();
+            if (valLower.includes("-")) {
+              const parts = valLower.split("-");
+              monthIndex = parseInt(parts[1]) - 1;
+            } else {
+              monthIndex = months.findIndex(name => valLower.startsWith(name.toLowerCase()));
+            }
+          } else if (typeof monthVal === "number") {
+            monthIndex = monthVal - 1;
+          }
+          return monthIndex === index;
+        });
+
+        if (item) {
+          const attendance = parseInt(item.Attendance || item.attendance || item.ATTENDANCE || 0);
+          const eligible = parseInt(item.Eligible || item.eligible || item.ELIGIBLE || lastEligible || 0);
+          const rate = item.Rate || item.rate || item.RATE || item.Percentage || item.percentage;
+          
+          const hasRealData = attendance > 0 || index <= currentMonth;
+
+          return {
+            name: m,
+            attendance: attendance,
+            eligible: eligible,
+            remaining: Math.max(0, eligible - attendance),
+            rate: hasRealData ? (rate !== undefined ? parseFloat(rate) : Math.round((attendance / eligible) * 100)) : null,
+            hasData: hasRealData
+          };
+        } else {
+          return {
+            name: m,
+            attendance: 0,
+            eligible: lastEligible,
+            remaining: lastEligible,
+            rate: null,
+            hasData: false
+          };
+        }
+      });
+    } else if (chartPeriod === "week") {
+      const rawWeeks = weeklyAttendance || [];
+      const hasDate = rawWeeks.some(w => w.AttDate || w.attDate || w.ATTDATE || w.Date || w.date);
+      
+      if (hasDate) {
+        return aggregateByPeriod(
+          rawWeeks,
+          (date) => {
+            const weekStart = getWeekStart(date);
+            const weekNum = getWeekNumber(weekStart);
+            const year = getYear(weekStart);
+            return `${year}-${String(weekNum).padStart(2, '0')}`;
+          },
+          (date) => {
+            const weekStart = getWeekStart(date);
+            const weekNum = getWeekNumber(weekStart);
+            return `W${weekNum}`;
+          },
+          (date) => {
+            const weekStart = getWeekStart(date);
+            const weekNum = getWeekNumber(weekStart);
+            const year = getYear(weekStart);
+            return new Date(year, 0, 1 + (weekNum - 1) * 7).getTime();
+          }
+        );
+      } else {
+        return rawWeeks.map((item, index) => {
+          const name = item.DayName || item.dayName || item.DAYNAME || item.Week || item.week || `W${index + 1}`;
+          const attendance = parseInt(item.Attendance || item.attendance || item.ATTENDANCE || 0);
+          const eligible = parseInt(item.Eligible || item.eligible || item.ELIGIBLE || 0);
+          const rate = item.Rate || item.rate || item.RATE || item.Percentage || item.percentage;
+          return {
+            name,
+            attendance,
+            eligible,
+            remaining: Math.max(0, eligible - attendance),
+            rate: eligible > 0 ? (rate !== undefined ? parseFloat(rate) : Math.round((attendance / eligible) * 100)) : null,
+            hasData: eligible > 0
+          };
+        });
+      }
+    } else {
+      const rawYears = yearlyAttendance || [];
+      const hasDate = rawYears.some(w => w.AttDate || w.attDate || w.ATTDATE || w.Date || w.date);
+
+      if (hasDate) {
+        return aggregateByPeriod(
+          rawYears,
+          (date) => `${getYear(date)}`,
+          (date) => `${getYear(date)}`,
+          (date) => new Date(getYear(date), 0, 1).getTime()
+        );
+      } else {
+        return rawYears.map((item, index) => {
+          const name = String(item.Year || item.year || item.YEAR || `Year ${index + 1}`);
+          const attendance = parseInt(item.Attendance || item.attendance || item.ATTENDANCE || 0);
+          const eligible = parseInt(item.Eligible || item.eligible || item.ELIGIBLE || 0);
+          const rate = item.Rate || item.rate || item.RATE || item.Percentage || item.percentage;
+          return {
+            name,
+            attendance,
+            eligible,
+            remaining: Math.max(0, eligible - attendance),
+            rate: eligible > 0 ? (rate !== undefined ? parseFloat(rate) : Math.round((attendance / eligible) * 100)) : null,
+            hasData: eligible > 0
+          };
+        });
+      }
+    }
+  }, [chartPeriod, weeklyAttendance, monthlyAttendance, yearlyAttendance]);
+
+  const barSize = chartData.length <= 12 ? 24 : 14;
+
+  return (
+    <Box sx={{ width: "100%", mt: 1 }}>
+      {/* Control row */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+        {/* Toggle buttons */}
+        <Box sx={{ display: "flex", gap: 1 }}>
+          {["Week", "Month", "Year"].map((p) => {
+            const isSelected = chartPeriod === p.toLowerCase();
+            return (
+              <Box
+                key={p}
+                onClick={() => setChartPeriod(p.toLowerCase())}
+                sx={{
+                  px: 2,
+                  py: 0.6,
+                  borderRadius: "8px",
+                  border: isSelected ? "none" : "1px solid #e2e8f0",
+                  bgcolor: isSelected ? "#1E3A8A" : "#fff",
+                  color: isSelected ? "#fff" : "#64748b",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  userSelect: "none",
+                  "&:hover": {
+                    bgcolor: isSelected ? "#1E3A8A" : "#f8faff",
+                  }
+                }}
+              >
+                {p}
+              </Box>
+            );
+          })}
+        </Box>
+        {/* Right label */}
+        <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: 700 }}>
+          All Divisions · CDPLC
+        </Typography>
+      </Box>
+
+      {/* Chart container */}
+      {chartData.length === 0 ? (
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 260, bgcolor: "#f8faff", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+          <Typography sx={{ fontSize: "0.85rem", color: "#94a3b8" }}>No chart data available</Typography>
+        </Box>
+      ) : (
+        <>
+          <Box sx={{ height: 260, width: "100%" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 10, right: -15, left: -20, bottom: 5 }}
+                barCategoryGap="30%"
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 10, fontWeight: 500 }}
+                />
+                <YAxis
+                  yAxisId="left"
+                  orientation="left"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "#64748b", fontSize: 10, fontWeight: 500 }}
+                  tickFormatter={formatYLeft}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "#64748b", fontSize: 10, fontWeight: 500 }}
+                  domain={[0, 100]}
+                  ticks={[0, 25, 50, 75, 100]}
+                  tickFormatter={formatYRight}
+                />
+                <ChartTooltip content={<CustomTooltip />} />
+                
+                {/* Attendance segment (bottom) */}
+                <Bar
+                  yAxisId="left"
+                  dataKey="attendance"
+                  name="Attendance"
+                  stackId="bars"
+                  barSize={barSize}
+                  fill="#3b82f6"
+                  radius={[0, 0, 4, 4]}
+                />
+
+                {/* Eligible segment (top) */}
+                <Bar
+                  yAxisId="left"
+                  dataKey="remaining"
+                  name="Eligible"
+                  stackId="bars"
+                  barSize={barSize}
+                  fill="#bfdbfe"
+                  radius={[4, 4, 0, 0]}
+                />
+
+                {/* Rate % line */}
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="rate"
+                  name="Rate %"
+                  stroke="#f59e0b"
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: "#f59e0b", strokeWidth: 0 }}
+                  activeDot={{ r: 6 }}
+                  connectNulls={false}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </Box>
+          <ChartLegend />
+        </>
+      )}
+    </Box>
+  );
 };
 
 /* ─── Desktop Location Table ──────────────────────────────────────────────── */
@@ -2319,6 +2763,7 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const currentYear = new Date().getFullYear().toString();
 
+  const [activeMainTab,     setActiveMainTab]      = useState(0); // 0 = Divisions, 1 = Chart
   const [selectedDivision,  setSelectedDivision]  = useState(null);
   const [expandedRow,       setExpandedRow]        = useState(null);
   const [drawerOpen,        setDrawerOpen]         = useState(false);
@@ -2332,7 +2777,6 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const handleDivisionSelect = useCallback((div) => {
     setSelectedDivision(div);
     setExpandedRow(null);
-    //setSearchTerm("");
   }, []);
 
   const handleBack = useCallback(() => {
@@ -2382,9 +2826,10 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const divEmployees   = selectedDivision ? filteredData.filter((d) => d.division === selectedDivision) : [];
   const totalPresent   = divEmployees.filter(isPresent).length;
 
-  const subtitle = selectedDivision
+  const mainTitle = selectedDivision ? `Division Overview - ${selectedDivision}` : "Division Overview";
+  const mainSubtitle = selectedDivision
     ? `${totalLocations} locations · ${divEmployees.length} employees · ${totalPresent} present${term ? ` · filtered by "${searchTerm}"` : ""}`
-    : `${divisions.length} divisions · ${filteredData.length} employees total${term ? ` · filtered by "${searchTerm}"` : ""}`;
+    : `${divisions.length || 8} divisions · click any division to view locations${term ? ` · filtered by "${searchTerm}"` : ""}`;
 
   const searchPlaceholder = selectedDivision
     ? "Search by name, service no, designation, location…"
@@ -2392,68 +2837,98 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
 
   return (
     <>
-      <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: "20px", boxShadow: "0 4px 24px rgba(0,74,173,0.06)" }}>
+      <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 20px rgba(0,74,173,0.05)" }}>
         <Box sx={{ mb: 2 }}>
-          <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "#004AAD", fontSize: "16px" }}>
-             CDPLC Attendance Based on Division
+          <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "#004AAD", fontSize: "1.1rem" }}>
+             {mainTitle}
           </Typography>
-         
+          <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 500 }}>
+            {mainSubtitle}
+          </Typography>
         </Box>
 
-        <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
+        {/* Tab navigation */}
+        <Tabs
+          value={activeMainTab}
+          onChange={(_, v) => setActiveMainTab(v)}
+          variant="fullWidth"
+          sx={{
+            borderBottom: "1px solid #e2e8f0",
+            mb: 2.5,
+            minHeight: 40,
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              minHeight: 40,
+              py: 0.75,
+              color: "#94a3b8",
+            },
+            "& .Mui-selected": { color: "#004AAD" },
+            "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2.5 },
+          }}
+        >
+          <Tab label="Divisions" />
+          <Tab label="Chart" />
+        </Tabs>
 
-        {!selectedDivision ? (
+        {activeMainTab === 0 ? (
           <>
-            {/* Division Level Chart - Shows divisions with expandable locations */}
-            <DivisionLevelChart 
-              data={filteredData} 
-              onDivisionClick={handleDivisionSelect} 
-            />
-            
-            {/* Original Division Cards as alternative view */}
-            <Box sx={{ mt: 3 }}>
-              <DivisionStep divisions={divisions} data={filteredData} onSelect={handleDivisionSelect} />
-            </Box>
-          </>
-        ) : (
-          <>
-            <Breadcrumb division={selectedDivision} onBack={handleBack} />
+            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
 
-            {/* Location Chart within selected division */}
-            <InlineLocationChart
-              data={filteredData}
-              division={selectedDivision}
-              onEmployeeClick={handleEmployeeClick}
-            />
-
-            {isMobile ? (
-              <Box
-                ref={scrollRef}
-                sx={{
-                  maxHeight: "calc(100vh - 260px)", overflowY: "auto", overflowX: "hidden", pr: 0.5,
-                  "&::-webkit-scrollbar": { width: 4 },
-                  "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
-                  "&::-webkit-scrollbar-thumb": { bgcolor: "#cbd5e1", borderRadius: 4 },
-                }}
-              >
-                {Object.keys(locationGroups).length === 0 && (
-                  <Box sx={{ textAlign: "center", py: 6 }}>
-                    <Search sx={{ fontSize: 44, color: "#cbd5e1", mb: 1 }} />
-                    <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem" }}>No locations match your search</Typography>
-                  </Box>
-                )}
-                <Box sx={{ height: 80 }} />
-              </Box>
+            {!selectedDivision ? (
+              <>
+                <DivisionLevelChart 
+                  data={filteredData} 
+                  onDivisionClick={handleDivisionSelect} 
+                />
+                <Box sx={{ mt: 3 }}>
+                  <DivisionStep divisions={divisions} data={filteredData} onSelect={handleDivisionSelect} />
+                </Box>
+              </>
             ) : (
-              <DesktopLocationTable
-                locationGroups={locationGroups}
-                expandedRow={expandedRow}
-                onExpand={handleToggle}
-                onViewDetails={handleViewDetails}
-                onEmployeeClick={handleEmployeeClick}
-              />
+              <>
+                <Breadcrumb division={selectedDivision} onBack={handleBack} />
+
+                {/* Location Chart within selected division */}
+                <InlineLocationChart
+                  data={filteredData}
+                  division={selectedDivision}
+                  onEmployeeClick={handleEmployeeClick}
+                />
+
+                {isMobile ? (
+                  <Box
+                    ref={scrollRef}
+                    sx={{
+                      maxHeight: "calc(100vh - 260px)", overflowY: "auto", overflowX: "hidden", pr: 0.5,
+                      "&::-webkit-scrollbar": { width: 4 },
+                      "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
+                      "&::-webkit-scrollbar-thumb": { bgcolor: "#cbd5e1", borderRadius: 4 },
+                    }}
+                  >
+                    {Object.keys(locationGroups).length === 0 && (
+                      <Box sx={{ textAlign: "center", py: 6 }}>
+                        <Search sx={{ fontSize: 44, color: "#cbd5e1", mb: 1 }} />
+                        <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem" }}>No locations match your search</Typography>
+                      </Box>
+                    )}
+                    <Box sx={{ height: 80 }} />
+                  </Box>
+                ) : (
+                  <DesktopLocationTable
+                    locationGroups={locationGroups}
+                    expandedRow={expandedRow}
+                    onExpand={handleToggle}
+                    onViewDetails={handleViewDetails}
+                    onEmployeeClick={handleEmployeeClick}
+                  />
+                )}
+              </>
             )}
           </>
+        ) : (
+          <CDLOverallTrendChart />
         )}
       </Paper>
 
