@@ -1561,6 +1561,7 @@ const AttendanceTab = ({ sno }) => {
 
 /* ─── EmployeeDetailsPopup ────────────────────────────────────────────────── */
 const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
+  const { weeklyAttendance } = useSelector((state) => state.attendanceCard || {});
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [noPayData, setNoPayData]             = useState([]);
   const [loading, setLoading]                 = useState(false);
@@ -1569,6 +1570,53 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
   const [selectedYear, setSelectedYear]       = useState(currentYear || new Date().getFullYear().toString());
   const [noPayLoading, setNoPayLoading]       = useState(false);
   const [noPayError, setNoPayError]           = useState(null);
+  const [empChartData, setEmpChartData]       = useState([]);
+  const [empChartLoading, setEmpChartLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && employee && tabValue === 4) {
+      let active = true;
+      setEmpChartLoading(true);
+      setEmpChartData([]);
+      const p_div = employee.division || "";
+      const p_loc = employee.loc || "";
+      const p_sno = employee.sno || "";
+
+      CommonService.GetEmpWiseAtt(p_div, p_loc, p_sno)
+        .then((res) => {
+          if (!active) return;
+          const raw =
+            res?.data?.ResultSet ||
+            res?.data?.resultSet ||
+            res?.data?.data ||
+            res?.data ||
+            [];
+          const rawArr = Array.isArray(raw) ? raw : [];
+          const normalized = rawArr.map((item) => {
+            const rawDate = item.Date ?? item.AttDate ?? item.att_date ?? item.date ?? "";
+            const attDate = parseOracleDate(rawDate);
+            const attendance = parseInt(item.Att_count ?? item.AttCount ?? item.Attendance ?? item.attendance ?? 0) || 0;
+            return {
+              ...item,
+              AttDate:    attDate,
+              Attendance: attendance,
+              Eligible:   0,
+            };
+          });
+          setEmpChartData(normalized);
+        })
+        .catch((err) => {
+          console.error("Error fetching employee wise attendance:", err);
+          if (active) setEmpChartData([]);
+        })
+        .finally(() => {
+          if (active) setEmpChartLoading(false);
+        });
+      return () => {
+        active = false;
+      };
+    }
+  }, [open, employee, tabValue]);
 
   useEffect(() => {
     if (open && employee && tabValue === 2 && employeeDetails?.barcode_no) {
@@ -1658,6 +1706,7 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
     { label: "Other Info", icon: <InfoOutlined sx={{ fontSize: 17 }} /> },
     { label: "No Pay",     icon: <ReceiptLong sx={{ fontSize: 17 }} /> },
     { label: "Attendance", icon: <AccessTime sx={{ fontSize: 17 }} /> },
+    { label: "Chart",      icon: <GridView sx={{ fontSize: 17 }} /> },
   ];
 
   return (
@@ -1709,10 +1758,24 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
       <Tabs
         value={tabValue}
         onChange={(_, v) => setTabValue(v)}
-        variant="fullWidth"
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
         sx={{
-          borderBottom: "0.5px solid #e2e8f0", minHeight: 44,
-          "& .MuiTab-root": { textTransform: "none", fontWeight: 600, fontSize: "0.72rem", minHeight: 44, py: 0, gap: "4px", color: "#94a3b8" },
+          borderBottom: "0.5px solid #e2e8f0",
+          minHeight: 44,
+          "& .MuiTab-root": {
+            textTransform: "none",
+            fontWeight: 600,
+            fontSize: "0.72rem",
+            minHeight: 44,
+            py: 0,
+            px: 2,
+            gap: "4px",
+            color: "#94a3b8",
+            minWidth: "auto",
+            flexShrink: 0,
+          },
           "& .Mui-selected": { color: "#004AAD" },
           "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2 },
         }}
@@ -1815,6 +1878,17 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
               </Box>
             )}
             {tabValue === 3 && <AttendanceTab sno={employee?.sno} />}
+            {tabValue === 4 && (
+              <Box sx={{ p: 1.5, bgcolor: "#fff" }}>
+                {empChartLoading ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                    <CircularProgress sx={{ color: "#004AAD" }} size={32} />
+                  </Box>
+                ) : (
+                  <WeeklyAttendanceTrend weeklyApiData={empChartData} hideEligible={true} />
+                )}
+              </Box>
+            )}
           </>
         )}
       </DialogContent>

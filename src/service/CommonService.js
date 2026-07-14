@@ -184,6 +184,18 @@ const GetLocWiseAtt = async (p_div, p_loc) => {
   });
 };
 
+const GetEmpWiseAtt = async (p_div, p_loc, p_sno) => {
+  return axios.get(`Attendancedashboard/GetEmpWiseAtt`, {
+    params: {
+      p_div,
+      p_loc,
+      p_sno,
+    },
+  }).then((response) => {
+    return response;
+  });
+};
+
 export default {
   getBannerImages,
   GetAccessHeadComponent,
@@ -200,4 +212,5 @@ export default {
   GetChaserDailyCollect,
   GetDivWiseAtt,
   GetLocWiseAtt,
+  GetEmpWiseAtt,
 };

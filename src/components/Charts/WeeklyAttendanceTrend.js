@@ -1207,7 +1207,7 @@ const LegendDot = ({ color, label }) => (
   </Box>
 );
 
-const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible" }) => (
+const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible", hideEligible = false }) => (
   <Box
     sx={{
       display: "flex",
@@ -1219,9 +1219,9 @@ const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible" }) => (
     }}
   >
     <LegendDot color="#3b82f6" label="Attendance" />
-    <LegendDot color="#bfdbfe" label={eligibleLabel} />
+    {!hideEligible && <LegendDot color="#bfdbfe" label={eligibleLabel} />}
     <LegendDot color="#f59e0b" label="Rate %" />
-    {showTarget && (
+    {showTarget && !hideEligible && (
       <Box sx={{ ml: "auto", display: "flex", gap: 1, alignItems: "center" }}>
         <Box sx={{ width: 20, height: 0, borderBottom: "2px dashed #ef4444" }} />
         <Typography sx={{ fontSize: { xs: 9, sm: 10 }, color: "#64748b" }}>Target</Typography>
@@ -1369,7 +1369,8 @@ const AttendanceChart = ({
   chartHeight,
   allMonthsData,
   allWeeksData,
-  eligibleLabel = "Eligible"
+  eligibleLabel = "Eligible",
+  hideEligible = false
 }) => {
 
   const barSize = getFixedBarSize(data.length);
@@ -1496,34 +1497,38 @@ const AttendanceChart = ({
             tickFormatter={(v) => `${v}%`}
           />
           <Tooltip content={<CustomTooltip eligibleLabel={eligibleLabel} />} />
-          <ReferenceLine
-            y={targetEligible}
-            stroke="#ef4444"
-            strokeDasharray="4 4"
-            yAxisId="left"
-            strokeWidth={1.5}
-          />
+          {!hideEligible && (
+            <ReferenceLine
+              y={targetEligible}
+              stroke="#ef4444"
+              strokeDasharray="4 4"
+              yAxisId="left"
+              strokeWidth={1.5}
+            />
+          )}
 
           {/* Bottom segment: Attendance (stacked) */}
           <Bar
             yAxisId="left"
             dataKey="attendance"
             name="Attendance"
-            stackId="bars"
+            stackId={hideEligible ? undefined : "bars"}
             barSize={barSize}
             fill="#3b82f6"
-            radius={[0, 0, 6, 6]}
+            radius={hideEligible ? [6, 6, 0, 0] : [0, 0, 6, 6]}
           />
 
-          <Bar
-            yAxisId="left"
-            dataKey="remaining"
-            name={eligibleLabel}
-            stackId="bars"
-            barSize={barSize}
-            fill="#bfdbfe"
-            radius={[6, 6, 0, 0]}
-          />
+          {!hideEligible && (
+            <Bar
+              yAxisId="left"
+              dataKey="remaining"
+              name={eligibleLabel}
+              stackId="bars"
+              barSize={barSize}
+              fill="#bfdbfe"
+              radius={[6, 6, 0, 0]}
+            />
+          )}
 
           <Line
             yAxisId="right"
@@ -1752,6 +1757,7 @@ export function WeeklyAttendanceTrend({
   targetEligible = 1700,
   targetRate = 75,
   eligibleLabel = "Eligible",
+  hideEligible = false,
 }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const [view, setView] = useState("week");
@@ -2117,10 +2123,11 @@ export function WeeklyAttendanceTrend({
                 allMonthsData={allMonthsData}
                 allWeeksData={allWeeksData}
                 eligibleLabel={eligibleLabel}
+                hideEligible={hideEligible}
               />
 
               {/* Legend - consistent across all views */}
-              <ChartLegend showTarget={true} eligibleLabel={eligibleLabel} />
+              <ChartLegend showTarget={true} eligibleLabel={eligibleLabel} hideEligible={hideEligible} />
             </>
           )}
         </Box>
