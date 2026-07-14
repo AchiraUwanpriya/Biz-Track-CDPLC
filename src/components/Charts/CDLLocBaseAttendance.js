@@ -1313,6 +1313,24 @@ const normalizeRow = (item) => ({
   cno:      item?.CNO  || item?.cno  || "",
 });
 
+// Convert Oracle-style date "01-JAN-2026" → ISO "2026-01-01" for JS date parsing
+const parseOracleDate = (raw) => {
+  if (!raw) return "";
+  // Already ISO or JS-parseable
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw;
+  // Oracle format: DD-MON-YYYY  e.g. "01-JAN-2026"
+  const monthMap = {
+    JAN:"01", FEB:"02", MAR:"03", APR:"04", MAY:"05", JUN:"06",
+    JUL:"07", AUG:"08", SEP:"09", OCT:"10", NOV:"11", DEC:"12",
+  };
+  const m = String(raw).trim().toUpperCase().match(/^(\d{1,2})-([A-Z]{3})-(\d{4})$/);
+  if (m) {
+    const [, dd, mon, yyyy] = m;
+    return `${yyyy}-${monthMap[mon] || "01"}-${dd.padStart(2, "0")}`;
+  }
+  return raw; // return as-is and let Date() try
+};
+
 /* ─── Chart color helpers ─────────────────────────────────────────────────── */
 const rateColor = (pct) =>
   pct >= 80 ? "#16a34a" : pct >= 60 ? "#d97706" : "#dc2626";
@@ -1927,6 +1945,49 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
   const [expandedLoc, setExpandedLoc] = useState(null);
   const [locInnerTab, setLocInnerTab] = useState(0);
   const rowRefs = useRef({});
+  const [locChartData, setLocChartData] = useState([]);
+  const [locChartLoading, setLocChartLoading] = useState(false);
+
+  useEffect(() => {
+    if (!expandedLoc || locInnerTab !== 1) {
+      setLocChartData([]);
+      return;
+    }
+    let active = true;
+    setLocChartLoading(true);
+    setLocChartData([]);
+    CommonService.GetLocWiseAtt(division, expandedLoc)
+      .then((res) => {
+        if (!active) return;
+        const raw =
+          res?.data?.ResultSet ||
+          res?.data?.resultSet ||
+          res?.data?.data ||
+          res?.data ||
+          [];
+        const rawArr = Array.isArray(raw) ? raw : [];
+        const normalized = rawArr.map((item) => {
+          const rawDate = item.Date ?? item.AttDate ?? item.att_date ?? item.date ?? "";
+          const attDate = parseOracleDate(rawDate);
+          const attendance = parseInt(item.Att_count ?? item.AttCount ?? item.Attendance ?? item.attendance ?? 0) || 0;
+          const eligible   = parseInt(item.Actual_count ?? item.ActualCount ?? item.Eligible ?? item.eligible ?? attendance) || attendance;
+          return {
+            ...item,
+            AttDate:    attDate,
+            Attendance: attendance,
+            Eligible:   eligible,
+          };
+        });
+        setLocChartData(normalized);
+      })
+      .catch(() => {
+        if (active) setLocChartData([]);
+      })
+      .finally(() => {
+        if (active) setLocChartLoading(false);
+      });
+    return () => { active = false; };
+  }, [expandedLoc, locInnerTab, division]);
 
   const chartData = useMemo(() => {
     const filtered = data.filter((d) => d.division === division);
@@ -2145,7 +2206,13 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
                 ) : (
                   /* Chart Tab - Weekly Attendance Trend Chart */
                   <Box sx={{ p: 1.5, bgcolor: "#fff" }}>
-                    <WeeklyAttendanceTrend weeklyApiData={weeklyAttendance} />
+                    {locChartLoading ? (
+                      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 5 }}>
+                        <CircularProgress sx={{ color: "#004AAD" }} size={28} />
+                      </Box>
+                    ) : (
+                      <WeeklyAttendanceTrend weeklyApiData={locChartData} eligibleLabel="Actual" />
+                    )}
                   </Box>
                 )}
               </Box>
@@ -2401,24 +2468,6 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const [divChartLoading, setDivChartLoading] = useState(false);
 
   const scrollRef = useRef(null);
-
-  // Convert Oracle-style date "01-JAN-2026" → ISO "2026-01-01" for JS date parsing
-  const parseOracleDate = (raw) => {
-    if (!raw) return "";
-    // Already ISO or JS-parseable
-    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw;
-    // Oracle format: DD-MON-YYYY  e.g. "01-JAN-2026"
-    const monthMap = {
-      JAN:"01", FEB:"02", MAR:"03", APR:"04", MAY:"05", JUN:"06",
-      JUL:"07", AUG:"08", SEP:"09", OCT:"10", NOV:"11", DEC:"12",
-    };
-    const m = String(raw).trim().toUpperCase().match(/^(\d{1,2})-([A-Z]{3})-(\d{4})$/);
-    if (m) {
-      const [, dd, mon, yyyy] = m;
-      return `${yyyy}-${monthMap[mon] || "01"}-${dd.padStart(2, "0")}`;
-    }
-    return raw; // return as-is and let Date() try
-  };
 
   // Fetch division-wise attendance trend when Chart tab is active inside a division
   useEffect(() => {
