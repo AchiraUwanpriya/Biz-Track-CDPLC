@@ -1916,51 +1916,7 @@ const DivisionLevelChart = ({ data, onDivisionClick }) => {
   );
 };
 
-/* ─── STEP 1: Division Cards (alternative view) ───────────────────────────── */
-const DivisionStep = ({ divisions, data, onSelect }) => {
-  const divStats = divisions.map((div) => {
-    const emps    = data.filter((d) => d.division === div);
-    const present = emps.filter(isPresent).length;
-    const locs    = [...new Set(emps.map((e) => e.loc))].length;
-    const rate    = emps.length > 0 ? Math.round((present / emps.length) * 100) : 0;
-    const rateColor = rate >= 80 ? "#16a34a" : rate >= 60 ? "#d97706" : "#dc2626";
-    return { div, total: emps.length, present, locs, rate, rateColor };
-  });
 
-  return (
-    <Box>
-      <Typography sx={{ mb: 1.5, fontWeight: 600, color: "#64748b", fontSize: "0.8rem" }}>
-        Select a division to view locations
-      </Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        {divStats.map(({ div, total, present, locs, rate, rateColor }) => (
-          <Box key={div} onClick={() => onSelect(div)}
-            sx={{
-              display: "flex", alignItems: "center", gap: 1.5,
-              px: 2, py: 1.25, border: "1.5px solid #e2e8f0",
-              borderRadius: "12px", cursor: "pointer", bgcolor: "#fff",
-              transition: "all 0.18s ease",
-              "&:hover": { borderColor: "#004AAD", bgcolor: "#f0f5ff" },
-            }}
-          >
-            <Avatar sx={{ width: 34, height: 34, bgcolor: "#e8f0fe", flexShrink: 0 }}>
-              <AccountTree sx={{ fontSize: 17, color: "#004AAD" }} />
-            </Avatar>
-            <Typography sx={{ flex: 1, fontWeight: 700, fontSize: "0.85rem", color: "#1e293b", lineHeight: 1.3, wordBreak: "break-word" }}>
-              {div}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexShrink: 0 }}>
-              <Chip label={`${locs} loc`} size="small" sx={{ height: 22, fontSize: "0.68rem", fontWeight: 600, bgcolor: "#e8f0fe", color: "#004AAD" }} />
-              <Chip label={`${present}/${total}`} size="small" sx={{ height: 22, fontSize: "0.68rem", fontWeight: 600, bgcolor: "#dcfce7", color: "#16a34a" }} />
-              <Chip label={`${rate}%`} size="small" sx={{ height: 22, fontSize: "0.68rem", fontWeight: 700, bgcolor: `${rateColor}18`, color: rateColor, minWidth: 42 }} />
-              <KeyboardArrowDown sx={{ fontSize: 18, color: "#94a3b8", transform: "rotate(-90deg)" }} />
-            </Box>
-          </Box>
-        ))}
-      </Box>
-    </Box>
-  );
-};
 /* ─── InlineLocationChart (existing) ──────────────────────────── */
 const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
   const [expandedLoc, setExpandedLoc] = useState(null);
@@ -2877,15 +2833,10 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
             <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
 
             {!selectedDivision ? (
-              <>
-                <DivisionLevelChart 
-                  data={filteredData} 
-                  onDivisionClick={handleDivisionSelect} 
-                />
-                <Box sx={{ mt: 3 }}>
-                  <DivisionStep divisions={divisions} data={filteredData} onSelect={handleDivisionSelect} />
-                </Box>
-              </>
+              <DivisionLevelChart 
+                data={filteredData} 
+                onDivisionClick={handleDivisionSelect} 
+              />
             ) : (
               <>
                 <Breadcrumb division={selectedDivision} onBack={handleBack} />
