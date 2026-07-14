@@ -1283,6 +1283,7 @@ import {
   Cancel, LocationOn, Visibility, AccountTree, ArrowBack,
   Person, Email, Phone, Work, CalendarToday, AttachMoney,
   ReceiptLong, AccessTime, InfoOutlined, EventNote, Search, GridView,
+  ChevronRight, ChevronLeft,
 } from "@mui/icons-material";
 import {
   ResponsiveContainer,
@@ -1293,6 +1294,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as ChartTooltip,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -1976,12 +1980,11 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
             {chartData.length} locations · click bar to expand
           </Typography>
         </Box>
-        
       </Box>
 
       {/* Bars + inline employee list */}
       {chartData.map((row) => {
-        const barW     = row.percentage;
+        const barW     = Math.max(Math.round((row.present / maxTotal) * 100), row.present > 0 ? 2 : 0);
         const isOpen   = expandedLoc === row.location;
         const barColor = rateColor(row.percentage);
 
@@ -2470,8 +2473,22 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
 
   return (
     <>
+      {/* Main Single Card Container for the entire view */}
       <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 20px rgba(0,74,173,0.05)" }}>
-        <Box sx={{ mb: 2 }}>
+        {/* Page Title */}
+        <Typography sx={{ fontSize: "1.15rem", fontWeight: 700, color: "#16388a", mb: 2 }}>
+          CDPLC Attendance Based on Division
+        </Typography>
+
+        {/* Global Search Bar */}
+        <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
+
+        {/* Breadcrumbs for Division Navigation */}
+        {selectedDivision && (
+          <Breadcrumb division={selectedDivision} onBack={handleBack} />
+        )}
+
+        <Box sx={{ mb: 2, mt: selectedDivision ? 0 : 1 }}>
           <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "#004AAD", fontSize: "1.1rem" }}>
              {mainTitle}
           </Typography>
@@ -2512,66 +2529,27 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
         </Tabs>
 
         {selectedDivision ? (
-          <>
-            <Breadcrumb division={selectedDivision} onBack={handleBack} />
-
-            {activeDivisionTab === 0 ? (
-              <>
-                <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
-
-                {/* Location Chart within selected division */}
-                <InlineLocationChart
-                  data={filteredData}
-                  division={selectedDivision}
-                  onEmployeeClick={handleEmployeeClick}
-                />
-
-                {isMobile ? (
-                  <Box
-                    ref={scrollRef}
-                    sx={{
-                      maxHeight: "calc(100vh - 260px)", overflowY: "auto", overflowX: "hidden", pr: 0.5,
-                      "&::-webkit-scrollbar": { width: 4 },
-                      "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
-                      "&::-webkit-scrollbar-thumb": { bgcolor: "#cbd5e1", borderRadius: 4 },
-                    }}
-                  >
-                    {Object.keys(locationGroups).length === 0 && (
-                      <Box sx={{ textAlign: "center", py: 6 }}>
-                        <Search sx={{ fontSize: 44, color: "#cbd5e1", mb: 1 }} />
-                        <Typography sx={{ color: "#94a3b8", fontSize: "0.85rem" }}>No locations match your search</Typography>
-                      </Box>
-                    )}
-                    <Box sx={{ height: 80 }} />
-                  </Box>
-                ) : (
-                  <DesktopLocationTable
-                    locationGroups={locationGroups}
-                    expandedRow={expandedRow}
-                    onExpand={handleToggle}
-                    onViewDetails={handleViewDetails}
-                    onEmployeeClick={handleEmployeeClick}
-                  />
-                )}
-              </>
-            ) : (
-              divChartLoading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
-                  <CircularProgress sx={{ color: "#004AAD" }} size={36} />
-                </Box>
-              ) : (
-                <WeeklyAttendanceTrend weeklyApiData={divChartData} eligibleLabel="Actual" />
-              )
-            )}
-          </>
-        ) : activeMainTab === 0 ? (
-          <>
-            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
-            <DivisionLevelChart 
-              data={filteredData} 
-              onDivisionClick={handleDivisionSelect} 
+          activeDivisionTab === 0 ? (
+            /* Location list and bar overview inside selected division */
+            <InlineLocationChart
+              data={filteredData}
+              division={selectedDivision}
+              onEmployeeClick={handleEmployeeClick}
             />
-          </>
+          ) : (
+            divChartLoading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
+                <CircularProgress sx={{ color: "#004AAD" }} size={36} />
+              </Box>
+            ) : (
+              <WeeklyAttendanceTrend weeklyApiData={divChartData} eligibleLabel="Actual" />
+            )
+          )
+        ) : activeMainTab === 0 ? (
+          <DivisionLevelChart 
+            data={filteredData} 
+            onDivisionClick={handleDivisionSelect} 
+          />
         ) : (
           <WeeklyAttendanceTrend weeklyApiData={weeklyAttendance} />
         )}
