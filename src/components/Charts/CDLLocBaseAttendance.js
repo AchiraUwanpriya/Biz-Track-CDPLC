@@ -1596,11 +1596,12 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
             const rawDate = item.Date ?? item.AttDate ?? item.att_date ?? item.date ?? "";
             const attDate = parseOracleDate(rawDate);
             const attendance = parseInt(item.Att_count ?? item.AttCount ?? item.Attendance ?? item.attendance ?? 0) || 0;
+            const eligible = parseInt(item.Actual_count ?? item.ActualCount ?? item.Eligible ?? item.eligible ?? (attendance > 0 ? attendance : 1)) || (attendance > 0 ? attendance : 1);
             return {
               ...item,
               AttDate:    attDate,
               Attendance: attendance,
-              Eligible:   0,
+              Eligible:   eligible,
             };
           });
           setEmpChartData(normalized);
@@ -1770,10 +1771,11 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
             fontSize: "0.72rem",
             minHeight: 44,
             py: 0,
-            px: 2,
-            gap: "4px",
+            px: 1,
+            gap: "3px",
             color: "#94a3b8",
-            minWidth: "auto",
+            width: "34%",
+            minWidth: "34%",
             flexShrink: 0,
           },
           "& .Mui-selected": { color: "#004AAD" },
@@ -1885,7 +1887,7 @@ const EmployeeDetailsPopup = ({ open, onClose, employee, currentYear }) => {
                     <CircularProgress sx={{ color: "#004AAD" }} size={32} />
                   </Box>
                 ) : (
-                  <WeeklyAttendanceTrend weeklyApiData={empChartData} hideEligible={true} />
+                  <WeeklyAttendanceTrend weeklyApiData={empChartData} hideEligible={true} titlePrefix="Employee" />
                 )}
               </Box>
             )}
@@ -2285,7 +2287,12 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
                         <CircularProgress sx={{ color: "#004AAD" }} size={28} />
                       </Box>
                     ) : (
-                      <WeeklyAttendanceTrend weeklyApiData={locChartData} eligibleLabel="Actual" />
+                      <WeeklyAttendanceTrend
+                        weeklyApiData={locChartData}
+                        eligibleLabel="Actual"
+                        yAxisDomain={[0, 100]}
+                        yAxisTicks={[0, 20, 40, 60, 80, 100]}
+                      />
                     )}
                   </Box>
                 )}
@@ -2726,7 +2733,12 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
                 <CircularProgress sx={{ color: "#004AAD" }} size={36} />
               </Box>
             ) : (
-              <WeeklyAttendanceTrend weeklyApiData={divChartData} eligibleLabel="Actual" />
+              <WeeklyAttendanceTrend
+                weeklyApiData={divChartData}
+                eligibleLabel="Actual"
+                yAxisDomain={[0, 100]}
+                yAxisTicks={[0, 20, 40, 60, 80, 100]}
+              />
             )
           )
         ) : activeMainTab === 0 ? (

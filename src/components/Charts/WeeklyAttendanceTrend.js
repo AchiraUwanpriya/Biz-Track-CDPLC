@@ -1370,7 +1370,9 @@ const AttendanceChart = ({
   allMonthsData,
   allWeeksData,
   eligibleLabel = "Eligible",
-  hideEligible = false
+  hideEligible = false,
+  yAxisDomain,
+  yAxisTicks
 }) => {
 
   const barSize = getFixedBarSize(data.length);
@@ -1484,6 +1486,8 @@ const AttendanceChart = ({
             tick={{ fill: "#64748b", fontSize: isMobile ? 8 : 10 }}
             width={yAxisWidth}
             tickFormatter={fmtK}
+            domain={yAxisDomain}
+            ticks={yAxisTicks}
           />
           <YAxis
             yAxisId="right"
@@ -1758,6 +1762,9 @@ export function WeeklyAttendanceTrend({
   targetRate = 75,
   eligibleLabel = "Eligible",
   hideEligible = false,
+  titlePrefix,
+  yAxisDomain,
+  yAxisTicks,
 }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const [view, setView] = useState("week");
@@ -1933,12 +1940,13 @@ export function WeeklyAttendanceTrend({
     bottom: isWeekView ? (isMobile ? 20 : 10) : (isMonthView ? (isMobile ? 15 : 10) : 1),
   };
 
+  const prefix = titlePrefix || "CDL";
   const titles = {
-    week: { title: "CDL Weekly Attendance" },
-    month: { title: "CDL Monthly Attendance" },
-    year: { title: "CDL Yearly Attendance" },
+    week: { title: `${prefix} Weekly Attendance` },
+    month: { title: `${prefix} Monthly Attendance` },
+    year: { title: `${prefix} Yearly Attendance` },
     range: {
-      title: "CDL Custom Range Attendance",
+      title: `${prefix} Custom Range Attendance`,
       sub: startDate && endDate
         ? `${formatTooltipDate(startDate)} to ${formatTooltipDate(endDate)}`
         : "Select a date range to view data"
@@ -2124,6 +2132,8 @@ export function WeeklyAttendanceTrend({
                 allWeeksData={allWeeksData}
                 eligibleLabel={eligibleLabel}
                 hideEligible={hideEligible}
+                yAxisDomain={yAxisDomain}
+                yAxisTicks={yAxisTicks}
               />
 
               {/* Legend - consistent across all views */}
