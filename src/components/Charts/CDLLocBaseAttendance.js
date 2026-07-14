@@ -1923,8 +1923,10 @@ const DivisionLevelChart = ({ data, onDivisionClick }) => {
 
 
 /* ─── InlineLocationChart (existing) ──────────────────────────── */
-const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
+const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance }) => {
   const [expandedLoc, setExpandedLoc] = useState(null);
+  const [locInnerTab, setLocInnerTab] = useState(0);
+  const rowRefs = useRef({});
 
   const chartData = useMemo(() => {
     const filtered = data.filter((d) => d.division === division);
@@ -1947,7 +1949,19 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
       .sort((a, b) => a.location.localeCompare(b.location));
   }, [data, division]);
 
-  useEffect(() => { setExpandedLoc(null); }, [division]);
+  useEffect(() => { setExpandedLoc(null); setLocInnerTab(0); }, [division]);
+
+  useEffect(() => {
+    if (expandedLoc && rowRefs.current[expandedLoc]) {
+      const timer = setTimeout(() => {
+        rowRefs.current[expandedLoc]?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [expandedLoc]);
 
   const maxTotal = Math.max(...chartData.map((r) => r.total), 1);
   const totalEmployees = chartData.reduce((s, r) => s + r.total, 0);
@@ -1956,8 +1970,10 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
 
   if (chartData.length === 0) return null;
 
-  const handleBarClick = (locName) =>
+  const handleBarClick = (locName) => {
     setExpandedLoc((prev) => (prev === locName ? null : locName));
+    setLocInnerTab(0);
+  };
 
   return (
     <Box
@@ -1989,7 +2005,17 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
         const barColor = rateColor(row.percentage);
 
         return (
-          <Box key={row.location} sx={{ mb: "6px", "&:last-child": { mb: 0 } }}>
+          <Box
+            key={row.location}
+            ref={(el) => { rowRefs.current[row.location] = el; }}
+            sx={{
+              mb: "6px",
+              "&:last-child": { mb: 0 },
+              transition: "all 0.22s ease",
+              boxShadow: isOpen ? "0 4px 12px rgba(0,74,173,0.08)" : "none",
+              borderRadius: "8px",
+            }}
+          >
             {/* ── Bar row ── */}
             <Box
               onClick={() => handleBarClick(row.location)}
@@ -2000,9 +2026,9 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
                 mx: "-8px",
                 border: isOpen ? `1.5px solid ${barColor}` : "1.5px solid transparent",
                 borderBottom: isOpen ? "none" : undefined,
-                bgcolor: isOpen ? `${barColor}0d` : "transparent",
+                bgcolor: isOpen ? `${barColor}15` : "transparent",
                 transition: "background 0.15s ease, border-color 0.15s ease",
-                "&:hover": { bgcolor: isOpen ? `${barColor}0d` : "#f0f5ff" },
+                "&:hover": { bgcolor: isOpen ? `${barColor}15` : "#f0f5ff" },
               }}
             >
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: "4px" }}>
@@ -2055,39 +2081,73 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
                   ))}
                 </Box>
 
-                {/* Column headers */}
-                <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5, px: 1.5, py: 0.7, bgcolor: "#e8f0fe" }}>
-                  {["Svc No", "Name", "Designation", "IN ", "OUT "].map((h) => (
-                    <Typography key={h} sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#004AAD" }}>{h}</Typography>
-                  ))}
-                </Box>
+                {/* Inner tab selectors */}
+                <Tabs
+                  value={locInnerTab}
+                  onChange={(_, v) => setLocInnerTab(v)}
+                  variant="fullWidth"
+                  sx={{
+                    borderBottom: "1px solid #e2e8f0",
+                    minHeight: 32,
+                    bgcolor: "#fff",
+                    "& .MuiTab-root": {
+                      textTransform: "none",
+                      fontWeight: 600,
+                      fontSize: "0.75rem",
+                      minHeight: 32,
+                      py: 0.5,
+                      color: "#94a3b8",
+                    },
+                    "& .Mui-selected": { color: "#004AAD" },
+                    "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2 },
+                  }}
+                >
+                  <Tab label="Employees" />
+                  <Tab label="Chart" />
+                </Tabs>
 
-                {/* Employee rows */}
-                {row.employees.map((emp, idx) => {
-                  const p = isPresent(emp);
-                  return (
-                    <Box
-                      key={emp.sno || idx}
-                      onClick={() => onEmployeeClick(emp)}
-                      sx={{
-                        display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5,
-                        px: 1.5, py: 0.85,
-                        bgcolor: idx % 2 === 0 ? "#fff" : "#f8faff",
-                        borderTop: "0.5px solid #f1f5f9",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        transition: "all 0.18s ease",
-                        "&:hover": { bgcolor: "#e8f0fe", transform: "translateX(3px)" },
-                      }}
-                    >
-                      <Typography sx={{ fontSize: "0.65rem", color: "#475569" }}>{emp.sno || "-"}</Typography>
-                      <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#1e293b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.repname || "-"}</Typography>
-                      <Typography sx={{ fontSize: "0.6rem", color: "#64748b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.des || "-"}</Typography>
-                      <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.inn : "NR"}</Typography>
-                      <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.pout : "NR"}</Typography>
+                {locInnerTab === 0 ? (
+                  <>
+                    {/* Column headers */}
+                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5, px: 1.5, py: 0.7, bgcolor: "#e8f0fe" }}>
+                      {["Svc No", "Name", "Designation", "IN ", "OUT "].map((h) => (
+                        <Typography key={h} sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#004AAD" }}>{h}</Typography>
+                      ))}
                     </Box>
-                  );
-                })}
+
+                    {/* Employee rows */}
+                    {row.employees.map((emp, idx) => {
+                      const p = isPresent(emp);
+                      return (
+                        <Box
+                          key={emp.sno || idx}
+                          onClick={() => onEmployeeClick(emp)}
+                          sx={{
+                            display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5,
+                            px: 1.5, py: 0.85,
+                            bgcolor: idx % 2 === 0 ? "#fff" : "#f8faff",
+                            borderTop: "0.5px solid #f1f5f9",
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "all 0.18s ease",
+                            "&:hover": { bgcolor: "#e8f0fe", transform: "translateX(3px)" },
+                          }}
+                        >
+                          <Typography sx={{ fontSize: "0.65rem", color: "#475569" }}>{emp.sno || "-"}</Typography>
+                          <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#1e293b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.repname || "-"}</Typography>
+                          <Typography sx={{ fontSize: "0.6rem", color: "#64748b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.des || "-"}</Typography>
+                          <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.inn : "NR"}</Typography>
+                          <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.pout : "NR"}</Typography>
+                        </Box>
+                      );
+                    })}
+                  </>
+                ) : (
+                  /* Chart Tab - Weekly Attendance Trend Chart */
+                  <Box sx={{ p: 1.5, bgcolor: "#fff" }}>
+                    <WeeklyAttendanceTrend weeklyApiData={weeklyAttendance} />
+                  </Box>
+                )}
               </Box>
             </Collapse>
           </Box>
@@ -2535,6 +2595,7 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
               data={filteredData}
               division={selectedDivision}
               onEmployeeClick={handleEmployeeClick}
+              weeklyAttendance={weeklyAttendance}
             />
           ) : (
             divChartLoading ? (
