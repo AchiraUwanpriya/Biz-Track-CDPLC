@@ -163,6 +163,16 @@ const GetEmployeeOtherInfo = async (p_sno) => {
   });
 };
 
+const GetDivWiseAtt = async (p_div) => {
+  return axios.get(`Attendancedashboard/GetDivWiseAtt`, {
+    params: {
+      p_div: p_div,
+    },
+  }).then((response) => {
+    return response;
+  });
+};
+
 export default {
   getBannerImages,
   GetAccessHeadComponent,
@@ -176,5 +186,6 @@ export default {
   GetEmployeeDetails,
   GetEmployeeAttSummary,
   GetEmployeeOtherInfo,
-  GetChaserDailyCollect
+  GetChaserDailyCollect,
+  GetDivWiseAtt,
 };

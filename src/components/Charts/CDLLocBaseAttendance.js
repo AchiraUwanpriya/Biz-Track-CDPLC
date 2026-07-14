@@ -1981,7 +1981,7 @@ const InlineLocationChart = ({ data, division, onEmployeeClick }) => {
 
       {/* Bars + inline employee list */}
       {chartData.map((row) => {
-        const barW     = Math.max(Math.round((row.present / maxTotal) * 100), row.present > 0 ? 2 : 0);
+        const barW     = row.percentage;
         const isOpen   = expandedLoc === row.location;
         const barColor = rateColor(row.percentage);
 
@@ -2325,6 +2325,7 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const { weeklyAttendance } = useSelector((state) => state.attendanceCard || {});
 
   const [activeMainTab,     setActiveMainTab]      = useState(0); // 0 = Divisions, 1 = Chart
+  const [activeDivisionTab, setActiveDivisionTab]  = useState(0); // 0 = Locations, 1 = Chart
   const [selectedDivision,  setSelectedDivision]  = useState(null);
   const [expandedRow,       setExpandedRow]        = useState(null);
   const [drawerOpen,        setDrawerOpen]         = useState(false);
@@ -2333,17 +2334,88 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const [selectedEmployee,  setSelectedEmployee]   = useState(null);
   const [searchTerm,        setSearchTerm]         = useState("");
 
+  const [divChartData,    setDivChartData]    = useState([]);
+  const [divChartLoading, setDivChartLoading] = useState(false);
+
   const scrollRef = useRef(null);
+
+  // Convert Oracle-style date "01-JAN-2026" → ISO "2026-01-01" for JS date parsing
+  const parseOracleDate = (raw) => {
+    if (!raw) return "";
+    // Already ISO or JS-parseable
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw;
+    // Oracle format: DD-MON-YYYY  e.g. "01-JAN-2026"
+    const monthMap = {
+      JAN:"01", FEB:"02", MAR:"03", APR:"04", MAY:"05", JUN:"06",
+      JUL:"07", AUG:"08", SEP:"09", OCT:"10", NOV:"11", DEC:"12",
+    };
+    const m = String(raw).trim().toUpperCase().match(/^(\d{1,2})-([A-Z]{3})-(\d{4})$/);
+    if (m) {
+      const [, dd, mon, yyyy] = m;
+      return `${yyyy}-${monthMap[mon] || "01"}-${dd.padStart(2, "0")}`;
+    }
+    return raw; // return as-is and let Date() try
+  };
+
+  // Fetch division-wise attendance trend when Chart tab is active inside a division
+  useEffect(() => {
+    if (!selectedDivision || activeDivisionTab !== 1) return;
+    let active = true;
+    setDivChartLoading(true);
+    setDivChartData([]);
+    CommonService.GetDivWiseAtt(selectedDivision)
+      .then((res) => {
+        if (!active) return;
+
+        const raw =
+          res?.data?.ResultSet ||
+          res?.data?.resultSet ||
+          res?.data?.data ||
+          res?.data ||
+          [];
+        const rawArr = Array.isArray(raw) ? raw : [];
+
+        // Confirmed API fields: Date (Oracle), Att_count, Actual_count
+        const normalized = rawArr.map((item) => {
+          // Date — convert "01-JAN-2026" → "2026-01-01"
+          const rawDate = item.Date ?? item.AttDate ?? item.att_date ?? item.date ?? "";
+          const attDate = parseOracleDate(rawDate);
+
+          // Att_count = employees present (attendance bar)
+          const attendance = parseInt(item.Att_count ?? item.AttCount ?? item.Attendance ?? item.attendance ?? 0) || 0;
+
+          // Actual_count = total actual employees in that division (eligible bar / strength)
+          const eligible   = parseInt(item.Actual_count ?? item.ActualCount ?? item.Eligible ?? item.eligible ?? attendance) || attendance;
+
+          return {
+            ...item,
+            AttDate:    attDate,
+            Attendance: attendance,
+            Eligible:   eligible,
+          };
+        });
+
+        setDivChartData(normalized);
+      })
+      .catch(() => {
+        if (active) setDivChartData([]);
+      })
+      .finally(() => { if (active) setDivChartLoading(false); });
+    return () => { active = false; };
+  }, [selectedDivision, activeDivisionTab]);
 
   const handleDivisionSelect = useCallback((div) => {
     setSelectedDivision(div);
     setExpandedRow(null);
+    setActiveDivisionTab(0);
   }, []);
 
   const handleBack = useCallback(() => {
     setSelectedDivision(null);
     setExpandedRow(null);
     setSearchTerm("");
+    setActiveDivisionTab(0);
+    setDivChartData([]);
   }, []);
 
   const handleToggle      = useCallback((loc) => setExpandedRow((prev) => (prev === loc ? null : loc)), []);
@@ -2387,9 +2459,9 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const divEmployees   = selectedDivision ? filteredData.filter((d) => d.division === selectedDivision) : [];
   const totalPresent   = divEmployees.filter(isPresent).length;
 
-  const mainTitle = selectedDivision ? `Division Overview - ${selectedDivision}` : "Division Overview";
+  const mainTitle = selectedDivision ? `Location Overview — ${selectedDivision}` : "Division Overview";
   const mainSubtitle = selectedDivision
-    ? `${totalLocations} locations · ${divEmployees.length} employees · ${totalPresent} present${term ? ` · filtered by "${searchTerm}"` : ""}`
+    ? `${totalLocations} locations · tap to expand`
     : `${divisions.length || 8} divisions · click any division to view locations${term ? ` · filtered by "${searchTerm}"` : ""}`;
 
   const searchPlaceholder = selectedDivision
@@ -2410,8 +2482,14 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
 
         {/* Tab navigation */}
         <Tabs
-          value={activeMainTab}
-          onChange={(_, v) => setActiveMainTab(v)}
+          value={selectedDivision ? activeDivisionTab : activeMainTab}
+          onChange={(_, v) => {
+            if (selectedDivision) {
+              setActiveDivisionTab(v);
+            } else {
+              setActiveMainTab(v);
+            }
+          }}
           variant="fullWidth"
           sx={{
             borderBottom: "1px solid #e2e8f0",
@@ -2429,22 +2507,17 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
             "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2.5 },
           }}
         >
-          <Tab label="Divisions" />
+          <Tab label={selectedDivision ? "Locations" : "Divisions"} />
           <Tab label="Chart" />
         </Tabs>
 
-        {activeMainTab === 0 ? (
+        {selectedDivision ? (
           <>
-            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
+            <Breadcrumb division={selectedDivision} onBack={handleBack} />
 
-            {!selectedDivision ? (
-              <DivisionLevelChart 
-                data={filteredData} 
-                onDivisionClick={handleDivisionSelect} 
-              />
-            ) : (
+            {activeDivisionTab === 0 ? (
               <>
-                <Breadcrumb division={selectedDivision} onBack={handleBack} />
+                <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
 
                 {/* Location Chart within selected division */}
                 <InlineLocationChart
@@ -2481,7 +2554,23 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
                   />
                 )}
               </>
+            ) : (
+              divChartLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
+                  <CircularProgress sx={{ color: "#004AAD" }} size={36} />
+                </Box>
+              ) : (
+                <WeeklyAttendanceTrend weeklyApiData={divChartData} eligibleLabel="Actual" />
+              )
             )}
+          </>
+        ) : activeMainTab === 0 ? (
+          <>
+            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
+            <DivisionLevelChart 
+              data={filteredData} 
+              onDivisionClick={handleDivisionSelect} 
+            />
           </>
         ) : (
           <WeeklyAttendanceTrend weeklyApiData={weeklyAttendance} />

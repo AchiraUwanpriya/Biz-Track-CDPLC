@@ -1080,7 +1080,7 @@ const formatTooltipDate = (dateStr) => {
   });
 };
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, eligibleLabel = "Eligible" }) => {
   if (active && payload && payload.length) {
     const row = payload[0].payload;
     const isAggregated = !!row.periodDays && row.periodDays > 1;
@@ -1110,7 +1110,7 @@ const CustomTooltip = ({ active, payload }) => {
               <Box key={i} sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 <Box sx={{ width: 8, height: 8, backgroundColor: "#bfdbfe", borderRadius: "50%" }} />
                 <Typography sx={{ fontSize: 11, color: "#64748b" }}>
-                  Eligible:{" "}
+                  {eligibleLabel}:{" "}
                   <span style={{ color: "#1a2d4d", fontWeight: 700 }}>{row.eligible}</span>
                 </Typography>
               </Box>
@@ -1207,7 +1207,7 @@ const LegendDot = ({ color, label }) => (
   </Box>
 );
 
-const ChartLegend = ({ showTarget = true }) => (
+const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible" }) => (
   <Box
     sx={{
       display: "flex",
@@ -1219,7 +1219,7 @@ const ChartLegend = ({ showTarget = true }) => (
     }}
   >
     <LegendDot color="#3b82f6" label="Attendance" />
-    <LegendDot color="#bfdbfe" label="Eligible" />
+    <LegendDot color="#bfdbfe" label={eligibleLabel} />
     <LegendDot color="#f59e0b" label="Rate %" />
     {showTarget && (
       <Box sx={{ ml: "auto", display: "flex", gap: 1, alignItems: "center" }}>
@@ -1368,7 +1368,8 @@ const AttendanceChart = ({
   yAxisRightW,
   chartHeight,
   allMonthsData,
-  allWeeksData
+  allWeeksData,
+  eligibleLabel = "Eligible"
 }) => {
 
   const barSize = getFixedBarSize(data.length);
@@ -1494,7 +1495,7 @@ const AttendanceChart = ({
             width={yAxisRightW}
             tickFormatter={(v) => `${v}%`}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip eligibleLabel={eligibleLabel} />} />
           <ReferenceLine
             y={targetEligible}
             stroke="#ef4444"
@@ -1517,7 +1518,7 @@ const AttendanceChart = ({
           <Bar
             yAxisId="left"
             dataKey="remaining"
-            name="Eligible"
+            name={eligibleLabel}
             stackId="bars"
             barSize={barSize}
             fill="#bfdbfe"
@@ -1750,6 +1751,7 @@ export function WeeklyAttendanceTrend({
   weeklyApiData = [],
   targetEligible = 1700,
   targetRate = 75,
+  eligibleLabel = "Eligible",
 }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const [view, setView] = useState("week");
@@ -2114,10 +2116,11 @@ export function WeeklyAttendanceTrend({
                 chartHeight={chartHeight}
                 allMonthsData={allMonthsData}
                 allWeeksData={allWeeksData}
+                eligibleLabel={eligibleLabel}
               />
 
               {/* Legend - consistent across all views */}
-              <ChartLegend showTarget={true} />
+              <ChartLegend showTarget={true} eligibleLabel={eligibleLabel} />
             </>
           )}
         </Box>
