@@ -2290,6 +2290,7 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
                       <WeeklyAttendanceTrend
                         weeklyApiData={locChartData}
                         eligibleLabel="Actual"
+                        titlePrefix={row.location}
                       />
                     )}
                   </Box>
@@ -2734,6 +2735,7 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
               <WeeklyAttendanceTrend
                 weeklyApiData={divChartData}
                 eligibleLabel="Actual"
+                titlePrefix={selectedDivision}
               />
             )
           )
