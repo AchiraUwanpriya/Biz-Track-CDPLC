@@ -1080,16 +1080,23 @@ const formatTooltipDate = (dateStr) => {
   });
 };
 
-const CustomTooltip = ({ active, payload, eligibleLabel = "Eligible" }) => {
+const CustomTooltip = ({ active, payload, eligibleLabel = "Eligible", titlePrefix, view }) => {
   if (active && payload && payload.length) {
     const row = payload[0].payload;
     const isAggregated = !!row.periodDays && row.periodDays > 1;
 
-    const headerLabel = isAggregated
-      ? row.monthLabel
-        ? `Week ${row.name} · ${row.monthLabel} (avg of ${row.periodDays} day${row.periodDays === 1 ? "" : "s"})`
-        : `${row.name} (avg of ${row.periodDays} day${row.periodDays === 1 ? "" : "s"})`
-      : (formatTooltipDate(row.fullDate) || row.name);
+    let headerLabel;
+    if (titlePrefix === "Employee" && view === "week") {
+      headerLabel = row.monthLabel
+        ? `Week ${row.name} · ${row.monthLabel} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended)`
+        : `Week ${row.name} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended)`;
+    } else {
+      headerLabel = isAggregated
+        ? row.monthLabel
+          ? `Week ${row.name} · ${row.monthLabel} (avg of ${row.periodDays} day${row.periodDays === 1 ? "" : "s"})`
+          : `${row.name} (avg of ${row.periodDays} day${row.periodDays === 1 ? "" : "s"})`
+        : (formatTooltipDate(row.fullDate) || row.name);
+    }
 
     return (
       <Box
@@ -1372,7 +1379,8 @@ const AttendanceChart = ({
   eligibleLabel = "Eligible",
   hideEligible = false,
   yAxisDomain,
-  yAxisTicks
+  yAxisTicks,
+  titlePrefix,
 }) => {
 
   const barSize = getFixedBarSize(data.length);
@@ -1489,18 +1497,20 @@ const AttendanceChart = ({
             domain={yAxisDomain}
             ticks={yAxisTicks}
           />
-          <YAxis
-            yAxisId="right"
-            orientation="right"
-            tickLine={false}
-            axisLine={false}
-            tick={{ fill: "#64748b", fontSize: isMobile ? 8 : 10 }}
-            domain={[0, 100]}
-            ticks={[0, 25, 50, 75, 100]}
-            width={yAxisRightW}
-            tickFormatter={(v) => `${v}%`}
-          />
-          <Tooltip content={<CustomTooltip eligibleLabel={eligibleLabel} />} />
+          {!(titlePrefix === "Employee" && view === "week") && (
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: "#64748b", fontSize: isMobile ? 8 : 10 }}
+              domain={[0, 100]}
+              ticks={[0, 25, 50, 75, 100]}
+              width={yAxisRightW}
+              tickFormatter={(v) => `${v}%`}
+            />
+          )}
+          <Tooltip content={<CustomTooltip eligibleLabel={eligibleLabel} titlePrefix={titlePrefix} view={view} />} />
           {!hideEligible && (
             <ReferenceLine
               y={targetEligible}
@@ -1534,17 +1544,19 @@ const AttendanceChart = ({
             />
           )}
 
-          <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="rate"
-            name="Rate %"
-            stroke="#f59e0b"
-            strokeWidth={data.length > 60 ? 2 : 2.5}
-            dot={showDots ? { r: dotSize, fill: "#f59e0b" } : false}
-            activeDot={{ r: 5 }}
-            connectNulls={false} // This prevents connecting across null values
-          />
+          {!(titlePrefix === "Employee" && view === "week") && (
+            <Line
+              yAxisId="right"
+              type="monotone"
+              dataKey="rate"
+              name="Rate %"
+              stroke="#f59e0b"
+              strokeWidth={data.length > 60 ? 2 : 2.5}
+              dot={showDots ? { r: dotSize, fill: "#f59e0b" } : false}
+              activeDot={{ r: 5 }}
+              connectNulls={false} // This prevents connecting across null values
+            />
+          )}
         </ComposedChart>
       </ResponsiveContainer>
     </Box>
@@ -1796,7 +1808,7 @@ export function WeeklyAttendanceTrend({
         .sort((a, b) => new Date(a.AttDate) - new Date(b.AttDate));
     };
 
-    const aggregateByPeriod = (data, keyFn, labelFn, sortKeyFn) => {
+    const aggregateByPeriod = (data, keyFn, labelFn, sortKeyFn, isWeek = false) => {
       const groups = {};
 
       data.forEach(item => {
@@ -1822,13 +1834,22 @@ export function WeeklyAttendanceTrend({
       return Object.values(groups)
         .sort((a, b) => a.sortKey - b.sortKey)
         .map(g => {
-          const avgEligible = g.count ? g.eligibleSum / g.count : 0;
-          const avgAttendance = g.count ? g.attendanceSum / g.count : 0;
-          const rate = avgEligible ? Math.round((avgAttendance / avgEligible) * 100) : 0;
+          let eligible, attendance, rate;
+          if (titlePrefix === "Employee" && isWeek) {
+            eligible = 7;
+            attendance = g.attendanceSum;
+            rate = null;
+          } else {
+            const avgEligible = g.count ? g.eligibleSum / g.count : 0;
+            const avgAttendance = g.count ? g.attendanceSum / g.count : 0;
+            rate = avgEligible ? Math.round((avgAttendance / avgEligible) * 100) : 0;
+            eligible = Math.round(avgEligible);
+            attendance = Math.round(avgAttendance);
+          }
           return {
             name: g.label,
-            eligible: Math.round(avgEligible),
-            attendance: Math.round(avgAttendance),
+            eligible,
+            attendance,
             rate,
             fullDate: g.repDate.toISOString(),
             dayName: "",
@@ -1855,7 +1876,8 @@ export function WeeklyAttendanceTrend({
         const weekNum = getWeekNumber(weekStart);
         const year = getYear(weekStart);
         return new Date(year, 0, 1 + (weekNum - 1) * 7).getTime();
-      }
+      },
+      true
     );
 
     let dataYear = new Date().getFullYear();
@@ -2132,8 +2154,9 @@ export function WeeklyAttendanceTrend({
                 allWeeksData={allWeeksData}
                 eligibleLabel={eligibleLabel}
                 hideEligible={hideEligible}
-                yAxisDomain={yAxisDomain}
-                yAxisTicks={yAxisTicks}
+                yAxisDomain={titlePrefix === "Employee" && view === "week" ? [0, 7] : yAxisDomain}
+                yAxisTicks={titlePrefix === "Employee" && view === "week" ? [0, 1, 2, 3, 4, 5, 6, 7] : yAxisTicks}
+                titlePrefix={titlePrefix}
               />
 
               {/* Legend - consistent across all views */}
