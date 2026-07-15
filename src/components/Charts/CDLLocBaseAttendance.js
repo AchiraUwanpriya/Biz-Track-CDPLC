@@ -2016,6 +2016,179 @@ const DivisionLevelChart = ({ data, onDivisionClick }) => {
 };
 
 
+/* ─── TraineeDivisionLevelChart - Shows trainees with progress bars ─── */
+const TraineeDivisionLevelChart = ({ traineeDivisionData }) => {
+  const [selectedCategory, setSelectedCategory] = useState("industrial");
+
+  const categories = [
+    { key: "industrial", label: "Industrial Trainees", icon: "🔧" },
+    { key: "clerical", label: "Clerical Trainees", icon: "📋" },
+  ];
+
+  const processedData = useMemo(() => {
+    if (!traineeDivisionData || !Array.isArray(traineeDivisionData)) {
+      return [];
+    }
+
+    return traineeDivisionData
+      .map((division) => {
+        let strength = 0;
+        let attendance = 0;
+        let percentage = 0;
+
+        if (selectedCategory === "clerical") {
+          strength = Math.max(0, parseInt(division.STRENGTH_CLERICAL) || 0);
+          attendance = Math.max(0, parseInt(division.ATTENDANCE_CLERICAL) || 0);
+          percentage = parseFloat(division.PERCENTAGE_CLERICAL) || 0;
+        } else if (selectedCategory === "industrial") {
+          strength = Math.max(0, parseInt(division.STRENGTH_INDUSTRIAL) || 0);
+          attendance = Math.max(0, parseInt(division.ATTENDANCE_INDUSTRIAL) || 0);
+          percentage = parseFloat(division.PERCENTAGE_INDUSTRIAL) || 0;
+        }
+
+        return {
+          division: division?.V_DIVNAME || "Unknown",
+          divisionCode: division?.HLD_DIV_CODE || "",
+          strength,
+          attendance,
+          percentage: Math.round(percentage),
+        };
+      })
+      .filter((item) => item.strength > 0)
+      .sort((a, b) => a.division.localeCompare(b.division));
+  }, [traineeDivisionData, selectedCategory]);
+
+  const maxStrength = useMemo(() => {
+    return Math.max(...processedData.map((r) => r.strength), 1);
+  }, [processedData]);
+
+  if (!traineeDivisionData || !Array.isArray(traineeDivisionData) || traineeDivisionData.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box
+      sx={{
+        animation: `fadeInUp 0.5s ease-out 0.3s forwards`,
+        opacity: 0,
+        "@keyframes fadeInUp": {
+          "0%": { opacity: 0, transform: "translateY(24px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+      }}
+    >
+      {/* Category Filter Buttons */}
+      <Box
+        sx={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "24px",
+          flexWrap: "nowrap",
+          overflowX: "auto",
+        }}
+      >
+        {categories.map((category) => (
+          <Button
+            key={category.key}
+            onClick={() => setSelectedCategory(category.key)}
+            sx={{
+              padding: "8px 18px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: 700,
+              textTransform: "none",
+              border: selectedCategory === category.key ? "1px solid #004AAD" : "1px solid #e2e8f0",
+              backgroundColor:
+                selectedCategory === category.key ? "#004AAD" : "#f1f5f9",
+              color:
+                selectedCategory === category.key ? "#ffffff" : "#64748b",
+              transition: "all 0.2s ease",
+              boxShadow: selectedCategory === category.key ? "0 2px 8px rgba(0,74,173,0.15)" : "none",
+              "&:hover": {
+                backgroundColor:
+                  selectedCategory === category.key ? "#003b8a" : "#e2e8f0",
+              },
+            }}
+          >
+             {category.label}
+          </Button>
+        ))}
+      </Box>
+
+      {/* Division list with progress bars */}
+      <Box
+        sx={{
+          mb: 3,
+          p: 2,
+          borderRadius: "16px",
+          background: "#fff",
+          border: "1.5px solid #e2e8f0",
+          boxShadow: "0 2px 12px rgba(0,74,173,0.06)",
+        }}
+      >
+        {/* Header inside the overview */}
+        <Box sx={{ mb: 2 }}>
+          <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, color: "#004AAD", letterSpacing: "0.03em" }}>
+            Division Overview
+          </Typography>
+          <Typography sx={{ fontSize: "12px", color: "#94a3b8", mt: "1px" }}>
+            {processedData.length} divisions · trainee distribution and attendance
+          </Typography>
+        </Box>
+
+        {processedData.map((row) => {
+          const barW = Math.max(Math.round((row.attendance / maxStrength) * 100), row.attendance > 0 ? 2 : 0);
+          const barColor = rateColor(row.percentage);
+
+          return (
+            <Box 
+              key={row.divisionCode} 
+              sx={{ mb: "12px", "&:last-child": { mb: 0 } }}
+            >
+              {/* Bar row */}
+              <Box
+                sx={{
+                  borderRadius: "8px",
+                  p: "6px 8px",
+                  mx: "-8px",
+                  transition: "all 0.18s ease",
+                }}
+              >
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: "4px" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0, flex: 1 }}>
+                    <AccountTree sx={{ fontSize: 12, color: "#004AAD", flexShrink: 0 }} />
+                    <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {row.divisionCode} - {row.division}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0, ml: 1 }}>
+                    <Typography sx={{ fontSize: "0.65rem", color: "#64748b" }}>{row.attendance}/{row.strength}</Typography>
+                    <PctBadge pct={row.percentage} />
+                  </Box>
+                </Box>
+                <Box sx={{ height: 5, background: "#f1f5f9", borderRadius: "10px", overflow: "hidden" }}>
+                  <Box sx={{ height: "100%", borderRadius: "10px", width: `${barW}%`, background: barColor, transition: "width 0.45s ease" }} />
+                </Box>
+              </Box>
+            </Box>
+          );
+        })}
+
+        {/* Legend */}
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "center", pt: "10px", mt: "8px", borderTop: "0.5px solid #f1f5f9" }}>
+          {[{ label: "≥80%", color: "#16a34a" }, { label: "60–79%", color: "#d97706" }, { label: "<60%", color: "#dc2626" }].map((l) => (
+            <Box key={l.label} sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <Box sx={{ width: 7, height: 7, borderRadius: "2px", background: l.color }} />
+              <Typography sx={{ fontSize: "0.62rem", color: "#64748b" }}>{l.label}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+
 /* ─── InlineLocationChart (existing) ──────────────────────────── */
 const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance }) => {
   const [expandedLoc, setExpandedLoc] = useState(null);
@@ -2532,8 +2705,9 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const currentYear = new Date().getFullYear().toString();
 
-  const { weeklyAttendance } = useSelector((state) => state.attendanceCard || {});
+  const { weeklyAttendance, traineeDivision } = useSelector((state) => state.attendanceCard || {});
 
+  const [mainTab,           setMainTab]            = useState(0); // 0 = Employee, 1 = Trainees
   const [activeMainTab,     setActiveMainTab]      = useState(0); // 0 = Divisions, 1 = Chart
   const [activeDivisionTab, setActiveDivisionTab]  = useState(0); // 0 = Locations, 1 = Chart
   const [selectedDivision,  setSelectedDivision]  = useState(null);
@@ -2669,83 +2843,143 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
           CDPLC Attendance Based on Division
         </Typography>
 
-        {/* Global Search Bar */}
-        <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
-
-        {/* Breadcrumbs for Division Navigation */}
-        {selectedDivision && (
-          <Breadcrumb division={selectedDivision} onBack={handleBack} />
-        )}
-
-        <Box sx={{ mb: 2, mt: selectedDivision ? 0 : 1 }}>
-          <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "#004AAD", fontSize: "1.1rem" }}>
-             {mainTitle}
-          </Typography>
-          <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 500 }}>
-            {mainSubtitle}
-          </Typography>
-        </Box>
-
-        {/* Tab navigation */}
-        <Tabs
-          value={selectedDivision ? activeDivisionTab : activeMainTab}
-          onChange={(_, v) => {
-            if (selectedDivision) {
-              setActiveDivisionTab(v);
-            } else {
-              setActiveMainTab(v);
-            }
-          }}
-          variant="fullWidth"
+        {/* Main Tab navigation: Employee vs Trainees styled as highlighted buttons */}
+        <Box
           sx={{
-            borderBottom: "1px solid #e2e8f0",
-            mb: 2.5,
-            minHeight: 40,
-            "& .MuiTab-root": {
-              textTransform: "none",
-              fontWeight: 600,
-              fontSize: "0.85rem",
-              minHeight: 40,
-              py: 0.75,
-              color: "#94a3b8",
-            },
-            "& .Mui-selected": { color: "#004AAD" },
-            "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2.5 },
+            display: "flex",
+            gap: 1.5,
+            mb: 3,
+            p: 0.5,
+            bgcolor: "#f1f5f9",
+            borderRadius: "14px",
+            border: "1px solid #e2e8f0",
           }}
         >
-          <Tab label={selectedDivision ? "Locations" : "Divisions"} />
-          <Tab label="Chart" />
-        </Tabs>
+          <Button
+            onClick={() => setMainTab(0)}
+            fullWidth
+            sx={{
+              py: 1,
+              borderRadius: "10px",
+              fontSize: "0.88rem",
+              fontWeight: 700,
+              textTransform: "none",
+              transition: "all 0.2s ease",
+              boxShadow: mainTab === 0 ? "0 4px 12px rgba(0,74,173,0.15)" : "none",
+              bgcolor: mainTab === 0 ? "#004AAD" : "transparent",
+              color: mainTab === 0 ? "#ffffff" : "#64748b",
+              "&:hover": {
+                bgcolor: mainTab === 0 ? "#003b8a" : "#e2e8f0",
+              },
+            }}
+          >
+            Employees
+          </Button>
+          <Button
+            onClick={() => setMainTab(1)}
+            fullWidth
+            sx={{
+              py: 1,
+              borderRadius: "10px",
+              fontSize: "0.88rem",
+              fontWeight: 700,
+              textTransform: "none",
+              transition: "all 0.2s ease",
+              boxShadow: mainTab === 1 ? "0 4px 12px rgba(0,74,173,0.15)" : "none",
+              bgcolor: mainTab === 1 ? "#004AAD" : "transparent",
+              color: mainTab === 1 ? "#ffffff" : "#64748b",
+              "&:hover": {
+                bgcolor: mainTab === 1 ? "#003b8a" : "#e2e8f0",
+              },
+            }}
+          >
+            Trainees
+          </Button>
+        </Box>
 
-        {selectedDivision ? (
-          activeDivisionTab === 0 ? (
-            /* Location list and bar overview inside selected division */
-            <InlineLocationChart
-              data={filteredData}
-              division={selectedDivision}
-              onEmployeeClick={handleEmployeeClick}
-              weeklyAttendance={weeklyAttendance}
-            />
-          ) : (
-            divChartLoading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
-                <CircularProgress sx={{ color: "#004AAD" }} size={36} />
-              </Box>
-            ) : (
-              <WeeklyAttendanceTrend
-                weeklyApiData={divChartData}
-                eligibleLabel="Actual"
-                titlePrefix={selectedDivision}
+        {mainTab === 0 ? (
+          <>
+            {/* Global Search Bar */}
+            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder={searchPlaceholder} />
+
+            {/* Breadcrumbs for Division Navigation */}
+            {selectedDivision && (
+              <Breadcrumb division={selectedDivision} onBack={handleBack} />
+            )}
+
+            <Box sx={{ mb: 2, mt: selectedDivision ? 0 : 1 }}>
+              <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "#004AAD", fontSize: "1.1rem" }}>
+                 {mainTitle}
+              </Typography>
+              <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 500 }}>
+                {mainSubtitle}
+              </Typography>
+            </Box>
+
+            {/* Tab navigation */}
+            <Tabs
+              value={selectedDivision ? activeDivisionTab : activeMainTab}
+              onChange={(_, v) => {
+                if (selectedDivision) {
+                  setActiveDivisionTab(v);
+                } else {
+                  setActiveMainTab(v);
+                }
+              }}
+              variant="fullWidth"
+              sx={{
+                borderBottom: "1px solid #e2e8f0",
+                mb: 2.5,
+                minHeight: 40,
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                  minHeight: 40,
+                  py: 0.75,
+                  color: "#94a3b8",
+                },
+                "& .Mui-selected": { color: "#004AAD" },
+                "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2.5 },
+              }}
+            >
+              <Tab label={selectedDivision ? "Locations" : "Divisions"} />
+              <Tab label="Chart" />
+            </Tabs>
+
+            {selectedDivision ? (
+              activeDivisionTab === 0 ? (
+                /* Location list and bar overview inside selected division */
+                <InlineLocationChart
+                  data={filteredData}
+                  division={selectedDivision}
+                  onEmployeeClick={handleEmployeeClick}
+                  weeklyAttendance={weeklyAttendance}
+                />
+              ) : (
+                divChartLoading ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
+                    <CircularProgress sx={{ color: "#004AAD" }} size={36} />
+                  </Box>
+                ) : (
+                  <WeeklyAttendanceTrend
+                    weeklyApiData={divChartData}
+                    eligibleLabel="Actual"
+                    titlePrefix={selectedDivision}
+                  />
+                )
+              )
+            ) : activeMainTab === 0 ? (
+              <DivisionLevelChart 
+                data={filteredData} 
+                onDivisionClick={handleDivisionSelect} 
               />
-            )
-          )
-        ) : activeMainTab === 0 ? (
-          <DivisionLevelChart 
-            data={filteredData} 
-            onDivisionClick={handleDivisionSelect} 
-          />
+            ) : (
+              <WeeklyAttendanceTrend weeklyApiData={weeklyAttendance} />
+            )}
+          </>
         ) : (
-          <WeeklyAttendanceTrend weeklyApiData={weeklyAttendance} />
+          <TraineeDivisionLevelChart traineeDivisionData={traineeDivision} />
         )}
       </Paper>
 
