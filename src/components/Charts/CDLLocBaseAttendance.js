@@ -2309,170 +2309,215 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
       </Box>
 
       {/* Bars + inline employee list */}
-      {chartData.map((row) => {
-        const barW     = Math.max(Math.round((row.present / maxTotal) * 100), row.present > 0 ? 2 : 0);
-        const isOpen   = expandedLoc === row.location;
-        const barColor = rateColor(row.percentage);
+      <Box
+        sx={{
+          maxHeight: expandedLoc ? "550px" : "275px",
+          overflowY: "auto",
+          transition: "max-height 0.25s ease-in-out",
+          mx: "-8px",
+          px: "8px",
+          "&::-webkit-scrollbar": {
+            width: "3px",
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "#f1f5f9",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#cbd5e1",
+            borderRadius: "4px",
+            "&:hover": {
+              backgroundColor: "#94a3b8",
+            },
+          },
+        }}
+      >
+        {chartData.map((row) => {
+          const barW     = Math.max(Math.round((row.present / maxTotal) * 100), row.present > 0 ? 2 : 0);
+          const isOpen   = expandedLoc === row.location;
+          const barColor = rateColor(row.percentage);
 
-        return (
-          <Box
-            key={row.location}
-            ref={(el) => { rowRefs.current[row.location] = el; }}
-            sx={{
-              mb: "6px",
-              "&:last-child": { mb: 0 },
-              transition: "all 0.22s ease",
-              boxShadow: isOpen ? "0 4px 12px rgba(0,74,173,0.08)" : "none",
-              borderRadius: "8px",
-            }}
-          >
-            {/* ── Bar row ── */}
+          return (
             <Box
-              onClick={() => handleBarClick(row.location)}
+              key={row.location}
+              ref={(el) => { rowRefs.current[row.location] = el; }}
               sx={{
-                cursor: "pointer",
-                borderRadius: isOpen ? "8px 8px 0 0" : "8px",
-                p: "6px 8px",
-                mx: "-8px",
-                border: isOpen ? `1.5px solid ${barColor}` : "1.5px solid transparent",
-                borderBottom: isOpen ? "none" : undefined,
-                bgcolor: isOpen ? `${barColor}15` : "transparent",
-                transition: "background 0.15s ease, border-color 0.15s ease",
-                "&:hover": { bgcolor: isOpen ? `${barColor}15` : "#f0f5ff" },
+                mb: "6px",
+                "&:last-child": { mb: 0 },
+                transition: "all 0.22s ease",
+                boxShadow: isOpen ? "0 4px 12px rgba(0,74,173,0.08)" : "none",
+                borderRadius: "8px",
               }}
             >
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: "4px" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0, flex: 1 }}>
-                  <LocationOn sx={{ fontSize: 12, color: isOpen ? barColor : "#004AAD", flexShrink: 0 }} />
-                  <Typography sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {row.location}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0, ml: 1 }}>
-                  <Typography sx={{ fontSize: "0.65rem", color: "#64748b" }}>{row.present}/{row.total}</Typography>
-                  <PctBadge pct={row.percentage} />
-                  <KeyboardArrowDown
-                    sx={{
-                      fontSize: 14, color: "#94a3b8",
-                      transition: "transform 0.22s ease",
-                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                    }}
-                  />
-                </Box>
-              </Box>
-              <Box sx={{ height: 5, background: "#f1f5f9", borderRadius: "10px", overflow: "hidden" }}>
-                <Box sx={{ height: "100%", borderRadius: "10px", width: `${barW}%`, background: barColor, transition: "width 0.45s ease" }} />
-              </Box>
-            </Box>
-
-            {/* ── Inline employee list (expands below bar) ── */}
-            <Collapse in={isOpen} timeout={220} unmountOnExit>
+              {/* ── Bar row ── */}
               <Box
+                onClick={() => handleBarClick(row.location)}
                 sx={{
+                  cursor: "pointer",
+                  borderRadius: isOpen ? "8px 8px 0 0" : "8px",
+                  p: "6px 8px",
                   mx: "-8px",
-                  border: `1.5px solid ${barColor}`,
-                  borderTop: "none",
-                  borderRadius: "0 0 8px 8px",
-                  overflow: "hidden",
-                  bgcolor: "#fafbff",
+                  border: isOpen ? `1.5px solid ${barColor}` : "1.5px solid transparent",
+                  borderBottom: isOpen ? "none" : undefined,
+                  bgcolor: isOpen ? `${barColor}15` : "transparent",
+                  transition: "background 0.15s ease, border-color 0.15s ease",
+                  "&:hover": { bgcolor: isOpen ? `${barColor}15` : "#f0f5ff" },
                 }}
               >
-                {/* Stats strip */}
-                <Box sx={{ display: "flex", bgcolor: "#fff", borderBottom: "1px solid #f1f5f9" }}>
-                  {[
-                    { label: "Strength", value: row.total,               color: "#004AAD" },
-                    { label: "Present",  value: row.present,             color: "#16a34a" },
-                    { label: "Absent",   value: row.total - row.present, color: "#dc2626" },
-                  ].map((s) => (
-                    <Box key={s.label} sx={{ flex: 1, textAlign: "center", py: 1, borderRight: "1px solid #f1f5f9", "&:last-child": { borderRight: "none" } }}>
-                      <Typography sx={{ fontSize: "0.6rem", color: "#64748b" }}>{s.label}</Typography>
-                      <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: s.color }}>{s.value}</Typography>
-                    </Box>
-                  ))}
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: "4px" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0, flex: 1 }}>
+                    <LocationOn sx={{ fontSize: 12, color: isOpen ? barColor : "#004AAD", flexShrink: 0 }} />
+                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {row.location}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0, ml: 1 }}>
+                    <Typography sx={{ fontSize: "0.65rem", color: "#64748b" }}>{row.present}/{row.total}</Typography>
+                    <PctBadge pct={row.percentage} />
+                    <KeyboardArrowDown
+                      sx={{
+                        fontSize: 14, color: "#94a3b8",
+                        transition: "transform 0.22s ease",
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    />
+                  </Box>
                 </Box>
+                <Box sx={{ height: 5, background: "#f1f5f9", borderRadius: "10px", overflow: "hidden" }}>
+                  <Box sx={{ height: "100%", borderRadius: "10px", width: `${barW}%`, background: barColor, transition: "width 0.45s ease" }} />
+                </Box>
+              </Box>
 
-                {/* Inner tab selectors */}
-                <Tabs
-                  value={locInnerTab}
-                  onChange={(_, v) => setLocInnerTab(v)}
-                  variant="fullWidth"
+              {/* ── Inline employee list (expands below bar) ── */}
+              <Collapse in={isOpen} timeout={220} unmountOnExit>
+                <Box
                   sx={{
-                    borderBottom: "1px solid #e2e8f0",
-                    minHeight: 32,
-                    bgcolor: "#fff",
-                    "& .MuiTab-root": {
-                      textTransform: "none",
-                      fontWeight: 600,
-                      fontSize: "0.75rem",
-                      minHeight: 32,
-                      py: 0.5,
-                      color: "#94a3b8",
-                    },
-                    "& .Mui-selected": { color: "#004AAD" },
-                    "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2 },
+                    mx: "-8px",
+                    border: `1.5px solid ${barColor}`,
+                    borderTop: "none",
+                    borderRadius: "0 0 8px 8px",
+                    overflow: "hidden",
+                    bgcolor: "#fafbff",
                   }}
                 >
-                  <Tab label="Employees" />
-                  <Tab label="Chart" />
-                </Tabs>
-
-                {locInnerTab === 0 ? (
-                  <>
-                    {/* Column headers */}
-                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5, px: 1.5, py: 0.7, bgcolor: "#e8f0fe" }}>
-                      {["Svc No", "Name", "Designation", "IN ", "OUT "].map((h) => (
-                        <Typography key={h} sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#004AAD" }}>{h}</Typography>
-                      ))}
-                    </Box>
-
-                    {/* Employee rows */}
-                    {row.employees.map((emp, idx) => {
-                      const p = isPresent(emp);
-                      return (
-                        <Box
-                          key={emp.sno || idx}
-                          onClick={() => onEmployeeClick(emp)}
-                          sx={{
-                            display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5,
-                            px: 1.5, py: 0.85,
-                            bgcolor: idx % 2 === 0 ? "#fff" : "#f8faff",
-                            borderTop: "0.5px solid #f1f5f9",
-                            alignItems: "center",
-                            cursor: "pointer",
-                            transition: "all 0.18s ease",
-                            "&:hover": { bgcolor: "#e8f0fe", transform: "translateX(3px)" },
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "0.65rem", color: "#475569" }}>{emp.sno || "-"}</Typography>
-                          <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#1e293b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.repname || "-"}</Typography>
-                          <Typography sx={{ fontSize: "0.6rem", color: "#64748b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.des || "-"}</Typography>
-                          <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.inn : "NR"}</Typography>
-                          <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.pout : "NR"}</Typography>
-                        </Box>
-                      );
-                    })}
-                  </>
-                ) : (
-                  /* Chart Tab - Weekly Attendance Trend Chart */
-                  <Box sx={{ p: 1.5, bgcolor: "#fff" }}>
-                    {locChartLoading ? (
-                      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 5 }}>
-                        <CircularProgress sx={{ color: "#004AAD" }} size={28} />
+                  {/* Stats strip */}
+                  <Box sx={{ display: "flex", bgcolor: "#fff", borderBottom: "1px solid #f1f5f9" }}>
+                    {[
+                      { label: "Strength", value: row.total,               color: "#004AAD" },
+                      { label: "Present",  value: row.present,             color: "#16a34a" },
+                      { label: "Absent",   value: row.total - row.present, color: "#dc2626" },
+                    ].map((s) => (
+                      <Box key={s.label} sx={{ flex: 1, textAlign: "center", py: 1, borderRight: "1px solid #f1f5f9", "&:last-child": { borderRight: "none" } }}>
+                        <Typography sx={{ fontSize: "0.6rem", color: "#64748b" }}>{s.label}</Typography>
+                        <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: s.color }}>{s.value}</Typography>
                       </Box>
-                    ) : (
-                      <WeeklyAttendanceTrend
-                        weeklyApiData={locChartData}
-                        eligibleLabel="Actual"
-                        titlePrefix={row.location}
-                      />
-                    )}
+                    ))}
                   </Box>
-                )}
-              </Box>
-            </Collapse>
-          </Box>
-        );
-      })}
+
+                  {/* Inner tab selectors */}
+                  <Tabs
+                    value={locInnerTab}
+                    onChange={(_, v) => setLocInnerTab(v)}
+                    variant="fullWidth"
+                    sx={{
+                      borderBottom: "1px solid #e2e8f0",
+                      minHeight: 32,
+                      bgcolor: "#fff",
+                      "& .MuiTab-root": {
+                        textTransform: "none",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        minHeight: 32,
+                        py: 0.5,
+                        color: "#94a3b8",
+                      },
+                      "& .Mui-selected": { color: "#004AAD" },
+                      "& .MuiTabs-indicator": { backgroundColor: "#004AAD", height: 2 },
+                    }}
+                  >
+                    <Tab label="Employees" />
+                    <Tab label="Chart" />
+                  </Tabs>
+
+                  {locInnerTab === 0 ? (
+                    <>
+                      {/* Column headers */}
+                      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5, px: 1.5, py: 0.7, bgcolor: "#e8f0fe" }}>
+                        {["Svc No", "Name", "Designation", "IN ", "OUT "].map((h) => (
+                          <Typography key={h} sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#004AAD" }}>{h}</Typography>
+                        ))}
+                      </Box>
+
+                      {/* Employee rows */}
+                      <Box
+                        sx={{
+                          maxHeight: "220px",
+                          overflowY: "auto",
+                          "&::-webkit-scrollbar": {
+                            width: "3px",
+                          },
+                          "&::-webkit-scrollbar-track": {
+                            backgroundColor: "#f1f5f9",
+                            borderRadius: "4px",
+                          },
+                          "&::-webkit-scrollbar-thumb": {
+                            backgroundColor: "#cbd5e1",
+                            borderRadius: "4px",
+                            "&:hover": {
+                              backgroundColor: "#94a3b8",
+                            },
+                          },
+                        }}
+                      >
+                        {row.employees.map((emp, idx) => {
+                          const p = isPresent(emp);
+                          return (
+                            <Box
+                              key={emp.sno || idx}
+                              onClick={() => onEmployeeClick(emp)}
+                              sx={{
+                                display: "grid", gridTemplateColumns: "1fr 1.6fr 1.4fr 0.7fr 0.5fr", gap: 0.5,
+                                px: 1.5, py: 0.85,
+                                bgcolor: idx % 2 === 0 ? "#fff" : "#f8faff",
+                                borderTop: "0.5px solid #f1f5f9",
+                                alignItems: "center",
+                                cursor: "pointer",
+                                transition: "all 0.18s ease",
+                                "&:hover": { bgcolor: "#e8f0fe", transform: "translateX(3px)" },
+                              }}
+                            >
+                              <Typography sx={{ fontSize: "0.65rem", color: "#475569" }}>{emp.sno || "-"}</Typography>
+                              <Typography sx={{ fontSize: "0.65rem", fontWeight: 600, color: "#1e293b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.repname || "-"}</Typography>
+                              <Typography sx={{ fontSize: "0.6rem", color: "#64748b", lineHeight: 1.2, wordBreak: "break-word" }}>{emp.des || "-"}</Typography>
+                              <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.inn : "NR"}</Typography>
+                              <Typography sx={{ fontSize: "0.68rem", fontWeight: p ? 700 : 400, color: p ? "#16a34a" : "#dc2626" }}>{p ? emp.pout : "NR"}</Typography>
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    </>
+                  ) : (
+                    /* Chart Tab - Weekly Attendance Trend Chart */
+                    <Box sx={{ p: 1.5, bgcolor: "#fff" }}>
+                      {locChartLoading ? (
+                        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 5 }}>
+                          <CircularProgress sx={{ color: "#004AAD" }} size={28} />
+                        </Box>
+                      ) : (
+                        <WeeklyAttendanceTrend
+                          weeklyApiData={locChartData}
+                          eligibleLabel="Actual"
+                          titlePrefix={row.location}
+                        />
+                      )}
+                    </Box>
+                  )}
+                </Box>
+              </Collapse>
+            </Box>
+          );
+        })}
+      </Box>
 
       {/* Legend */}
       <Box sx={{ display: "flex", gap: 2, justifyContent: "center", pt: "10px", mt: "8px", borderTop: "0.5px solid #f1f5f9" }}>
