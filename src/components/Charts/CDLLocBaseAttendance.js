@@ -2158,7 +2158,7 @@ const TraineeDivisionLevelChart = ({ traineeDivisionData }) => {
                   <Box sx={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0, flex: 1 }}>
                     <AccountTree sx={{ fontSize: 12, color: "#004AAD", flexShrink: 0 }} />
                     <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {row.divisionCode} - {row.division}
+                      {row.divisionCode}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0, ml: 1 }}>
