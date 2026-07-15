@@ -1713,7 +1713,7 @@ const Dashboard = () => {
               </Box>
 
               {/* ── Weekly Attendance ── */}
-              {/* <Box sx={{ mb: "24px" }}>
+               <Box sx={{ mb: "24px" }}>
                 {loadingStates.weeklyAttendance ? (
                   <ChartSkeleton height={400} />
                 ) : (
@@ -1723,7 +1723,7 @@ const Dashboard = () => {
                     targetRate={75}
                   />
                 )}
-              </Box> */}
+              </Box> 
 
               <Box sx={{ height: "20px" }} />
             </Box>
