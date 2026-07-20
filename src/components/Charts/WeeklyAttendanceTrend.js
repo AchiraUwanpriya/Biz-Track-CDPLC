@@ -1086,10 +1086,18 @@ const CustomTooltip = ({ active, payload, eligibleLabel = "Eligible", titlePrefi
     const isAggregated = !!row.periodDays && row.periodDays > 1;
 
     let headerLabel;
-    if (titlePrefix === "Employee" && view === "week") {
-      headerLabel = row.monthLabel
-        ? `Week ${row.name} · ${row.monthLabel} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended)`
-        : `Week ${row.name} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended)`;
+    if (titlePrefix === "Employee") {
+      if (view === "week") {
+        headerLabel = row.monthLabel
+          ? `Week ${row.name} · ${row.monthLabel} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended)`
+          : `Week ${row.name} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended)`;
+      } else if (view === "month") {
+        headerLabel = `${row.name} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended out of 31 days)`;
+      } else if (view === "year") {
+        headerLabel = `${row.name} (${row.attendance} day${row.attendance === 1 ? "" : "s"} attended out of 365 days)`;
+      } else {
+        headerLabel = formatTooltipDate(row.fullDate) || row.name;
+      }
     } else {
       headerLabel = isAggregated
         ? row.monthLabel
@@ -1214,7 +1222,7 @@ const LegendDot = ({ color, label }) => (
   </Box>
 );
 
-const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible", hideEligible = false }) => (
+const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible", hideEligible = false, titlePrefix, view }) => (
   <Box
     sx={{
       display: "flex",
@@ -1227,12 +1235,19 @@ const ChartLegend = ({ showTarget = true, eligibleLabel = "Eligible", hideEligib
   >
     <LegendDot color="#3b82f6" label="Attendance" />
     {!hideEligible && <LegendDot color="#bfdbfe" label={eligibleLabel} />}
-    <LegendDot color="#f59e0b" label="Rate %" />
-    {showTarget && !hideEligible && (
+    {titlePrefix !== "Employee" && <LegendDot color="#f59e0b" label="Rate %" />}
+    {titlePrefix === "Employee" && (view === "week" || view === "month") ? (
       <Box sx={{ ml: "auto", display: "flex", gap: 1, alignItems: "center" }}>
-        <Box sx={{ width: 20, height: 0, borderBottom: "2px dashed #ef4444" }} />
-        <Typography sx={{ fontSize: { xs: 9, sm: 10 }, color: "#64748b" }}>Target</Typography>
+        <Box sx={{ width: 20, height: 0, borderBottom: "2px dashed #f97316" }} />
+        <Typography sx={{ fontSize: { xs: 9, sm: 10 }, color: "#64748b" }}>Target ({view === "week" ? "7 Days" : "31 Days"})</Typography>
       </Box>
+    ) : (
+      showTarget && !hideEligible && (
+        <Box sx={{ ml: "auto", display: "flex", gap: 1, alignItems: "center" }}>
+          <Box sx={{ width: 20, height: 0, borderBottom: "2px dashed #ef4444" }} />
+          <Typography sx={{ fontSize: { xs: 9, sm: 10 }, color: "#64748b" }}>Target</Typography>
+        </Box>
+      )
     )}
   </Box>
 );
@@ -1497,7 +1512,7 @@ const AttendanceChart = ({
             domain={yAxisDomain}
             ticks={yAxisTicks}
           />
-          {!(titlePrefix === "Employee" && view === "week") && (
+          {titlePrefix !== "Employee" && (
             <YAxis
               yAxisId="right"
               orientation="right"
@@ -1511,14 +1526,24 @@ const AttendanceChart = ({
             />
           )}
           <Tooltip content={<CustomTooltip eligibleLabel={eligibleLabel} titlePrefix={titlePrefix} view={view} />} />
-          {!hideEligible && (
+          {titlePrefix === "Employee" && (view === "week" || view === "month") ? (
             <ReferenceLine
-              y={targetEligible}
-              stroke="#ef4444"
+              y={view === "week" ? 7 : 31}
+              stroke="#f97316"
               strokeDasharray="4 4"
               yAxisId="left"
               strokeWidth={1.5}
             />
+          ) : (
+            !hideEligible && (
+              <ReferenceLine
+                y={targetEligible}
+                stroke="#ef4444"
+                strokeDasharray="4 4"
+                yAxisId="left"
+                strokeWidth={1.5}
+              />
+            )
           )}
 
           {/* Bottom segment: Attendance (stacked) */}
@@ -1544,7 +1569,7 @@ const AttendanceChart = ({
             />
           )}
 
-          {!(titlePrefix === "Employee" && view === "week") && (
+          {titlePrefix !== "Employee" && (
             <Line
               yAxisId="right"
               type="monotone"
@@ -1808,7 +1833,7 @@ export function WeeklyAttendanceTrend({
         .sort((a, b) => new Date(a.AttDate) - new Date(b.AttDate));
     };
 
-    const aggregateByPeriod = (data, keyFn, labelFn, sortKeyFn, isWeek = false) => {
+    const aggregateByPeriod = (data, keyFn, labelFn, sortKeyFn, periodType = "default") => {
       const groups = {};
 
       data.forEach(item => {
@@ -1835,10 +1860,24 @@ export function WeeklyAttendanceTrend({
         .sort((a, b) => a.sortKey - b.sortKey)
         .map(g => {
           let eligible, attendance, rate;
-          if (titlePrefix === "Employee" && isWeek) {
-            eligible = 7;
-            attendance = g.attendanceSum;
-            rate = null;
+          if (titlePrefix === "Employee") {
+            if (periodType === "week") {
+              eligible = 7;
+              attendance = g.attendanceSum;
+              rate = null;
+            } else if (periodType === "month") {
+              eligible = 31;
+              attendance = g.attendanceSum;
+              rate = null;
+            } else if (periodType === "year") {
+              eligible = 365;
+              attendance = g.attendanceSum;
+              rate = null;
+            } else {
+              eligible = g.count;
+              attendance = g.attendanceSum;
+              rate = null;
+            }
           } else {
             const avgEligible = g.count ? g.eligibleSum / g.count : 0;
             const avgAttendance = g.count ? g.attendanceSum / g.count : 0;
@@ -1877,7 +1916,7 @@ export function WeeklyAttendanceTrend({
         const year = getYear(weekStart);
         return new Date(year, 0, 1 + (weekNum - 1) * 7).getTime();
       },
-      true
+      "week"
     );
 
     let dataYear = new Date().getFullYear();
@@ -1899,7 +1938,8 @@ export function WeeklyAttendanceTrend({
       weeklyApiData,
       (date) => `${getYear(date)}-${date.getMonth()}`,
       (date) => date.toLocaleDateString('en-US', { month: 'short' }),
-      (date) => new Date(getYear(date), date.getMonth(), 1).getTime()
+      (date) => new Date(getYear(date), date.getMonth(), 1).getTime(),
+      "month"
     );
 
     const allMonthsData = enrichMonthDataWithAllMonths(rawMonthData, dataYear);
@@ -1908,7 +1948,8 @@ export function WeeklyAttendanceTrend({
       weeklyApiData,
       (date) => `${getYear(date)}`,
       (date) => `${getYear(date)}`,
-      (date) => new Date(getYear(date), 0, 1).getTime()
+      (date) => new Date(getYear(date), 0, 1).getTime(),
+      "year"
     );
 
     let rangeData = [];
@@ -2154,13 +2195,43 @@ export function WeeklyAttendanceTrend({
                 allWeeksData={allWeeksData}
                 eligibleLabel={eligibleLabel}
                 hideEligible={hideEligible}
-                yAxisDomain={titlePrefix === "Employee" && view === "week" ? [0, 7] : yAxisDomain}
-                yAxisTicks={titlePrefix === "Employee" && view === "week" ? [0, 1, 2, 3, 4, 5, 6, 7] : yAxisTicks}
+                yAxisDomain={
+                  titlePrefix === "Employee"
+                    ? view === "week"
+                      ? [0, 7]
+                      : view === "month"
+                      ? [0, 31]
+                      : view === "year"
+                      ? [0, 365]
+                      : view === "range"
+                      ? [0, 1]
+                      : yAxisDomain
+                    : yAxisDomain
+                }
+                yAxisTicks={
+                  titlePrefix === "Employee"
+                    ? view === "week"
+                      ? [0, 1, 2, 3, 4, 5, 6, 7]
+                      : view === "month"
+                      ? [0, 5, 10, 15, 20, 25, 31]
+                      : view === "year"
+                      ? [0, 50, 100, 150, 200, 250, 300, 365]
+                      : view === "range"
+                      ? [0, 1]
+                      : yAxisTicks
+                    : yAxisTicks
+                }
                 titlePrefix={titlePrefix}
               />
 
               {/* Legend - consistent across all views */}
-              <ChartLegend showTarget={true} eligibleLabel={eligibleLabel} hideEligible={hideEligible} />
+              <ChartLegend
+                showTarget={true}
+                eligibleLabel={eligibleLabel}
+                hideEligible={hideEligible}
+                titlePrefix={titlePrefix}
+                view={view}
+              />
             </>
           )}
         </Box>
