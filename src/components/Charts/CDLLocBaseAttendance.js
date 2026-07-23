@@ -2827,7 +2827,6 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
   const divEmployees   = selectedDivision ? filteredData.filter((d) => d.division === selectedDivision) : [];
   const totalPresent   = divEmployees.filter(isPresent).length;
 
-  const mainTitle = selectedDivision ? `Location Overview — ${selectedDivision}` : "Division Overview";
   const mainSubtitle = selectedDivision
     ? `${totalLocations} locations · tap to expand`
     : `${divisions.length || 8} divisions · click any division to view locations${term ? ` · filtered by "${searchTerm}"` : ""}`;
@@ -2908,15 +2907,6 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
             {selectedDivision && (
               <Breadcrumb division={selectedDivision} onBack={handleBack} />
             )}
-
-            <Box sx={{ mb: 2, mt: selectedDivision ? 0 : 1 }}>
-              <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "#004AAD", fontSize: "1.1rem" }}>
-                 {mainTitle}
-              </Typography>
-              <Typography sx={{ color: "#64748b", fontSize: "0.8rem", fontWeight: 500 }}>
-                {mainSubtitle}
-              </Typography>
-            </Box>
 
             {/* Tab navigation */}
             <Tabs
