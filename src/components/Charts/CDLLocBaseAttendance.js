@@ -2299,25 +2299,8 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
       {/* Bars + inline employee list */}
       <Box
         sx={{
-          maxHeight: expandedLoc ? "550px" : "275px",
-          overflowY: "auto",
-          transition: "max-height 0.25s ease-in-out",
           mx: "-8px",
           px: "8px",
-          "&::-webkit-scrollbar": {
-            width: "3px",
-          },
-          "&::-webkit-scrollbar-track": {
-            backgroundColor: "#f1f5f9",
-            borderRadius: "4px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#cbd5e1",
-            borderRadius: "4px",
-            "&:hover": {
-              backgroundColor: "#94a3b8",
-            },
-          },
         }}
       >
         {chartData.map((row) => {
@@ -2439,22 +2422,8 @@ const InlineLocationChart = ({ data, division, onEmployeeClick, weeklyAttendance
                       {/* Employee rows */}
                       <Box
                         sx={{
-                          maxHeight: "220px",
-                          overflowY: "auto",
-                          "&::-webkit-scrollbar": {
-                            width: "3px",
-                          },
-                          "&::-webkit-scrollbar-track": {
-                            backgroundColor: "#f1f5f9",
-                            borderRadius: "4px",
-                          },
-                          "&::-webkit-scrollbar-thumb": {
-                            backgroundColor: "#cbd5e1",
-                            borderRadius: "4px",
-                            "&:hover": {
-                              backgroundColor: "#94a3b8",
-                            },
-                          },
+                          mx: "-4px",
+                          px: "4px",
                         }}
                       >
                         {row.employees.map((emp, idx) => {
