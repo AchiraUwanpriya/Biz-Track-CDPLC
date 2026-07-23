@@ -193,7 +193,7 @@
 //             {rate}%
 //           </Typography>
 //           <Typography sx={{ fontSize: "10px", color: cfg.rateColor, mt: "1px" }}>
-           
+
 //           </Typography>
 //         </Box>
 //       </Box>
@@ -243,7 +243,7 @@
 //             {(strength || 0).toLocaleString()}
 //           </Typography>
 //         </Box>
-        
+
 //       </Box>
 //     </Paper>
 //   );
@@ -525,7 +525,7 @@
 //         dispatch(GetCDLWeekAttendance(today));
 //         dispatch(GetCDLMonthlyAttendance( ));    
 //         dispatch(GetCDLYearlyAttendance( ));
-        
+
 //       } catch (error) {
 //         console.error("Error dispatching actions:", error);
 //       }
@@ -661,7 +661,7 @@
 //                 onCardClick={handleAttendanceCardClick}
 //               />
 
-              
+
 
 //               {/* ── CDPLC Breakdown ── */}
 //               <Box ref={cdplcChartRef} sx={{ mb: "24px" }}>
@@ -678,7 +678,7 @@
 //                 <CDLLocBaseAttendance />
 //               </Box>
 
-              
+
 
 //               {/* ──--------- Division Breakdown -----------── */}
 //               {/* <Box sx={{ mb: "24px" }}>
@@ -852,6 +852,7 @@ const TYPE_CONFIG = {
 };
 
 // ─── Build per-type breakdown ─────────────────────────────────────────────────
+
 const buildTypeBreakdown = (allAttendance = []) => {
   const transformed = (allAttendance || [])
     .filter((item) => {
@@ -875,6 +876,7 @@ const buildTypeBreakdown = (allAttendance = []) => {
       merged[row.type].attendance += row.attendance;
     }
   });
+
 
   return Object.values(merged).sort(
     (a, b) => (TYPE_ORDER[a.type] || 99) - (TYPE_ORDER[b.type] || 99)
@@ -916,6 +918,7 @@ const AttendanceKpiCard = ({ type, strength, eligible, attendance, onClick }) =>
   const cfg = TYPE_CONFIG[type] || TYPE_CONFIG["CDPLC"];
   const rate = eligible > 0 ? Math.round((attendance / eligible) * 100) : 0;
   const isInteractive = Boolean(onClick);
+
 
   const handleKeyDown = (event) => {
     if (!isInteractive) return;
@@ -1254,7 +1257,6 @@ const DateFilter = ({ selectedDate, onDateChange, onApply, onClear, loading }) =
     handleClose();
   };
 
-  // Format date for display (MM/DD/YYYY)
   const formatDateDisplay = (date) => {
     if (!date) return "Select Date";
     const parts = date.split("-");
@@ -1432,9 +1434,8 @@ const Dashboard = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // ─── Central Date State ──────────────────────────────────────────────────────
-  
+
   const [selectedDate, setSelectedDate] = useState(() => {
-   // const saved = localStorage.getItem("dashboard_selected_date");
     return new Date().toISOString().split("T")[0];
   });
 
@@ -1473,7 +1474,6 @@ const Dashboard = () => {
       weeklyAttendance: true,
     });
 
-    // Fetch all data with the selected date
     dispatch(GetAllAttendance(date, date));
     dispatch(GetTraineeBasedTypes(date));
     dispatch(GetCdlBasedDivison(date, date));
@@ -1509,7 +1509,7 @@ const Dashboard = () => {
   // ─── Initial data fetch ─────────────────────────────────────────────────────
   useEffect(() => {
     fetchDashboardData(selectedDate);
-  }, []); // Only run once on mount
+  }, []);
 
   // ─── Update loading states when data arrives ──────────────────────────────
   useEffect(() => {
@@ -1538,6 +1538,7 @@ const Dashboard = () => {
     }
   }, [allAttendance]);
 
+  
   useEffect(() => {
     if (weeklyAttendance?.length > 0) {
       setLoadingStates((p) => ({ ...p, weeklyAttendance: false }));
@@ -1631,9 +1632,9 @@ const Dashboard = () => {
           >
             {activeTab === 0 ? "HR Dashboard"
               : activeTab === 1 ? "Financial Dashboard"
-              : activeTab === 4 ? "Company Overview"
-              : activeTab === 5 ? "Own Overview"
-              : "Dashboard"}
+                : activeTab === 4 ? "Company Overview"
+                  : activeTab === 5 ? "Own Overview"
+                    : "Dashboard"}
           </Typography>
         </Box>
 
@@ -1648,7 +1649,7 @@ const Dashboard = () => {
           />
 
           {/* ── Date Display ── */}
-          
+
         </Box>
       </Box>
 
@@ -1688,12 +1689,6 @@ const Dashboard = () => {
                   <CDPLCBreakdown hadDate={selectedDate} />
                 )}
               </Box>
-
-              {/* ── CDLLocationChart ── */}
-              <Box sx={{ mb: "24px" }}>
-                <CDLLocBaseAttendance  hadDate={selectedDate} />
-              </Box>
-
               {/* ── Employee Type Chart ── */}
               <Box ref={traineeTypeChartRef} sx={{ mb: "24px" }}>
                 {loadingStates.traineeTypes ? (
@@ -1703,17 +1698,24 @@ const Dashboard = () => {
                 )}
               </Box>
 
-              {/* ── Trainees Division Breakdown ── */}
+              {/* ── CDLLocationChart ── */}
               <Box sx={{ mb: "24px" }}>
+                <CDLLocBaseAttendance hadDate={selectedDate} />
+              </Box>
+
+              
+
+              {/* ── Trainees Division Breakdown ── */}
+              {/* <Box sx={{ mb: "24px" }}>
                 {loadingStates.traineeDivision ? (
                   <ChartSkeleton height={400} />
                 ) : (
                   <TraineesDivisionBreakdown traineeDivisionData={traineeDivision} />
                 )}
-              </Box>
+              </Box> */}
 
               {/* ── Weekly Attendance ── */}
-               <Box sx={{ mb: "24px" }}>
+              <Box sx={{ mb: "24px" }}>
                 {loadingStates.weeklyAttendance ? (
                   <ChartSkeleton height={400} />
                 ) : (
@@ -1723,7 +1725,7 @@ const Dashboard = () => {
                     targetRate={75}
                   />
                 )}
-              </Box> 
+              </Box>
 
               <Box sx={{ height: "20px" }} />
             </Box>

@@ -427,40 +427,40 @@ const Header = ({ title }) => {
   let navigate = useNavigate();
   const dispatch = useDispatch();
  
-  useEffect(() => {
-    const fetchInTime = async () => {
-      const currentDate = new Date();
-      const month = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}`;
+  // useEffect(() => {
+  //   const fetchInTime = async () => {
+  //     const currentDate = new Date();
+  //     const month = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)
+  //       .toString()
+  //       .padStart(2, "0")}`;
 
-      try {
-        const response = await axios.get(
-          `Attendance/GetAttendanceCard?P_MONTH=${month}`
-        );
+  //     try {
+  //       const response = await axios.get(
+  //         `Attendance/GetAttendanceCard?P_MONTH=${month}`
+  //       );
 
-        if (response.data.StatusCode === 200) {
-          const resultSet = response.data.ResultSet;
-          const today = currentDate.toLocaleDateString();
+  //       if (response.data.StatusCode === 200) {
+  //         const resultSet = response.data.ResultSet;
+  //         const today = currentDate.toLocaleDateString();
 
-          const todayRecord = resultSet.find((record) => {
-            const recordDate = new Date(record.Date).toLocaleDateString();
-            return recordDate === today;
-          });
+  //         const todayRecord = resultSet.find((record) => {
+  //           const recordDate = new Date(record.Date).toLocaleDateString();
+  //           return recordDate === today;
+  //         });
 
-          if (todayRecord) {
-            setInTime(todayRecord.InTime || "Unavailable");  
-          } else {
-            setInTime("Unavailable");   
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching In Time:", error);
-      }
-    };
+  //         if (todayRecord) {
+  //           setInTime(todayRecord.InTime || "Unavailable");  
+  //         } else {
+  //           setInTime("Unavailable");   
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching In Time:", error);
+  //     }
+  //   };
 
-    fetchInTime();
-  }, []);
+  //   fetchInTime();
+  // }, []);
  
   useEffect(() => {
     console.log("useEffect triggered - data:", data, "authKey:", authKey);
@@ -622,7 +622,7 @@ const Header = ({ title }) => {
           </IconButton>
         </Box>
 
-        {inTime && inTime !== "Unavailable" && (
+        {/* {inTime && inTime !== "Unavailable" && (
           <Typography
             sx={{
               color: "green",
@@ -633,7 +633,7 @@ const Header = ({ title }) => {
           >
             In Time: {inTime}
           </Typography>
-        )}
+        )} */}
 
         <Menu
           anchorEl={anchorEl}

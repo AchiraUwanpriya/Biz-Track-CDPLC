@@ -537,6 +537,7 @@ import CollectForm from "./layouts/CollectingForm/Dailycollectionsheet";
 import CollectChoice from "./layouts/CollectingForm/CollectChoice";
 import ExecutivePage from './layouts/CollectingForm/ExecutiveData';
 import Subordering from './layouts/sub_ordering/SubOrdering';
+import Calendar from "./layouts/calendar/calendar";
 
 // Import all approval component files
 import IwoApp from "./layouts/approvals/IwoApp";
@@ -698,6 +699,7 @@ function App() {
                       <Route element={<LeaveApp />} path="/approvals/leave" />
                       <Route element={<OTApp />} path="/approvals/ot" />
                       <Route element={<EFileApp />} path="/approvals/efile" />
+                      <Route element={<Calendar />} path="/calendar" />
                       <Route
                         element={<AgrementApp />}
                         path="/approvals/agreement"

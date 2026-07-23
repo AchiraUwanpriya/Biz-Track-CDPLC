@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -7,10 +7,48 @@ import {
   CardActionArea,
   Button,
 } from "@mui/material";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 
 const Approvals = () => {
   const navigate = useNavigate();
+  const [inTime, setInTime] = useState("");  
+    useEffect(() => {
+    const fetchInTime = async () => {
+      const currentDate = new Date();
+      const month = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}`;
+
+      try {
+        const response = await axios.get(
+          `Attendance/GetAttendanceCard?P_MONTH=${month}`
+        );
+
+        if (response.data.StatusCode === 200) {
+          const resultSet = response.data.ResultSet;
+          const today = currentDate.toLocaleDateString();
+
+          const todayRecord = resultSet.find((record) => {
+            const recordDate = new Date(record.Date).toLocaleDateString();
+            return recordDate === today;
+          });
+
+          if (todayRecord) {
+            setInTime(todayRecord.InTime || "Unavailable");  
+          } else {
+            setInTime("Unavailable");   
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching In Time:", error);
+      }
+    };
+
+    fetchInTime();
+  }, []);
+
   const categories = [
     {
       id: "EMOBCI0002",
@@ -72,12 +110,36 @@ const Approvals = () => {
     <Box
       sx={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: 2 }}
     >
-      <Typography
-        variant="h5"
-        sx={{ mb: 2, fontWeight: 500, textAlign: "center" }}
-      >
-        Personal
-      </Typography>
+      <Box
+  sx={{
+    position: "relative",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    mb: 2,
+  }}
+>
+  <Typography variant="h5" sx={{ fontWeight: 500 }}>
+    Personal
+  </Typography>
+
+  {inTime && inTime !== "Unavailable" && (
+    <Typography
+      variant="body2"
+      sx={{
+        position: "absolute",
+        right: 0,
+        color: "green",
+        fontSize: 12,
+        fontWeight: 600,
+        whiteSpace: "nowrap",
+      }}
+    >
+      In Time: {inTime}
+    </Typography>
+  )}
+</Box>
+
       <Grid container spacing={1}>
         {categories.map((category) => (
           <Grid item xs={4} key={category.id} sx={{ padding: 1 }}>
@@ -141,6 +203,9 @@ const Approvals = () => {
 };
 
 export default Approvals;
+
+
+
 
 
 

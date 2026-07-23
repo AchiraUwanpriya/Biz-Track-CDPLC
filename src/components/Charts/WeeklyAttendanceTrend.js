@@ -208,7 +208,6 @@
 //   </Box>
 // );
 
-// // ─── Empty State ─────────────────────────────────────────────────────────────
 // const EmptyState = ({ height = 200, message = "No data available" }) => (
 //   <Box
 //     sx={{
@@ -227,7 +226,6 @@
 //   </Box>
 // );
 
-// // ─── FIXED BAR SIZE - SAME FOR ALL VIEWS ──────────────────────────────────
 // const getFixedBarSize = (dataLength) => {
 //   if (dataLength <= 7) return 32;
 //   if (dataLength <= 31) return 28;
@@ -236,7 +234,6 @@
 //   return 22;
 // };
 
-// // ─── UPDATED: WeekAxisTick - ONLY SHOWS WEEK NUMBERS ──────────────────────
 // const WeekAxisTick = ({ x, y, payload, index, weekData, isMobile }) => {
 //   const item = weekData?.[index];
 //   if (!item) return null;
@@ -272,7 +269,6 @@
 //   };
 
 //   const showMonth = shouldShowMonth();
-
 
 //   const fontSize = isMobile ? 8 : 10;
 //   const monthFontSize = isMobile ? 7 : 9;
@@ -311,7 +307,35 @@
 //   );
 // };
 
-// // ─── UPDATED: AttendanceChart with Mobile Responsive X-Axis ──────────────
+// const MonthAxisTick = ({ x, y, payload, index, monthData, isMobile }) => {
+//   const item = monthData?.[index];
+//   if (!item) return null;
+
+
+
+//   const monthLabel = item.name || '';
+//   const hasData = item.hasData !== false;
+
+//   const fontSize = isMobile ? 8 : 10;
+
+//   return (
+//     <g transform={`translate(${x},${y})`}>
+//       <text
+//         x={0}
+//         y={0}
+//         dy={isMobile ? 10 : 12}
+//         textAnchor="middle"
+//         fontSize={fontSize}
+//         fill={hasData ? "#1e1e1f" : "#94a3b8"}
+//         fontWeight={hasData ? "600" : "400"}
+//         opacity={hasData ? 1 : 0.5}
+//       >
+//         {monthLabel}
+//       </text>
+//     </g>
+//   );
+// };
+
 // const AttendanceChart = ({
 //   data,
 //   view,
@@ -320,24 +344,27 @@
 //   chartMargin,
 //   yAxisWidth,
 //   yAxisRightW,
-//   chartHeight
+//   chartHeight,
+//   allMonthsData,
+//   allWeeksData
 // }) => {
 
 //   const barSize = getFixedBarSize(data.length);
 //   const isWeekView = view === "week";
+//   const isMonthView = view === "month";
 
 //   const showDots = data.length <= 30;
 //   const dotSize = data.length <= 15 ? 4 : 3;
 
-//   // ─── Calculate optimal tick interval for X-axis ──────────────────────
 //   const getTickInterval = () => {
 //     if (isWeekView && isMobile) {
-
 //       return 3;
 //     }
 //     if (isWeekView && !isMobile) {
-
 //       return 1;
+//     }
+//     if (isMonthView) {
+//       return 0;
 //     }
 //     if (data.length <= 15) return 0;
 //     if (data.length <= 31) return 2;
@@ -348,14 +375,13 @@
 //     return Math.floor(data.length / 20);
 //   };
 
-//   const shouldAngleLabels = !isWeekView && data.length > 20;
-//   const labelAngle = isWeekView ? 0 : (shouldAngleLabels ? -45 : 0);
-//   const labelAnchor = isWeekView ? "middle" : (shouldAngleLabels ? "end" : "middle");
-
+//   const shouldAngleLabels = !isWeekView && !isMonthView && data.length > 20;
+//   const labelAngle = isWeekView ? 0 : (isMonthView ? 0 : (shouldAngleLabels ? -45 : 0));
+//   const labelAnchor = isWeekView ? "middle" : (isMonthView ? "middle" : (shouldAngleLabels ? "end" : "middle"));
 
 //   const labelHeight = isWeekView
 //     ? (isMobile ? 30 : 25)
-//     : (shouldAngleLabels ? 50 : 30);
+//     : (isMonthView ? (isMobile ? 20 : 25) : (shouldAngleLabels ? 50 : 30));
 
 //   const getTickFontSize = () => {
 //     if (isMobile) return 8;
@@ -366,11 +392,42 @@
 //     return 8;
 //   };
 
-//   const processedData = isWeekView ? data.map((item) => {
-//     return { ...item, showMonthLabel: false };
-//   }) : data;
+//   let chartData = data;
+//   let xAxisTick = null;
 
-//   const stackedData = processedData.map((d) => ({
+//   if (isWeekView && allWeeksData && allWeeksData.length > 0) {
+//     chartData = allWeeksData.map(week => ({
+//       ...week,
+
+//       rate: week.hasData ? week.rate : null,
+//       eligible: week.hasData ? week.eligible : 0,
+//       attendance: week.hasData ? week.attendance : 0,
+//       periodDays: week.hasData ? week.periodDays : 0,
+//       hasData: week.hasData,
+//     }));
+
+//     xAxisTick = <WeekAxisTick weekData={chartData} isMobile={isMobile} />;
+//   } else if (isMonthView && allMonthsData && allMonthsData.length > 0) {
+
+//     chartData = allMonthsData.map(month => ({
+//       ...month,
+//       rate: month.hasData ? month.rate : null,
+//       eligible: month.hasData ? month.eligible : 0,
+//       attendance: month.hasData ? month.attendance : 0,
+//       hasData: month.hasData,
+//     }));
+
+//     xAxisTick = <MonthAxisTick monthData={chartData} isMobile={isMobile} />;
+//   } else if (isWeekView) {
+
+//     chartData = data;
+//     xAxisTick = <WeekAxisTick weekData={data} isMobile={isMobile} />;
+//   } else if (isMonthView) {
+//     chartData = data;
+//     xAxisTick = { fill: "#64748b", fontSize: getTickFontSize() };
+//   }
+
+//   const stackedData = chartData.map((d) => ({
 //     ...d,
 //     remaining: Math.max(0, (d.eligible || 0) - (d.attendance || 0)),
 //   }));
@@ -389,15 +446,11 @@
 //             dataKey="name"
 //             axisLine={false}
 //             tickLine={false}
-//             tick={
-//               isWeekView
-//                 ? <WeekAxisTick weekData={stackedData} isMobile={isMobile} />
-//                 : { fill: "#64748b", fontSize: getTickFontSize() }
-//             }
+//             tick={xAxisTick || { fill: "#64748b", fontSize: getTickFontSize() }}
 //             angle={labelAngle}
 //             textAnchor={labelAnchor}
 //             height={labelHeight}
-//             interval={isWeekView ? 0 : getTickInterval()}
+//             interval={isWeekView ? 0 : (isMonthView ? 0 : getTickInterval())}
 //           />
 //           <YAxis
 //             yAxisId="left"
@@ -458,11 +511,83 @@
 //             strokeWidth={data.length > 60 ? 2 : 2.5}
 //             dot={showDots ? { r: dotSize, fill: "#f59e0b" } : false}
 //             activeDot={{ r: 5 }}
+//             connectNulls={false} // This prevents connecting across null values
 //           />
 //         </ComposedChart>
 //       </ResponsiveContainer>
 //     </Box>
 //   );
+// };
+
+// const enrichWeekDataWithMonth = (weeks, year) => {
+//   const allWeeks = [];
+//   const targetYear = year || new Date().getFullYear();
+
+
+//   const firstDay = new Date(targetYear, 0, 1);
+
+//   const firstWeekNum = getWeekNumber(firstDay);
+
+//   const startWeek = 1;
+
+//   for (let weekNum = startWeek; weekNum <= 53; weekNum++) {
+//     const existingData = weeks.find(w => {
+//       const wDate = new Date(w.fullDate);
+//       return getWeekNumber(wDate) === weekNum &&
+//         getYearFromWeek(weekNum, targetYear) === targetYear;
+//     });
+
+//     const date = new Date(targetYear, 0, 1 + (weekNum - 1) * 7);
+//     const monthName = getMonthName(date);
+
+//     allWeeks.push({
+//       name: String(weekNum),
+//       weekNumber: weekNum,
+//       year: targetYear,
+//       monthLabel: monthName,
+//       fullLabel: `Week ${weekNum} (${monthName} ${targetYear})`,
+//       fullDate: date.toISOString(),
+//       eligible: existingData ? existingData.eligible : 0,
+//       attendance: existingData ? existingData.attendance : 0,
+//       rate: existingData ? existingData.rate : 0,
+//       periodDays: existingData ? existingData.periodDays : 0,
+//       hasData: !!existingData,
+//       ...(existingData || {})
+//     });
+//   }
+
+//   return allWeeks;
+// };
+
+// // ─── NEW: Function to get all 12 months with data ──────────────────────────
+// const enrichMonthDataWithAllMonths = (months, year) => {
+//   const allMonths = [];
+//   const targetYear = year || new Date().getFullYear();
+
+//   for (let month = 0; month < 12; month++) {
+//     const existingData = months.find(m => {
+//       const mDate = new Date(m.fullDate);
+//       return mDate.getMonth() === month && mDate.getFullYear() === targetYear;
+//     });
+
+//     const date = new Date(targetYear, month, 1);
+//     const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+
+//     allMonths.push({
+//       name: monthName,
+//       monthNumber: month,
+//       year: targetYear,
+//       fullDate: date.toISOString(),
+//       eligible: existingData ? existingData.eligible : 0,
+//       attendance: existingData ? existingData.attendance : 0,
+//       rate: existingData ? existingData.rate : 0,
+//       periodDays: existingData ? existingData.periodDays : 0,
+//       hasData: !!existingData,
+//       ...(existingData || {})
+//     });
+//   }
+
+//   return allMonths;
 // };
 
 // const DateRangePicker = ({
@@ -599,47 +724,6 @@
 //   );
 // };
 
-
-// const enrichWeekDataWithMonth = (weeks, year) => {
-
-//   const allWeeks = [];
-
-
-//   const targetYear = year || new Date().getFullYear();
-
-
-//   for (let weekNum = 1; weekNum <= 53; weekNum++) {
-
-//     const existingData = weeks.find(w => {
-//       const wDate = new Date(w.fullDate);
-//       return getWeekNumber(wDate) === weekNum &&
-//         getYearFromWeek(weekNum, targetYear) === targetYear;
-//     });
-
-//     const date = new Date(targetYear, 0, 1 + (weekNum - 1) * 7);
-//     const monthName = getMonthName(date);
-
-//     allWeeks.push({
-//       name: String(weekNum),
-//       weekNumber: weekNum,
-//       year: targetYear,
-//       monthLabel: monthName,
-//       fullLabel: `Week ${weekNum} (${monthName} ${targetYear})`,
-//       fullDate: date.toISOString(),
-//       eligible: existingData ? existingData.eligible : 0,
-//       attendance: existingData ? existingData.attendance : 0,
-//       rate: existingData ? existingData.rate : 0,
-//       periodDays: existingData ? existingData.periodDays : 0,
-//       hasData: !!existingData,
-//       ...(existingData || {})
-//     });
-//   }
-
-
-//   return allWeeks;
-// };
-
-// // ─── Main Component ───────────────────────────────────────────────────────────
 // export function WeeklyAttendanceTrend({
 //   weeklyApiData = [],
 //   targetEligible = 1700,
@@ -648,7 +732,6 @@
 //   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
 //   const [view, setView] = useState("week");
 
-//   // ─── Date range state ──────────────────────────────────────────────────
 //   const [startDate, setStartDate] = useState(null);
 //   const [endDate, setEndDate] = useState(null);
 
@@ -658,10 +741,9 @@
 //     return () => window.removeEventListener("resize", handleResize);
 //   }, []);
 
-//   // ─── Filter and process data based on date ranges ──────────────────────────
 //   const processData = () => {
 //     if (!weeklyApiData || weeklyApiData.length === 0) {
-//       return { weekData: [], monthData: [], yearData: [], rangeData: [] };
+//       return { weekData: [], monthData: [], yearData: [], rangeData: [], allMonthsData: [], allWeeksData: [] };
 //     }
 
 //     const today = new Date();
@@ -739,7 +821,6 @@
 //       }
 //     );
 
-
 //     let dataYear = new Date().getFullYear();
 //     if (rawWeekData.length > 0) {
 //       const firstDate = new Date(rawWeekData[0].fullDate);
@@ -748,17 +829,21 @@
 //       }
 //     }
 
-
 //     const weekData = enrichWeekDataWithMonth(rawWeekData, dataYear);
 
+//     const allWeeksData = weekData.map(week => ({
+//       ...week,
+//       rate: week.hasData ? week.rate : null,
+//     }));
 
-//     const monthData = aggregateByPeriod(
+//     const rawMonthData = aggregateByPeriod(
 //       weeklyApiData,
 //       (date) => `${getYear(date)}-${date.getMonth()}`,
-//       (date) => date.toLocaleDateString('en-US',
-//         { month: 'short' }),
+//       (date) => date.toLocaleDateString('en-US', { month: 'short' }),
 //       (date) => new Date(getYear(date), date.getMonth(), 1).getTime()
 //     );
+
+//     const allMonthsData = enrichMonthDataWithAllMonths(rawMonthData, dataYear);
 
 //     const yearData = aggregateByPeriod(
 //       weeklyApiData,
@@ -766,7 +851,6 @@
 //       (date) => `${getYear(date)}`,
 //       (date) => new Date(getYear(date), 0, 1).getTime()
 //     );
-
 
 //     let rangeData = [];
 //     if (startDate && endDate) {
@@ -784,10 +868,18 @@
 //         };
 //       });
 //     }
-//     return { weekData, monthData, yearData, rangeData };
+
+//     return {
+//       weekData,
+//       monthData: rawMonthData,
+//       yearData,
+//       rangeData,
+//       allMonthsData,
+//       allWeeksData
+//     };
 //   };
 
-//   const { weekData, monthData, yearData, rangeData } = processData();
+//   const { weekData, monthData, yearData, rangeData, allMonthsData, allWeeksData } = processData();
 
 //   // ── Derived ───────────────────────────────────────────────────────────────
 //   const isRangeView = view === "range";
@@ -808,7 +900,7 @@
 //     top: 16,
 //     right: isMobile ? -8 : -12,
 //     left: isMobile ? -18 : -20,
-//     bottom: isWeekView ? (isMobile ? 20 : 10) : 1,
+//     bottom: isWeekView ? (isMobile ? 20 : 10) : (isMonthView ? (isMobile ? 15 : 10) : 1),
 //   };
 
 //   const titles = {
@@ -852,6 +944,9 @@
 
 //   const currentData = getCurrentData();
 //   const isEmpty = currentData.length === 0;
+
+//   const showAllWeeks = isWeekView && allWeeksData && allWeeksData.length > 0;
+//   const showAllMonths = isMonthView && allMonthsData && allMonthsData.length > 0;
 
 //   const handleViewChange = (newView) => {
 //     setView(newView);
@@ -976,9 +1071,7 @@
 //             </Box>
 //           </Box>
 
-//           {/* ════════════════════════════════════════
-//               SINGLE CHART - SAME BAR SIZE FOR ALL VIEWS
-//           ════════════════════════════════════════ */}
+
 //           {isEmpty ? (
 //             <EmptyState
 //               height={chartHeight}
@@ -997,6 +1090,8 @@
 //                 yAxisWidth={yAxisWidth}
 //                 yAxisRightW={yAxisRightW}
 //                 chartHeight={chartHeight}
+//                 allMonthsData={allMonthsData}
+//                 allWeeksData={allWeeksData}
 //               />
 
 //               {/* Legend - consistent across all views */}
@@ -1019,6 +1114,13 @@
 
 
 
+
+
+
+
+
+
+///-------------------------- 2026-07-15-------------
 
 import React, { useState, useEffect } from "react";
 import { Box, Typography, ButtonGroup, Button, TextField, Popover } from "@mui/material";
@@ -1270,6 +1372,7 @@ const EmptyState = ({ height = 200, message = "No data available" }) => (
   </Box>
 );
 
+
 const getFixedBarSize = (dataLength) => {
   if (dataLength <= 7) return 32;
   if (dataLength <= 31) return 28;
@@ -1277,6 +1380,7 @@ const getFixedBarSize = (dataLength) => {
   if (dataLength <= 180) return 24;
   return 22;
 };
+
 
 const WeekAxisTick = ({ x, y, payload, index, weekData, isMobile }) => {
   const item = weekData?.[index];

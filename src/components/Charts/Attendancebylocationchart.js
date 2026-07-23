@@ -100,7 +100,7 @@ const RateLabel = (props) => {
 };
 
 /* ─── AttendanceByLocationChart ───────────────────────────────────────────── */
-const AttendanceByLocationChart = ({ data = [], selectedDivision = null, disablePaper = false }) => {
+const AttendanceByLocationChart = ({ data = [], selectedDivision = null }) => {
   const today = new Date().toISOString().split("T")[0];
 
   /* Build chart data from props */
@@ -144,10 +144,16 @@ const AttendanceByLocationChart = ({ data = [], selectedDivision = null, disable
     );
   }
 
-  const renderContent = () => (
-    <>
+  return (
+    <Paper
+      sx={{
+        borderRadius: "20px",
+        overflow: "hidden",
+        boxShadow: "0 4px 24px rgba(0,74,173,0.06)",
+      }}
+    >
       {/* ── Header ── */}
-      <Box sx={{ p: disablePaper ? "4px 8px 12px" : "16px 20px 12px" }}>
+      <Box sx={{ p: "16px 20px 12px" }}>
         {/* Top row */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.2, flexWrap: "wrap", gap: 1 }}>
           <Box>
@@ -204,7 +210,7 @@ const AttendanceByLocationChart = ({ data = [], selectedDivision = null, disable
       </Box>
 
       {/* ── Action buttons ── */}
-      <Box sx={{ px: disablePaper ? "8px" : "20px", pb: 1.5, display: "flex", gap: 1 }}>
+      <Box sx={{ px: "20px", pb: 1.5, display: "flex", gap: 1 }}>
         <Button
           size="small"
           startIcon={<Download sx={{ fontSize: 15 }} />}
@@ -232,7 +238,7 @@ const AttendanceByLocationChart = ({ data = [], selectedDivision = null, disable
       </Box>
 
       {/* ── Chart ── */}
-      <Box sx={{ px: disablePaper ? "0px" : "12px", pb: 1 }}>
+      <Box sx={{ px: "12px", pb: 1 }}>
         <ResponsiveContainer width="100%" height={chartHeight}>
           <BarChart
             data={chartData}
@@ -278,7 +284,7 @@ const AttendanceByLocationChart = ({ data = [], selectedDivision = null, disable
       </Box>
 
       {/* ── Legend ── */}
-      <Box sx={{ px: disablePaper ? "8px" : "20px", pb: "14px", display: "flex", gap: 1.5, flexWrap: "wrap" }}>
+      <Box sx={{ px: "20px", pb: "14px", display: "flex", gap: 1.5, flexWrap: "wrap" }}>
         {[
           { color: "#3B7DD8", label: "Present" },
           { color: "#fca5a5", label: "Absent"  },
@@ -301,22 +307,6 @@ const AttendanceByLocationChart = ({ data = [], selectedDivision = null, disable
           ))}
         </Box>
       </Box>
-    </>
-  );
-
-  if (disablePaper) {
-    return <Box sx={{ width: "100%" }}>{renderContent()}</Box>;
-  }
-
-  return (
-    <Paper
-      sx={{
-        borderRadius: "20px",
-        overflow: "hidden",
-        boxShadow: "0 4px 24px rgba(0,74,173,0.06)",
-      }}
-    >
-      {renderContent()}
     </Paper>
   );
 };

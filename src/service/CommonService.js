@@ -163,6 +163,7 @@ const GetEmployeeOtherInfo = async (p_sno) => {
   });
 };
 
+
 const GetDivWiseAtt = async (p_div) => {
   return axios.get(`Attendancedashboard/GetDivWiseAtt`, {
     params: {
@@ -212,5 +213,5 @@ export default {
   GetChaserDailyCollect,
   GetDivWiseAtt,
   GetLocWiseAtt,
-  GetEmpWiseAtt,
+  GetEmpWiseAtt
 };
