@@ -1147,7 +1147,7 @@ const Leave = () => {
                       >
                         <TableCell
                           sx={{
-                            width: "32%",
+                            width: "27%",
                             fontWeight: 800,
                             fontSize: "10px",
                             color: "#ffffff",
@@ -1193,7 +1193,7 @@ const Leave = () => {
                         </TableCell>
                         <TableCell
                           sx={{
-                            width: "17%",
+                            width: "19%",
                             fontWeight: 800,
                             fontSize: "10px",
                             color: "#ffffff",
@@ -1208,7 +1208,7 @@ const Leave = () => {
                         </TableCell>
                         <TableCell
                           sx={{
-                            width: "17%",
+                            width: "18%",
                             fontWeight: 800,
                             fontSize: "10px",
                             color: "#ffffff",
