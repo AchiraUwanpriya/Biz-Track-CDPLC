@@ -14,6 +14,7 @@ import {
   Typography,
   Chip,
   Box,
+  TableContainer,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close"; 
 
@@ -54,20 +55,26 @@ const LeaveDetailsModal = ({ open, onClose, rowData, modalTitle }) => {
           <CloseIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ maxHeight: 380, overflowY: "auto", p: 1.8 }}>
+      <DialogContent sx={{ p: 1.8 }}>
         {rowData && rowData.length > 0 ? (
-          <Table
-            size="small"
+          <TableContainer
             sx={{
-              width: "100%",
-              tableLayout: "fixed",
-              borderCollapse: "separate",
-              borderSpacing: 0,
+              maxHeight: 360,
+              overflowY: "auto",
               borderRadius: "12px",
               border: "1px solid #f1f5f9",
-              overflow: "hidden",
             }}
           >
+            <Table
+              stickyHeader
+              size="small"
+              sx={{
+                width: "100%",
+                tableLayout: "fixed",
+                borderCollapse: "separate",
+                borderSpacing: 0,
+              }}
+            >
             <TableHead>
               <TableRow>
                 <TableCell
@@ -248,6 +255,7 @@ const LeaveDetailsModal = ({ open, onClose, rowData, modalTitle }) => {
               })}
             </TableBody>
           </Table>
+        </TableContainer>
         ) : (
           <Box sx={{ p: 3, textAlign: "center" }}>
             <Typography sx={{ color: "#64748b", fontSize: 12 }}>
