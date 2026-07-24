@@ -15,6 +15,8 @@ import {
   Button,
   TextField,
   Grid,
+  Chip,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@material-ui/core/styles";
 import LeaveBalance from "./LeaveBalance";
@@ -31,7 +33,16 @@ import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import LeaveDetailsModal from "../../../src/components/Utility/LeaveDetailsModal";
 import LeaveSummaryModal from "../../../src/components/Utility/LeaveSummaryModal";
-import { Visibility, DesignServices } from "@mui/icons-material";
+import {
+  Visibility,
+  DesignServices,
+  ArrowBack,
+  EventNote,
+  Assessment,
+  EventBusy,
+  AccessTime,
+  Lock,
+} from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -64,6 +75,48 @@ function a11yProps(index) {
     id: `full-width-tab-${index}`,
     "aria-controls": `full-width-tabpanel-${index}`,
   };
+}
+
+function LegendDotChip({ label, count, type = "common" }) {
+  const configs = {
+    poya: { bg: "#fff7ed", border: "#fed7aa", dot: "#ea580c", text: "#9a3412" },
+    mercantile: { bg: "#fdf2f8", border: "#fbcfe8", dot: "#ec4899", text: "#9d174d" },
+    common: { bg: "#ecfeff", border: "#a5f3fc", dot: "#06b6d4", text: "#155e75" },
+    info: { bg: "#eff6ff", border: "#bfdbfe", dot: "#2563eb", text: "#1d4ed8" },
+  };
+  const c = configs[type] || configs.info;
+
+  return (
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        px: 1.5,
+        py: 0.4,
+        borderRadius: "20px",
+        backgroundColor: c.bg,
+        border: `1px solid ${c.border}`,
+        fontSize: "12px",
+        fontWeight: 600,
+        color: c.text,
+      }}
+    >
+      <Box
+        sx={{
+          width: 7,
+          height: 7,
+          borderRadius: "50%",
+          backgroundColor: c.dot,
+          mr: 1,
+          flexShrink: 0,
+        }}
+      />
+      <span>{label}</span>
+      {count !== undefined && (
+        <span style={{ marginLeft: 6, fontWeight: 700 }}>{count}</span>
+      )}
+    </Box>
+  );
 }
 
 const AddLeave = () => {
@@ -405,153 +458,312 @@ const AddLeave = () => {
 
 
     <Paper
-      elevation={1}
+      elevation={0}
       sx={{
-        p: 1,
-        mt: 2,
-        backgroundColor: isDisabled ? "#f5f5f5" : "#fff",
-        opacity: isDisabled ? 0.6 : 1,
-        pointerEvents: isDisabled ? "none" : "auto",
+        p: { xs: 1.8, sm: 2.2 },
+        mt: 1.5,
+        borderRadius: "18px",
+        border: "1px solid #f1f5f9",
+        backgroundColor: "#ffffff",
+        boxShadow: "0 8px 24px rgba(37, 99, 235, 0.04)",
+        transition: "all 0.2s ease-in-out",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
-        Add Leave
-      </Typography>
+      {/* Dashed Notice Box for disabled mode */}
+      {isDisabled && (
+        <Box
+          sx={{
+            p: 1.2,
+            mb: 2,
+            borderRadius: "12px",
+            border: "1.5px dashed #bfdbfe",
+            backgroundColor: "#f8fafc",
+            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
+          }}
+        >
+          <Lock sx={{ fontSize: 16, color: "#2563eb" }} />
+          <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#2563eb" }}>
+            Add Leave Application — Read Only Mode
+          </Typography>
+        </Box>
+      )}
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1.8,
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 800,
+            fontSize: "0.95rem",
+            color: "#0f172a",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Box
+            sx={{
+              width: 30,
+              height: 30,
+              borderRadius: "10px",
+              backgroundColor: "#eff6ff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#2563eb",
+            }}
+          >
+            <EventNote sx={{ fontSize: 17 }} />
+          </Box>
+          Add Leave Application
+        </Typography>
+      </Box>
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-          <DatePicker
-            label="Leave Start Date"
-            value={startDate}
-            disabled={isDisabled}
-            onChange={(newValue) => setStartDate(newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                size="small"
-                inputProps={{ style: { fontSize: 12 } }}
-              />
-            )}
-          />
-          <DatePicker
-            label="Leave End Date"
-            value={endDate}
-            disabled={isDisabled}
-            onChange={(newValue) => setEndDate(newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                size="small"
-                inputProps={{ style: { fontSize: 12 } }}
-              />
-            )}
-          />
-        </Box>
+        <Grid container spacing={1.5} sx={{ mb: 1.8 }}>
+          <Grid item xs={12} sm={6}>
+            <DatePicker
+              label="Leave Start Date"
+              value={startDate}
+              disabled={isDisabled}
+              onChange={(newValue) => setStartDate(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  fullWidth
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      fontSize: 12,
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontSize: 12,
+                    },
+                  }}
+                />
+              )}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <DatePicker
+              label="Leave End Date"
+              value={endDate}
+              disabled={isDisabled}
+              onChange={(newValue) => setEndDate(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  fullWidth
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      fontSize: 12,
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontSize: 12,
+                    },
+                  }}
+                />
+              )}
+            />
+          </Grid>
+        </Grid>
       </LocalizationProvider>
 
       {/* Leave Type & Days */}
-      <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
-        {/* Leave Type */}
-        <Box
-          sx={{
-            flex: 1,
-            minWidth: "35%",
-            border: "1px solid #ccc",
-            borderRadius: 1,
-            p: 1,
-          }}
-        >
-          <FormControl component="fieldset" sx={{ width: "100%" }} disabled={isDisabled}>
-            <FormLabel component="legend" sx={{ fontSize: 12 }}>
-              Leave Type
-            </FormLabel>
-            <RadioGroup value={leaveType}>
-              <Grid container spacing={1}>
-                {[
-                  "Casual Leave",
-                  "Annual Leave",
-                  "Day Off",
-                  "Sick Leave",
-                  "Duty Leave",
-                  "Shift Day-Off",
-                ].map((type) => (
-                  <Grid item xs={6} key={type}>
+      <Grid container spacing={1.5} sx={{ mb: 1.8 }}>
+        <Grid item xs={12} md={8}>
+          <Box
+            sx={{
+              border: "1px solid #e2e8f0",
+              borderRadius: "14px",
+              p: 1.5,
+              backgroundColor: "#ffffff",
+              height: "100%",
+            }}
+          >
+            <FormControl component="fieldset" sx={{ width: "100%" }} disabled={isDisabled}>
+              <FormLabel
+                component="legend"
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  mb: 1,
+                }}
+              >
+                Leave Type
+              </FormLabel>
+              <RadioGroup value={leaveType}>
+                <Grid container spacing={0.8}>
+                  {[
+                    { type: "Casual Leave", dotColor: "#06b6d4", bg: "#ecfeff" },
+                    { type: "Annual Leave", dotColor: "#10b981", bg: "#ecfdf5" },
+                    { type: "Day Off", dotColor: "#6366f1", bg: "#e0e7ff" },
+                    { type: "Sick Leave", dotColor: "#f59e0b", bg: "#fffbeb" },
+                    { type: "Duty Leave", dotColor: "#3b82f6", bg: "#eff6ff" },
+                    { type: "Shift Day-Off", dotColor: "#ec4899", bg: "#fdf2f8" },
+                  ].map(({ type, dotColor, bg }) => (
+                    <Grid item xs={6} sm={4} key={type}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          border: leaveType === type ? `1.5px solid ${dotColor}` : "1px solid #e2e8f0",
+                          borderRadius: "10px",
+                          px: 1,
+                          py: 0.4,
+                          display: "flex",
+                          alignItems: "center",
+                          backgroundColor: leaveType === type ? bg : "#ffffff",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <FormControlLabel
+                          value={type}
+                          control={<Radio size="small" sx={{ p: 0.3, color: dotColor }} />}
+                          label={
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <Box
+                                sx={{
+                                  width: 6,
+                                  height: 6,
+                                  borderRadius: "50%",
+                                  backgroundColor: dotColor,
+                                  mr: 0.6,
+                                }}
+                              />
+                              <span style={{ fontSize: "11px", fontWeight: 600 }}>{type}</span>
+                            </Box>
+                          }
+                          sx={{
+                            m: 0,
+                            width: "100%",
+                            "& .MuiFormControlLabel-label": {
+                              color: "#1e293b",
+                            },
+                          }}
+                        />
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </RadioGroup>
+            </FormControl>
+          </Box>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Box
+            sx={{
+              border: "1px solid #e2e8f0",
+              borderRadius: "14px",
+              p: 1.5,
+              backgroundColor: "#ffffff",
+              height: "100%",
+            }}
+          >
+            <FormControl component="fieldset" sx={{ width: "100%" }} disabled={isDisabled}>
+              <FormLabel
+                component="legend"
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  mb: 1,
+                }}
+              >
+                Days
+              </FormLabel>
+              <RadioGroup row value={days}>
+                {["1", "0.5"].map((d) => (
+                  <Paper
+                    key={d}
+                    elevation={0}
+                    sx={{
+                      border: days === d ? "1.5px solid #2563eb" : "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                      px: 1.5,
+                      py: 0.4,
+                      mr: 1,
+                      backgroundColor: days === d ? "#eff6ff" : "#ffffff",
+                    }}
+                  >
                     <FormControlLabel
-                      value={type}
-                      control={<Radio sx={{ p: 0.5 }} />}
-                      label={type}
+                      value={d}
+                      control={<Radio size="small" sx={{ p: 0.3, color: "#2563eb" }} />}
+                      label={d}
                       sx={{
                         m: 0,
                         "& .MuiFormControlLabel-label": {
-                          fontSize: "12px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          color: "#1e293b",
                         },
                       }}
                     />
-                  </Grid>
+                  </Paper>
                 ))}
-              </Grid>
-            </RadioGroup>
-          </FormControl>
-        </Box>
-
-        {/* Days */}
-        <Box
-          sx={{
-            width: "20%",
-            border: "1px solid #ccc",
-            borderRadius: 1,
-            p: 1,
-          }}
-        >
-          <FormControl component="fieldset" sx={{ width: "100%" }} disabled={isDisabled}>
-            <FormLabel component="legend" sx={{ fontSize: 12 }}>
-              Days
-            </FormLabel>
-            <RadioGroup row value={days}>
-              <FormControlLabel
-                value="1"
-                control={<Radio />}
-                label="1"
-                sx={{ "& .MuiFormControlLabel-label": { fontSize: "12px" } }}
-              />
-              <FormControlLabel
-                value="0.5"
-                control={<Radio />}
-                label="0.5"
-                sx={{ "& .MuiFormControlLabel-label": { fontSize: "12px" } }}
-              />
-            </RadioGroup>
-          </FormControl>
-        </Box>
-      </Box>
+              </RadioGroup>
+            </FormControl>
+          </Box>
+        </Grid>
+      </Grid>
 
       {/* Reason */}
       <TextField
         label="Reason"
         multiline
-        rows={1}
+        rows={2}
         fullWidth
         disabled={isDisabled}
         value={reason}
         inputProps={{ maxLength: 100, style: { fontSize: 12 } }}
         InputLabelProps={{ style: { fontSize: 12 } }}
-        sx={{ mb: 1 }}
+        sx={{
+          mb: 1.8,
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "12px",
+          },
+        }}
       />
 
       <Button
         variant="contained"
-        color="primary"
         disabled={isDisabled}
         onClick={handleSubmit}
-        sx={{ fontSize: 12 }}
+        sx={{
+          fontSize: 12,
+          fontWeight: 700,
+          px: 3,
+          py: 0.7,
+          borderRadius: "14px",
+          textTransform: "none",
+          backgroundColor: "#2563eb",
+          boxShadow: "0 2px 10px rgba(37, 99, 235, 0.25)",
+          "&:hover": {
+            backgroundColor: "#1d4ed8",
+          },
+        }}
       >
-        Submit
+        Submit Application
       </Button>
     </Paper>
-
-
   );
 };
 
@@ -621,15 +833,6 @@ const Leave = () => {
       default:
         data = [];
     }
-
-    // if (data.length === 0) {
-    //   Swal.fire({
-    //     title: `${tabName} Not Available`,
-    //     text: `No data available for the ${tabName} tab for the selected Year.`,
-    //     icon: "info",
-    //     confirmButtonText: "OK",
-    //   });
-    // }
   };
 
   useEffect(() => {
@@ -672,454 +875,605 @@ const Leave = () => {
     }
   };
 
-
-
   return (
     <Box
-      sx={{ width: "100%", maxWidth: "800px", margin: "0 auto", padding: 1 }}
+      sx={{
+        width: "100%",
+        maxWidth: "760px",
+        margin: "0 auto",
+        padding: { xs: 1, sm: 1.8 },
+      }}
     >
-      <Box
+      {/* Calendar Style Gradient Header Banner */}
+      <Paper
+        elevation={0}
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)",
+          borderRadius: "18px",
+          p: { xs: 1.8, sm: 2.2 },
+          color: "#ffffff",
+          boxShadow: "0 8px 24px rgba(37, 99, 235, 0.18)",
+          mb: 2,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <FormControl sx={{ width: "150px" }}>
-          <InputLabel>Year</InputLabel>
-          <Select
-            value={year}
-            onChange={handleChangeYear}
-            label="Year"
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            gap: 1.2,
+          }}
+        >
+          {/* Top: Back Button (Left Aligned) */}
+          <Button
+            variant="contained"
+            startIcon={<ArrowBack sx={{ fontSize: 16 }} />}
+            onClick={() => navigate(-1)}
             sx={{
+              alignSelf: "flex-start",
               height: "32px",
+              borderRadius: "16px",
+              fontWeight: 700,
               fontSize: "12px",
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 200,
-                  overflowY: "auto",
-                },
+              textTransform: "none",
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              color: "#ffffff",
+              backdropFilter: "blur(8px)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              boxShadow: "none",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.35)",
+                boxShadow: "none",
               },
             }}
           >
-            {/* {Array.from({ length: 11 }, (_, i) => 2025 - i).map(
-              (yearOption) => (
-                <MenuItem key={yearOption} value={yearOption}>
-                  {yearOption}
-                </MenuItem>
-              )
-            )} */}
-            {Array.from({ length: 10 }, (_, index) => {
-              const currentYear = new Date().getFullYear();
-              const yearOption = currentYear - index;
+            Back
+          </Button>
 
-              return (
-                <MenuItem
-                  key={yearOption}
-                  value={yearOption}
-                  sx={{ fontSize: "12px", height: "28px" }}
-                >
-                  {yearOption}
-                </MenuItem>
-              );
-            })}
+          {/* Middle: Title Words (Centered) */}
+          <Box sx={{ alignSelf: "center", textAlign: "center", width: "100%" }}>
+            <Typography
+              sx={{
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "1.2px",
+                color: "rgba(255, 255, 255, 0.8)",
+                mb: 0.2,
+                textAlign: "center",
+              }}
+            >
+              CDPLC Portal • {year}
+            </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: "1.2rem", sm: "1.4rem" },
+                letterSpacing: "0.4px",
+                color: "#ffffff",
+                textAlign: "center",
+              }}
+            >
+              Leave & Attendance
+            </Typography>
+          </Box>
 
+          {/* Bottom: Year Picker (Left Aligned) */}
+          <FormControl size="small" sx={{ alignSelf: "flex-center", minWidth: 100 }}>
+            <Select
+              value={year}
+              onChange={handleChangeYear}
+              sx={{
+                height: "32px",
+                fontSize: "12px",
+                fontWeight: 700,
+                color: "#ffffff",
+                borderRadius: "16px",
+                backgroundColor: "rgba(255, 255, 255, 0.18)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                "& .MuiSelect-icon": { color: "#ffffff" },
+                "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.28)" },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    borderRadius: "12px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                  },
+                },
+              }}
+            >
+              {Array.from({ length: 10 }, (_, index) => {
+                const currentYear = new Date().getFullYear();
+                const yearOption = currentYear - index;
 
-          </Select>
-        </FormControl>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate(-1)}
-          sx={{ textTransform: "none", height: "40px" }}
-        >
-          Back
-        </Button>
-      </Box>
+                return (
+                  <MenuItem
+                    key={yearOption}
+                    value={yearOption}
+                    sx={{ fontSize: "12px" }}
+                  >
+                    {yearOption}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </Box>
+      </Paper>
 
-      {/* <Box
+      {/* Overlapping White Segmented Pill Tabs */}
+      <Paper
+        elevation={0}
         sx={{
+          p: 0.5,
           display: "flex",
           justifyContent: "center",
-          gap: 0,
-          marginTop: 1,
-        }}
-      >
-        <Button
-          variant={selectedTab === "AddLeave" ? "contained" : "outlined"}
-          onClick={() => handleTabClick("AddLeave")}
-          sx={{
-            backgroundColor:
-              selectedTab === "AddLeave" ? "#5ac8fa" : "transparent",
-            "&:hover": {
-              backgroundColor:
-                selectedTab === "AddLeave" ? "#5ac8fa" : "#f1f1f1",
-            },
-            fontSize: "12px",
-          }}
-        >
-          Add Leave
-        </Button>
-        <Button
-          variant={selectedTab === "LeaveSummery" ? "contained" : "outlined"}
-          onClick={() => handleTabClick("LeaveSummery")}
-          sx={{
-            backgroundColor:
-              selectedTab === "LeaveSummery" ? "#5ac8fa" : "transparent",
-            "&:hover": {
-              backgroundColor:
-                selectedTab === "LeaveSummery" ? "#5ac8fa" : "#f1f1f1",
-            },
-            fontSize: "12px",
-          }}
-        >
-          Leave Summary
-        </Button>
-        <Button
-          variant={selectedTab === "NotEnteredLeave" ? "contained" : "outlined"}
-          onClick={() => handleTabClick("NotEnteredLeave")}
-          sx={{
-            backgroundColor:
-              selectedTab === "NotEnteredLeave" ? "#5ac8fa" : "transparent",
-            "&:hover": {
-              backgroundColor:
-                selectedTab === "NotEnteredLeave" ? "#5ac8fa" : "#f1f1f1",
-            },
-            fontSize: "14px",
-          }}
-        >
-          Not Entered Leave
-        </Button>
-        <Button
-          variant={selectedTab === "Punctuality" ? "contained" : "outlined"}
-          onClick={() => handleTabClick("Punctuality")}
-          sx={{
-            backgroundColor:
-              selectedTab === "Punctuality" ? "#5ac8fa" : "transparent",
-            "&:hover": {
-              backgroundColor:
-                selectedTab === "Punctuality" ? "#5ac8fa" : "#f1f1f1",
-            },
-            fontSize: "14px",
-            px: 1, // Adds horizontal padding for add padding to left and right of the button name
-
-            minWidth: "auto", // Optional: allows button to shrink-wrap the text
-          }}
-        >
-          Punctuality
-        </Button>
-      </Box> */}
-
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 0.1,
-          marginTop: 1,
+          gap: 0.5,
+          borderRadius: "18px",
+          backgroundColor: "#ffffff",
+          border: "1px solid #f1f5f9",
+          boxShadow: "0 6px 18px rgba(37, 99, 235, 0.05)",
+          mb: 2,
         }}
       >
         {[
-          { key: "Leave Details", label: "Add Leave" },
-          { key: "LeaveSummery", label: "Leave Summary" },
-          { key: "NotEnteredLeave", label: "Not Entered Leave" },
-          { key: "Punctuality", label: "Punctuality" },
-        ].map((tab) => (
-          <Button
-            key={tab.key}
-            variant={selectedTab === tab.key ? "contained" : "outlined"}
-            onClick={() => handleTabClick(tab.key)}
-            sx={{
-              backgroundColor:
-                selectedTab === tab.key ? "#1976d2" : "transparent",
-              "&:hover": {
-                backgroundColor:
-                  selectedTab === tab.key ? "#1976d2" : "#f1f1f1",
-              },
-              fontSize: "11px",
-              px: 1,
-              py: 0.4,
-              minHeight: "28px",
-              minWidth: "auto",
-              borderRadius: "6px",
-            }}
-          >
-            {tab.label}
-          </Button>
-        ))}
-      </Box>
+          {
+            key: "Leave Details",
+            label: "Add Leave",
+            icon: <EventNote sx={{ fontSize: 15 }} />,
+          },
+          {
+            key: "LeaveSummery",
+            label: "Leave Summary",
+            icon: <Assessment sx={{ fontSize: 15 }} />,
+          },
+          {
+            key: "NotEnteredLeave",
+            label: "Not Entered Leave",
+            icon: <EventBusy sx={{ fontSize: 15 }} />,
+          },
+          {
+            key: "Punctuality",
+            label: "Punctuality",
+            icon: <AccessTime sx={{ fontSize: 15 }} />,
+          },
+        ].map((tab) => {
+          const isSelected = selectedTab === tab.key;
+          return (
+            <Button
+              key={tab.key}
+              variant={isSelected ? "contained" : "text"}
+              startIcon={tab.icon}
+              onClick={() => handleTabClick(tab.key)}
+              sx={{
+                flex: 1,
+                py: 0.6,
+                px: 1,
+                fontSize: "11px",
+                fontWeight: isSelected ? 700 : 600,
+                color: isSelected ? "#ffffff" : "#64748b",
+                backgroundColor: isSelected ? "#2563eb" : "transparent",
+                boxShadow: isSelected
+                  ? "0 3px 10px rgba(37, 99, 235, 0.25)"
+                  : "none",
+                borderRadius: "14px",
+                textTransform: "none",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: isSelected ? "#1d4ed8" : "#f1f5f9",
+                  color: isSelected ? "#ffffff" : "#1e293b",
+                },
+              }}
+            >
+              {tab.label}
+            </Button>
+          );
+        })}
+      </Paper>
 
-
+      {/* Main Active Tab Views */}
       {selectedTab === "Leave Details" && (
         <>
-          {/* {showLeaveBalanceSummary && selectedTab !== "AddLeave" && (
-        <Paper elevation={1} sx={{ padding: 1, marginTop: 2 }}>
-          Below codes inside the paper block are same
-        </Paper>
-      )} */}
-          {/* Moved Leave Balance Summary here under Add Leave */}
+          <AddLeave />
 
-
-          <AddLeave />{" "}
-          {/* Used for add the Leave Balance Summary Top of the Add Leave Section */}
           {showLeaveBalanceSummary && (
-            <Paper elevation={1} sx={{ padding: 1, marginTop: 2 }}>
-              <Typography
-                variant="h6"
-                sx={{ marginBottom: 1, fontWeight: "bold" }}
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 1.8, sm: 2.2 },
+                mt: 2,
+                borderRadius: "18px",
+                border: "1px solid #f1f5f9",
+                backgroundColor: "#ffffff",
+                boxShadow: "0 8px 24px rgba(37, 99, 235, 0.04)",
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 1.8,
+                  flexWrap: "wrap",
+                  gap: 1,
+                }}
               >
-                Leave Balance Summary
-              </Typography>
-              {isLoading ? (
-                <Typography>Loading...</Typography>
-              ) : (
-                <Table
-                  size="small"
-                  sx={{ width: "100%", tableLayout: "fixed" }}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: "0.95rem",
+                    color: "#0f172a",
+                  }}
                 >
-                  <TableHead>
-                    <TableRow
-                      sx={{ backgroundColor: "#1976d2", color: "white" }}
-                    >
-                      <TableCell
+                  Leave Balance Summary
+                </Typography>
+
+                <Box sx={{ display: "flex", gap: 0.8, flexWrap: "wrap" }}>
+                  <LegendDotChip label="Total" type="info" />
+                  <LegendDotChip label="Taken" type="mercantile" />
+                  <LegendDotChip label="Balance" type="common" />
+                </Box>
+              </Box>
+
+              {isLoading ? (
+                <Typography sx={{ p: 2, textAlign: "center", color: "#64748b", fontSize: 12 }}>
+                  Loading...
+                </Typography>
+              ) : (
+                <Box sx={{ overflowX: "auto" }}>
+                  <Table
+                    size="small"
+                    sx={{
+                      width: "100%",
+                      tableLayout: "fixed",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                    }}
+                  >
+                    <TableHead>
+                      <TableRow
                         sx={{
-                          width: "24%",
-                          fontWeight: 600,
-                          fontSize: "11px",
-                          color: "white",
-                          padding: "8px",
-                          textAlign: "center",
+                          background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+                          
                         }}
                       >
-                        Description
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "11px",
-                          color: "white",
-                          textAlign: "center",
-                          padding: "8px",
-                        }}
-                      >
-                        Total
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "11px",
-                          color: "white",
-                          textAlign: "center",
-                          padding: "8px",
-                        }}
-                      >
-                        Taken
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "11px",
-                          color: "white",
-                          textAlign: "center",
-                          padding: "8px",
-                        }}
-                      >
-                        Balance
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "11px",
-                          color: "white",
-                          textAlign: "center",
-                          padding: "8px",
-                        }}
-                      >
-                        Action
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {leaveBalanceData.map((row, index) => (
-                      <TableRow key={index}>
                         <TableCell
                           sx={{
+                            width: "32%",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            color: "#ffffff",
+                            py: 1,
+                            px: 1,
                             textAlign: "center",
-                            padding: "5px",
-                            fontSize: "12px",
+                            borderTopLeftRadius: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.4px",
                           }}
                         >
-                          {row.Description}
+                          Description
                         </TableCell>
                         <TableCell
                           sx={{
+                            width: "17%",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            color: "#ffffff",
                             textAlign: "center",
-                            padding: "5px",
-                            fontSize: "12px",
+                            py: 1,
+                            px: 1,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.4px",
                           }}
                         >
-                          {row.Total}
+                          Total
                         </TableCell>
                         <TableCell
                           sx={{
+                            width: "17%",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            color: "#ffffff",
                             textAlign: "center",
-                            padding: "5px",
-                            fontSize: "12px",
+                            py: 1,
+                            px: 1,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.4px",
                           }}
                         >
-                          {row.Taken}
+                          Taken
                         </TableCell>
                         <TableCell
                           sx={{
+                            width: "17%",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            color: "#ffffff",
                             textAlign: "center",
-                            padding: "5px",
-                            fontSize: "12px",
+                            py: 1,
+                            px: 1,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.4px",
                           }}
                         >
-                          {row.Balance}
+                          Balance
                         </TableCell>
                         <TableCell
                           sx={{
+                            width: "17%",
+                            fontWeight: 800,
+                            fontSize: "10px",
+                            color: "#ffffff",
                             textAlign: "center",
-                            padding: "5px",
-                            fontSize: "12px",
+                            py: 1,
+                            px: 1,
+                            borderTopRightRadius: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.4px",
                           }}
                         >
-                          <Button
-                            variant="outlined"
-                            onClick={() => {
-                              setModalTitle(`${row.Description} Details`);
-                              fetchLeaveDetails(row.Type, year);
-                              setOpenModal(true);
-                            }}
-                            sx={{
-                              backgroundColor: "#5ac8fa",
-                              "&:hover": { backgroundColor: "#5ac8fa" },
-                              color: "white",
-                              borderColor: "#5ac8fa",
-                              padding: "4px",
-                              minWidth: "auto",
-                              borderRadius: "50%",
-                            }}
-                          >
-                            <Visibility sx={{ fontSize: "16px" }} />
-                          </Button>
+                          Action
                         </TableCell>
                       </TableRow>
-                    ))}
-                    <TableRow>
-                      <TableCell
-                        sx={{
-                          textAlign: "center",
-                          padding: "5px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        Total
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          padding: "5px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        {totalLeave}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          padding: "5px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        {totalTakenLeave}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          padding: "5px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        {totalBalanceLeave}
-                      </TableCell>
-                      <TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outlined"
-                            onClick={handleDesignButtonClick}
+                    </TableHead>
+                    <TableBody>
+                      {leaveBalanceData.map((row, index) => (
+                        <TableRow
+                          key={index}
+                          sx={{
+                            backgroundColor:
+                              index % 2 === 0 ? "#ffffff" : "#f8fafc",
+                            "&:hover": { backgroundColor: "#f1f5f9" },
+                            transition: "background-color 0.15s",
+                          }}
+                        >
+                          <TableCell
                             sx={{
-                              backgroundColor: "#5ac8fa",
-                              "&:hover": { backgroundColor: "#5ac8fa" },
-                              color: "white",
-                              borderColor: "#5ac8fa",
-                              padding: "4px",
-                              minWidth: "auto",
-                              borderRadius: "50%",
-                              marginLeft: "-5px",
+                              textAlign: "center",
+                              py: 0.7,
+                              px: 1,
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              color: "#1e293b",
+                              borderBottom: "1px solid #f1f5f9",
                             }}
                           >
-                            <DesignServices
-                              sx={{ fontSize: "16px", alignItems: "center" }}
+                            {row.Description}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              textAlign: "center",
+                              py: 0.7,
+                              px: 1,
+                              borderBottom: "1px solid #f1f5f9",
+                            }}
+                          >
+                            <Chip
+                              label={row.Total}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                backgroundColor: "#eff6ff",
+                                color: "#1d4ed8",
+                                borderRadius: "10px",
+                              }}
                             />
-                          </Button>
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              textAlign: "center",
+                              py: 0.7,
+                              px: 1,
+                              borderBottom: "1px solid #f1f5f9",
+                            }}
+                          >
+                            <Chip
+                              label={row.Taken}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                backgroundColor: "#fdf2f8",
+                                color: "#9d174d",
+                                border: "1px solid #fbcfe8",
+                                borderRadius: "10px",
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              textAlign: "center",
+                              py: 0.7,
+                              px: 1,
+                              borderBottom: "1px solid #f1f5f9",
+                            }}
+                          >
+                            <Chip
+                              label={row.Balance}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                backgroundColor: "#ecfeff",
+                                color: "#155e75",
+                                border: "1px solid #a5f3fc",
+                                borderRadius: "10px",
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              textAlign: "center",
+                              py: 0.7,
+                              px: 1,
+                              borderBottom: "1px solid #f1f5f9",
+                            }}
+                          >
+                            <Tooltip title="View Details">
+                              <Button
+                                variant="contained"
+                                onClick={() => {
+                                  setModalTitle(`${row.Description} Details`);
+                                  fetchLeaveDetails(row.Type, year);
+                                  setOpenModal(true);
+                                }}
+                                sx={{
+                                  backgroundColor: "#2563eb",
+                                  "&:hover": { backgroundColor: "#1d4ed8" },
+                                  color: "white",
+                                  p: "4px",
+                                  minWidth: "auto",
+                                  borderRadius: "50%",
+                                  boxShadow: "0 2px 6px rgba(37, 99, 235, 0.25)",
+                                }}
+                              >
+                                <Visibility sx={{ fontSize: "13px" }} />
+                              </Button>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      <TableRow
+                        sx={{
+                          backgroundColor: "#f8fafc",
+                          borderTop: "2px solid #e2e8f0",
+                        }}
+                      >
+                        <TableCell
+                          sx={{
+                            textAlign: "center",
+                            py: 1,
+                            px: 1,
+                            fontSize: "11px",
+                            fontWeight: 800,
+                            color: "#0f172a",
+                          }}
+                        >
+                          Total Summary
                         </TableCell>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                        <TableCell
+                          sx={{
+                            fontWeight: 800,
+                            textAlign: "center",
+                            py: 1,
+                            px: 1,
+                            fontSize: "11px",
+                            color: "#1d4ed8",
+                          }}
+                        >
+                          {totalLeave}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: 800,
+                            textAlign: "center",
+                            py: 1,
+                            px: 1,
+                            fontSize: "11px",
+                            color: "#9d174d",
+                          }}
+                        >
+                          {totalTakenLeave}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            fontWeight: 800,
+                            textAlign: "center",
+                            py: 1,
+                            px: 1,
+                            fontSize: "11px",
+                            color: "#155e75",
+                          }}
+                        >
+                          {totalBalanceLeave}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center", py: 1, px: 1 }}>
+                          <Tooltip title="Leave Balance Design View">
+                            <Button
+                              variant="contained"
+                              onClick={handleDesignButtonClick}
+                              sx={{
+                                backgroundColor: "#7c3aed",
+                                "&:hover": { backgroundColor: "#6d28d9" },
+                                color: "white",
+                                p: "4px",
+                                minWidth: "auto",
+                                borderRadius: "50%",
+                                boxShadow: "0 2px 6px rgba(124, 58, 237, 0.25)",
+                              }}
+                            >
+                              <DesignServices sx={{ fontSize: "13px" }} />
+                            </Button>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Box>
               )}
             </Paper>
           )}
-
         </>
       )}
 
-      <Box
-        flex={1}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 1,
-          mt: 1,
-          mb: 1,
-          mr: 1,
-        }}
-      ></Box>
       {[
         "LeaveBalance",
         "Punctuality",
         "NotEnteredLeave",
         "LeaveSummery",
       ].includes(selectedTab) && (
-          <Paper elevation={3} sx={{ padding: 2 }}>
-            <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: "bold" }}>
-              {selectedTab === "LeaveBalance" && "Leave Balance Summary"}
-              {selectedTab === "Punctuality" && "Punctuality Summary"}
-              {selectedTab === "NotEnteredLeave" && "Not Entered Leave Summary"}
-              {selectedTab === "LeaveSummery" && "Leave Summary"}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 1.8, sm: 2.2 },
+            borderRadius: "18px",
+            border: "1px solid #f1f5f9",
+            backgroundColor: "#ffffff",
+            boxShadow: "0 8px 24px rgba(37, 99, 235, 0.04)",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 1.8,
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              color: "#0f172a",
+            }}
+          >
+            {selectedTab === "LeaveBalance" && "Leave Balance Summary"}
+            {selectedTab === "Punctuality" && "Punctuality Summary"}
+            {selectedTab === "NotEnteredLeave" && "Not Entered Leave Summary"}
+            {selectedTab === "LeaveSummery" && "Leave Summary"}
+          </Typography>
+          {isLoading ? (
+            <Typography sx={{ p: 2, textAlign: "center", color: "#64748b", fontSize: 12 }}>
+              Loading...
             </Typography>
-            {isLoading ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <>
-                {selectedTab === "LeaveBalance" && <LeaveBalance />}
-                {selectedTab === "Punctuality" && <Punctuality />}
-                {selectedTab === "NotEnteredLeave" && (
-                  <NotEnteredLeave selectedYear={year} />
-                )}
-                {selectedTab === "LeaveSummery" && <LeaveSummery />}
-              </>
-            )}
-          </Paper>
-        )}
+          ) : (
+            <>
+              {selectedTab === "LeaveBalance" && <LeaveBalance />}
+              {selectedTab === "Punctuality" && <Punctuality />}
+              {selectedTab === "NotEnteredLeave" && (
+                <NotEnteredLeave selectedYear={year} />
+              )}
+              {selectedTab === "LeaveSummery" && <LeaveSummery />}
+            </>
+          )}
+        </Paper>
+      )}
 
       {openLeaveSummaryModal && (
         <LeaveSummaryModal

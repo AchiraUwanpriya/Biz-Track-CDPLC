@@ -1,7 +1,7 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, Typography, Paper } from "@mui/material";
 import CircularProgressWithLabel from "../../components/Prograss";
 
 import { useSelector } from "react-redux";
@@ -9,50 +9,41 @@ import Loader from "../../components/Utility/Loader";
 import NotFound from "../../components/Utility/NotFound";
 
 function FacebookCircularProgress({ total_Leave, total_Leave_Pcn }) {
-  return React.createElement(
-    "div",
-    { style: { display: "flex", flexDirection: "column" } },
-    React.createElement(
-      Box,
-      {
-        sx: {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Box
+        sx={{
           position: "relative",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-        },
-      },
-      React.createElement(CircularProgress, {
-        variant: "determinate",
-        sx: {
-          color: (theme) =>
-            theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
-        },
-        size: 250,
-        thickness: 4,
-        // ...props,
-        value: 100,
-      }),
-      React.createElement(CircularProgress, {
-        //variant: "indeterminate",
-        variant: "determinate",
-        value: total_Leave_Pcn,
-        disableShrink: true,
-        sx: {
-          color: (theme) =>
-            theme.palette.mode === "light" ? "#FAD7A0" : "#308fe8",
-          animationDuration: "550ms",
-          position: "absolute",
-          left: 0,
-        },
-        size: 250,
-        thickness: 4,
-        // ...props,
-      }),
-      React.createElement(
-        Box,
-        {
-          sx: {
+          my: 1,
+        }}
+      >
+        <CircularProgress
+          variant="determinate"
+          sx={{
+            color: "#f1f5f9",
+          }}
+          size={160}
+          thickness={4.5}
+          value={100}
+        />
+        <CircularProgress
+          variant="determinate"
+          value={total_Leave_Pcn || 0}
+          disableShrink
+          sx={{
+            color: "#2563eb",
+            animationDuration: "550ms",
+            position: "absolute",
+            strokeLinecap: "round",
+          }}
+          size={160}
+          thickness={4.5}
+        />
+        <Box
+          sx={{
             top: 0,
             left: 0,
             bottom: 0,
@@ -62,27 +53,36 @@ function FacebookCircularProgress({ total_Leave, total_Leave_Pcn }) {
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
-          },
-        },
-        React.createElement(Typography, {
-          variant: "caption",
-          component: "div",
-          color: "text.secondary",
-          fontSize: 25,
-          fontWeight: 600,
-          // children: `${total_Leave}/42`,
-          children: `${total_Leave}`,
-        }),
-        React.createElement(Typography, {
-          variant: "caption",
-          component: "div",
-          color: "text.secondary",
-          fontSize: 14,
-          fontWeight: 600,
-          children: "Leave Balance",
-        })
-      )
-    )
+          }}
+        >
+          <Typography
+            variant="h4"
+            component="div"
+            sx={{
+              fontWeight: 800,
+              color: "#0f172a",
+              lineHeight: 1,
+            }}
+          >
+            {total_Leave}
+          </Typography>
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{
+              color: "#64748b",
+              fontSize: 11,
+              fontWeight: 700,
+              mt: 0.5,
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+            }}
+          >
+            Total Balance
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -93,164 +93,250 @@ export default function LeaveBalance() {
   return (
     <>
       {loading ? (
-        <Loader></Loader>
+        <Loader />
       ) : (
         <Box
           sx={{
             display: "flex",
-            flexWrap: "wrap",
+            flexDirection: "column",
+            alignItems: "center",
             width: "100%",
-            overflow: "auto",
-            justifyContent: "center",
-
-            // backgroundColor:'blue'
           }}
         >
-          <Card>
-            <CardContent>
-              <Grid container rowSpacing={0.1}>
-                {msg === null ? (
-                  <Box
+          <Card
+            elevation={0}
+            sx={{
+              width: "100%",
+              backgroundColor: "transparent",
+            }}
+          >
+            <CardContent sx={{ p: 0 }}>
+              {msg === null ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <FacebookCircularProgress
+                    total_Leave={total_Leave}
+                    total_Leave_Pcn={total_Leave_Pcn}
+                  />
+
+                  <Grid
+                    container
+                    spacing={1.5}
                     sx={{
-                      flexGrow: 1,
-                      display: "flex",
+                      mt: 1.5,
                       justifyContent: "center",
-                      alignItems: "center",
-                      flexDirection: "column",
-                      //  marginBottom:5
                     }}
                   >
-                    <FacebookCircularProgress
-                      total_Leave={total_Leave}
-                      total_Leave_Pcn={total_Leave_Pcn}
-                    />
-
-                    <Grid
-                      marginTop={"10%"}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                      gap={3}
-                    >
-                      <Grid
-                        item
-                        xs={4}
+                    {/* Annual Leaves */}
+                    <Grid item xs={12} sm={4}>
+                      <Paper
+                        elevation={0}
                         sx={{
-                          padding: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          p: 1.8,
+                          borderRadius: "16px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #e2e8f0",
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.03)",
+                          transition: "all 0.2s ease-in-out",
+                          "&:hover": {
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 18px rgba(16, 185, 129, 0.12)",
+                          },
                         }}
                       >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
+                        <CircularProgressWithLabel
+                          value={
+                            responseBody === null || !responseBody[0]
+                              ? 0
+                              : (100 / 14) * responseBody[0].Taken
+                          }
+                          size={60}
+                          bgcolor={"#10b981"}
+                        >
+                          {responseBody && responseBody[0]
+                            ? responseBody[0].Taken
+                            : 0}
+                        </CircularProgressWithLabel>
+                        <Box
+                          sx={{
+                            display: "inline-flex",
                             alignItems: "center",
-                            justifyContent: "center",
+                            mt: 1.2,
+                            px: 1.2,
+                            py: 0.3,
+                            borderRadius: "14px",
+                            backgroundColor: "#ecfdf5",
+                            border: "1px solid #a7f3d0",
                           }}
                         >
-                          <CircularProgressWithLabel
-                            value={
-                              responseBody === null
-                                ? 0
-                                : (100 / 14) * responseBody[0].Taken
-                            }
-                            size={80}
-                            bgcolor={"#9ACD32"}
-                          >
-                            {responseBody[0].Taken}
-                          </CircularProgressWithLabel>
+                          <Box
+                            sx={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              backgroundColor: "#10b981",
+                              mr: 0.8,
+                            }}
+                          />
                           <Typography
-                            variant="caption"
-                            component="div"
-                            color="text.secondary"
-                            fontSize={12}
-                            fontWeight={400}
+                            sx={{
+                              color: "#065f46",
+                              fontSize: 11,
+                              fontWeight: 700,
+                            }}
                           >
-                            Annual Leaves Taken
+                            Annual Leaves
                           </Typography>
-                        </div>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sx={{
-                          padding: 1,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <CircularProgressWithLabel
-                            value={
-                              responseBody === null
-                                ? 0
-                                : (100 / 7) * responseBody[1].Taken
-                            }
-                            size={80}
-                            bgcolor={"#40E0D0"}
-                          >
-                            {responseBody[1].Taken}
-                          </CircularProgressWithLabel>
-                          <Typography
-                            variant="caption"
-                            component="div"
-                            color="text.secondary"
-                            fontSize={12}
-                            fontWeight={400}
-                          >
-                            Casual Leaves Taken
-                          </Typography>
-                        </div>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sx={{
-                          padding: 1,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <CircularProgressWithLabel
-                            value={
-                              responseBody === null
-                                ? 0
-                                : (100 / 21) * responseBody[2].Taken
-                            }
-                            size={80}
-                            bgcolor={"#BDB76B"}
-                          >
-                            {responseBody[2].Taken}
-                          </CircularProgressWithLabel>
-                          <Typography
-                            variant="caption"
-                            component="div"
-                            color="text.secondary"
-                            fontSize={12}
-                            fontWeight={400}
-                          >
-                            Sick Leaves Taken
-                          </Typography>
-                        </div>
-                      </Grid>
+                        </Box>
+                      </Paper>
                     </Grid>
-                  </Box>
-                ) : (
-                  <NotFound text={msg} />
-                )}
-              </Grid>
+
+                    {/* Casual Leaves */}
+                    <Grid item xs={12} sm={4}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          p: 1.8,
+                          borderRadius: "16px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #e2e8f0",
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.03)",
+                          transition: "all 0.2s ease-in-out",
+                          "&:hover": {
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 18px rgba(6, 182, 212, 0.12)",
+                          },
+                        }}
+                      >
+                        <CircularProgressWithLabel
+                          value={
+                            responseBody === null || !responseBody[1]
+                              ? 0
+                              : (100 / 7) * responseBody[1].Taken
+                          }
+                          size={60}
+                          bgcolor={"#06b6d4"}
+                        >
+                          {responseBody && responseBody[1]
+                            ? responseBody[1].Taken
+                            : 0}
+                        </CircularProgressWithLabel>
+                        <Box
+                          sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            mt: 1.2,
+                            px: 1.2,
+                            py: 0.3,
+                            borderRadius: "14px",
+                            backgroundColor: "#ecfeff",
+                            border: "1px solid #a5f3fc",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              backgroundColor: "#06b6d4",
+                              mr: 0.8,
+                            }}
+                          />
+                          <Typography
+                            sx={{
+                              color: "#155e75",
+                              fontSize: 11,
+                              fontWeight: 700,
+                            }}
+                          >
+                            Casual Leaves
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    </Grid>
+
+                    {/* Sick Leaves */}
+                    <Grid item xs={12} sm={4}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          p: 1.8,
+                          borderRadius: "16px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #e2e8f0",
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.03)",
+                          transition: "all 0.2s ease-in-out",
+                          "&:hover": {
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 18px rgba(245, 158, 11, 0.12)",
+                          },
+                        }}
+                      >
+                        <CircularProgressWithLabel
+                          value={
+                            responseBody === null || !responseBody[2]
+                              ? 0
+                              : (100 / 21) * responseBody[2].Taken
+                          }
+                          size={60}
+                          bgcolor={"#f59e0b"}
+                        >
+                          {responseBody && responseBody[2]
+                            ? responseBody[2].Taken
+                            : 0}
+                        </CircularProgressWithLabel>
+                        <Box
+                          sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            mt: 1.2,
+                            px: 1.2,
+                            py: 0.3,
+                            borderRadius: "14px",
+                            backgroundColor: "#fffbeb",
+                            border: "1px solid #fde68a",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              backgroundColor: "#f59e0b",
+                              mr: 0.8,
+                            }}
+                          />
+                          <Typography
+                            sx={{
+                              color: "#92400e",
+                              fontSize: 11,
+                              fontWeight: 700,
+                            }}
+                          >
+                            Sick Leaves
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+                </Box>
+              ) : (
+                <NotFound text={msg} />
+              )}
             </CardContent>
           </Card>
         </Box>
