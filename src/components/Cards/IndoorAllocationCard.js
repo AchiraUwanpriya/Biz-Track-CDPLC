@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Box, Grid } from "@mui/material";
-import { useSelector } from "react-redux";
-import { DonutLarge } from "@material-ui/icons";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { Box, Grid, Paper } from "@mui/material";
 
 export default function IndoorAllocationCard({ dataList }) {
   const [expanded, setExpanded] = useState(false);
@@ -23,497 +19,178 @@ export default function IndoorAllocationCard({ dataList }) {
     return <IconButton {...other} />;
   })(({ theme, expand }) => ({
     transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-    marginLeft: "auto",
     transition: theme.transitions.create("transform", {
       duration: theme.transitions.duration.shortest,
     }),
+    padding: 0,
+    marginLeft: "4px",
   }));
 
+  const detailItems = [
+    { label: "Reference Date", value: dataList?.RefDate },
+    { label: "Auth Date", value: dataList?.AuthDate },
+    { label: "Admission Date", value: dataList?.AdmisionDate },
+    { label: "Discharge Date", value: dataList?.DischargeDate },
+    { label: "Reference No", value: dataList?.ReferenceNo },
+    { label: "Insurance Amount", value: dataList?.InsuranceAmount },
+    { label: "CDL Recovery Amount", value: dataList?.CdlRecoveryAmount },
+  ];
+
   return (
-    <div style={{ marginTop: "1rem" }}>
-      <Card sx={{ margin: 0, marginTop: 0 }}>
-        <CardContent
-          sx={{
-            padding: 1,
-          }}
-        >
-          <Box sx={{}}>
-            <Grid container direction="row">
-              <Box sx={{ display: "flex", zIndex: 999, width: "100%" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    flex: 1,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      paddingLeft: 8,
-                      paddingRight: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontSize: 13,
-                          fontWeight: 750,
-                          fontFamily: "sans-serif",
-                          opacity: "120%",
-                          color: "##2c3e50",
-
-                        }}
-                      >
-                        Details Here
-                      </Typography>
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                          marginBottom: -2,
-                          marginTop: 0.5
-
-
-
-                        }}
-                      >
-                        <Typography
-                          paragraph
-                          sx={{
-                            fontWeight: 500,
-                            fontFamily: "sans-serif",
-                            color: "#646464",
-                            fontSize: 13
-
-                          }}
-                        >
-                          Reference No {" "} : {dataList.ReferenceNo}
-
-                        </Typography>
-                      </Grid>
-
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                          marginBottom: -6
-                        }}
-                      >
-                        <Typography
-                          paragraph
-                          sx={{
-                            fontWeight: 500,
-                            fontFamily: "sans-serif",
-                            color: "#646464",
-                            fontSize: 13
-                          }}
-                        >
-                          Insurance Amount {" "} : {dataList.InsuranceAmount}
-
-                        </Typography>
-                      </Grid>
-
-                      <Typography
-                        sx={{
-                          fontSize: 14,
-                          fontWeight: 600,
-                          fontFamily: "sans-serif",
-                        }}
-                      >
-
-                      </Typography>
-                    </div>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        backgroundColor: "rgba(94, 198, 212, 0.942)",
-                        padding: 5,
-                        borderRadius: 5,
-                        width: "35%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontSize: 14,
-                          fontWeight: 400,
-                          fontFamily: "sans-serif",
-                          color: "#646464",
-                        }}
-                      >
-                        Show
-                      </Typography>
-                    </div>
-                  </div>
-                </Box>
-              </Box>
-            </Grid>
+    <Paper
+      elevation={0}
+      sx={{
+        borderRadius: "14px",
+        border: "1px solid #e2e8f0",
+        backgroundColor: "#ffffff",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.03)",
+        transition: "all 0.2s ease-in-out",
+        overflow: "hidden",
+        "&:hover": {
+          boxShadow: "0 6px 16px rgba(37, 99, 235, 0.08)",
+          borderColor: "#bfdbfe",
+        },
+      }}
+    >
+      {/* Main Header Bar */}
+      <Box
+        onClick={handleExpandClick}
+        sx={{
+          p: 1.5,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {/* Icon Badge */}
+          <Box
+            sx={{
+              width: 38,
+              height: 38,
+              borderRadius: "10px",
+              backgroundColor: "#eff6ff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#2563eb",
+              flexShrink: 0,
+            }}
+          >
+            <ReceiptLongIcon sx={{ fontSize: 20 }} />
           </Box>
-        </CardContent>
-        <CardActions
-          disableSpacing
-          sx={{ padding: 0 }}
-          onClick={handleExpandClick}
+
+          {/* Core Summary Info */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.2 }}>
+            <Typography
+              sx={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: "#0f172a",
+                lineHeight: 1.2,
+              }}
+            >
+              Ref #: {dataList?.ReferenceNo || "N/A"}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: "#64748b",
+              }}
+            >
+              Insurance:{" "}
+              <span style={{ fontWeight: 700, color: "#1e293b" }}>
+                {dataList?.InsuranceAmount || "N/A"}
+              </span>
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Action Trigger Pill */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            px: 1.2,
+            py: 0.4,
+            borderRadius: "10px",
+            backgroundColor: expanded ? "#2563eb" : "#f1f5f9",
+            color: expanded ? "#ffffff" : "#475569",
+            transition: "all 0.2s ease-in-out",
+          }}
         >
           <Typography
             sx={{
-              fontSize: 12,
-              fontWeight: 600,
-              marginLeft: 2,
-              fontFamily: "sans-serif",
-              color: "#40E0D0",
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: "none",
+              mr: 0.2,
             }}
           >
-
+            {expanded ? "Hide" : "Show"}
           </Typography>
-
-          <ExpandMore
-            expand={expanded}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
-            aria-label="show more"
-          >
-            <ExpandMoreIcon />
-          </ExpandMore>
-        </CardActions>
-        <Collapse in={expanded} timeout="auto">
-          <CardContent sx={{ padding: 0, paddingBottom: 0 }}>
-            <Box
+          <ExpandMore expand={expanded} aria-label="show more">
+            <ExpandMoreIcon
               sx={{
-                padding: 0,
+                fontSize: 18,
+                color: expanded ? "#ffffff" : "#475569",
               }}
-            >
-              <Grid
-                container
-                spacing={0}
-                sx={{
-                  padding: 2,
-                  paddingBottom: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    Reference Date{" "}
+            />
+          </ExpandMore>
+        </Box>
+      </Box>
 
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
+      {/* Expandable Details Section */}
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <Box
+          sx={{
+            p: 1.5,
+            backgroundColor: "#f8fafc",
+            borderTop: "1px solid #f1f5f9",
+          }}
+        >
+          <Grid container spacing={1}>
+            {detailItems.map((item, idx) => (
+              <Grid item xs={12} sm={6} key={idx}>
+                <Paper
+                  elevation={0}
                   sx={{
+                    p: 1,
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    backgroundColor: "#ffffff",
                     display: "flex",
-                    justifyContent: "flex-start",
+                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
                   <Typography
-                    paragraph
                     sx={{
+                      fontSize: 11,
                       fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
+                      color: "#64748b",
                     }}
                   >
-                    : {dataList.RefDate}
-
+                    {item.label}
                   </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
                   <Typography
-                    paragraph
                     sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#1e293b",
                     }}
                   >
-                    Auth Date {" "}
-
+                    {item.value || "-"}
                   </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    : {dataList.AuthDate}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    Admission Date {" "}
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    : {dataList.AdmisionDate}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    Discharge Date {" "}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    : {dataList.DischargeDate}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    Reference No {" "}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    : {dataList.ReferenceNo}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    Insurance Amount {" "}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    : {dataList.InsuranceAmount}
-
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    CDL Recovery Amount {" "}
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    paragraph
-                    sx={{
-                      fontWeight: 600,
-                      fontFamily: "sans-serif",
-                      color: "#646464",
-                    }}
-                  >
-                    : {dataList.CdlRecoveryAmount}
-
-                  </Typography>
-                </Grid>
+                </Paper>
               </Grid>
-            </Box>
-          </CardContent>
-        </Collapse>
-
-      </Card>
-
-    </div>
+            ))}
+          </Grid>
+        </Box>
+      </Collapse>
+    </Paper>
   );
 }
-
-
-
