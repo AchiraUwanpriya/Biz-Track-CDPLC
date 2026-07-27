@@ -140,7 +140,7 @@ const Leave = () => {
           </Box>
 
           {/* Bottom: Year Picker */}
-          <FormControl size="small" sx={{ alignSelf: "center", minWidth: 110 }}>
+          <FormControl size="small" sx={{ alignSelf: "flex-start", minWidth: 365 }}>
             <Select
               value={year}
               onChange={handleChangeYear}
