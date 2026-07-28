@@ -4917,7 +4917,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                     position: "relative",
                   }}
                 >
-                  {responseBody?.EwoStatus?.toLowerCase() === "evaluation completed" && (
+                  {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && (
                     <IconButton
                       size="small"
                       onClick={() => setIsEditingBilledAmount((prev) => !prev)}
@@ -4942,7 +4942,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                     Billed Amount
                   </Typography>
 
-                  {responseBody?.EwoStatus?.toLowerCase() === "evaluation completed" && isEditingBilledAmount ? (
+                  {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && isEditingBilledAmount ? (
                     <TextField
                       size="small"
                       variant="outlined"
