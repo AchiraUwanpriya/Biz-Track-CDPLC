@@ -1257,6 +1257,7 @@
 ///  ---------------------------- New Update added chart --------------------------------
 
 
+
 import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import CommonService from "../../service/CommonService";
 import { useSelector } from "react-redux";
@@ -1286,8 +1287,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
-/* ─── Helpers ─────────────────────────────────────────────────────────────── */
+ 
 const isPresent = (emp) => emp.inn && emp.inn !== "NR" && emp.inn !== "";
 
 const normalizeRow = (item) => ({
@@ -1300,13 +1300,10 @@ const normalizeRow = (item) => ({
   pout:     item?.COUT || item?.pout || "",
   cno:      item?.CNO  || item?.cno  || "",
 });
-
-// Convert Oracle-style date "01-JAN-2026" → ISO "2026-01-01" for JS date parsing
+ 
 const parseOracleDate = (raw) => {
-  if (!raw) return "";
-  // Already ISO or JS-parseable
-  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw;
-  // Oracle format: DD-MON-YYYY  e.g. "01-JAN-2026"
+  if (!raw) return ""; 
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw; 
   const monthMap = {
     JAN:"01", FEB:"02", MAR:"03", APR:"04", MAY:"05", JUN:"06",
     JUL:"07", AUG:"08", SEP:"09", OCT:"10", NOV:"11", DEC:"12",
@@ -1316,7 +1313,7 @@ const parseOracleDate = (raw) => {
     const [, dd, mon, yyyy] = m;
     return `${yyyy}-${monthMap[mon] || "01"}-${dd.padStart(2, "0")}`;
   }
-  return raw; // return as-is and let Date() try
+  return raw;  
 };
 
 /* ─── Chart color helpers ─────────────────────────────────────────────────── */
@@ -2709,9 +2706,9 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
 
   const { weeklyAttendance, traineeDivision } = useSelector((state) => state.attendanceCard || {});
 
-  const [mainTab,           setMainTab]            = useState(0); // 0 = Employee, 1 = Trainees
-  const [activeMainTab,     setActiveMainTab]      = useState(0); // 0 = Divisions, 1 = Chart
-  const [activeDivisionTab, setActiveDivisionTab]  = useState(0); // 0 = Locations, 1 = Chart
+  const [mainTab,           setMainTab]            = useState(0); 
+  const [activeMainTab,     setActiveMainTab]      = useState(0);
+  const [activeDivisionTab, setActiveDivisionTab]  = useState(0); 
   const [selectedDivision,  setSelectedDivision]  = useState(null);
   const [expandedRow,       setExpandedRow]        = useState(null);
   const [drawerOpen,        setDrawerOpen]         = useState(false);
@@ -2725,7 +2722,6 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
 
   const scrollRef = useRef(null);
 
-  // Fetch division-wise attendance trend when Chart tab is active inside a division
   useEffect(() => {
     if (!selectedDivision || activeDivisionTab !== 1) return;
     let active = true;
@@ -2743,16 +2739,16 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
           [];
         const rawArr = Array.isArray(raw) ? raw : [];
 
-        // Confirmed API fields: Date (Oracle), Att_count, Actual_count
+        
         const normalized = rawArr.map((item) => {
-          // Date — convert "01-JAN-2026" → "2026-01-01"
+          
           const rawDate = item.Date ?? item.AttDate ?? item.att_date ?? item.date ?? "";
           const attDate = parseOracleDate(rawDate);
 
-          // Att_count = employees present (attendance bar)
+         
           const attendance = parseInt(item.Att_count ?? item.AttCount ?? item.Attendance ?? item.attendance ?? 0) || 0;
 
-          // Actual_count = total actual employees in that division (eligible bar / strength)
+          
           const eligible   = parseInt(item.Actual_count ?? item.ActualCount ?? item.Eligible ?? item.eligible ?? attendance) || attendance;
 
           return {
