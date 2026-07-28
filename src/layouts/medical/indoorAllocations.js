@@ -67,7 +67,25 @@ function IndoorAllocations({ allocationName }) {
           width: "100%",
           flexDirection: "column",
           gap: 1.5,
-          mb: 2,
+          maxHeight: { xs: "calc(100vh - 430px)", sm: "calc(100vh - 450px)", md: "460px" },
+          overflowY: "auto",
+          overflowX: "hidden",
+          pr: 0.5,
+          py: 0.5,
+          "&::-webkit-scrollbar": {
+            width: "6px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "#f1f5f9",
+            borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#cbd5e1",
+            borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "#94a3b8",
+          },
         }}
       >
         {list.map((item, index) => (
