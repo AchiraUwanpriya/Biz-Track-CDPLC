@@ -3791,6 +3791,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
+import EditIcon from "@mui/icons-material/Edit";
 import { Divider } from "@mui/material";
 import {
   Grid,
@@ -4147,6 +4148,14 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
   // ─── EWO state ────────────────────────────────────────────────
   const [serviceNo, setServiceNo] = useState(data?.[0]?.ServiceNo || "");
   const [remarks, setRemarks] = useState("");
+  const [billedAmount, setBilledAmount] = useState("");
+  const [isEditingBilledAmount, setIsEditingBilledAmount] = useState(false);
+
+  // Sync billedAmount when responseBody changes (e.g. after EWO fetch)
+  useEffect(() => {
+    setBilledAmount(responseBody?.BilledAmount ?? "");
+    setIsEditingBilledAmount(false);
+  }, [responseBody?.BilledAmount]);
 
   const dispatch = useDispatch();
 
@@ -4905,27 +4914,72 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
                     textAlign: "center",
                     minWidth: 0,
+                    position: "relative",
                   }}
                 >
+                  {responseBody?.EwoStatus?.toLowerCase() === "evaluation completed" && (
+                    <IconButton
+                      size="small"
+                      onClick={() => setIsEditingBilledAmount((prev) => !prev)}
+                      sx={{
+                        position: "absolute",
+                        top: 4,
+                        right: 4,
+                        p: 0.25,
+                        color: isEditingBilledAmount ? "#059669" : "#64748b",
+                      }}
+                      title="Edit Billed Amount"
+                    >
+                      <EditIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  )}
                   <Typography
                     variant="caption"
                     color="text.secondary"
                     display="block"
+                    sx={{ mb: isEditingBilledAmount ? 0.5 : 0 }}
                   >
                     Billed Amount
                   </Typography>
-                  <Typography
-                    variant="h6"
-                    fontWeight={700}
-                    sx={{
-                      color: "#059669",
-                      fontSize: { xs: "1rem", sm: "1.25rem" },
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {responseBody?.BilledAmount || "0.00"}
-                  </Typography>
+
+                  {responseBody?.EwoStatus?.toLowerCase() === "evaluation completed" && isEditingBilledAmount ? (
+                    <TextField
+                      size="small"
+                      variant="outlined"
+                      value={billedAmount}
+                      onChange={(e) => setBilledAmount(e.target.value)}
+                      inputProps={{ inputMode: "decimal", style: { textAlign: "center" } }}
+                      autoFocus
+                      sx={{
+                        width: "100%",
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 1.5,
+                          "& fieldset": { borderColor: "#059669" },
+                          "&:hover fieldset": { borderColor: "#047857" },
+                          "&.Mui-focused fieldset": { borderColor: "#059669" },
+                        },
+                        "& .MuiInputBase-input": {
+                          color: "#059669",
+                          fontWeight: 700,
+                          fontSize: { xs: "1rem", sm: "1.1rem" },
+                          py: 0.75,
+                        },
+                      }}
+                    />
+                  ) : (
+                    <Typography
+                      variant="h6"
+                      fontWeight={700}
+                      sx={{
+                        color: "#059669",
+                        fontSize: { xs: "1rem", sm: "1.25rem" },
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {billedAmount || responseBody?.BilledAmount || "0.00"}
+                    </Typography>
+                  )}
                 </Box>
               </Grid>
             </Grid>
