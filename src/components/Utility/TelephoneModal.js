@@ -8,6 +8,8 @@ import WorkIcon from "@mui/icons-material/Work";
 import BusinessIcon from "@mui/icons-material/Business";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import BadgeIcon from "@mui/icons-material/Badge";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import SmsIcon from "@mui/icons-material/Sms";
 import axios from "axios";
 
 const defaultAvatar = require("../../assets/images/man.png");
@@ -24,6 +26,17 @@ const modalStyle = {
   boxShadow: "0 20px 40px rgba(0, 0, 0, 0.16)",
   outline: "none",
   overflow: "hidden",
+};
+
+const getWhatsAppUrl = (phone) => {
+  if (!phone) return "#";
+  let cleaned = phone.replace(/[^0-9]/g, "");
+  if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "94" + cleaned.slice(1);
+  } else if (cleaned.length === 9 && !cleaned.startsWith("94")) {
+    cleaned = "94" + cleaned;
+  }
+  return `https://wa.me/${cleaned}`;
 };
 
 const TelephoneModal = ({ open, onClose, data }) => {
@@ -322,42 +335,19 @@ const TelephoneModal = ({ open, onClose, data }) => {
 
           {/* Action Buttons Footer */}
           {(Telephone || (Email && Email !== "email@example.com")) && (
-            <Box sx={{ display: "flex", gap: 1.2, mt: 1 }}>
-              {Telephone && (
-                <Button
-                  component="a"
-                  href={`tel:${Telephone}`}
-                  fullWidth
-                  variant="contained"
-                  startIcon={<PhoneIcon sx={{ fontSize: 16 }} />}
-                  sx={{
-                    borderRadius: "12px",
-                    py: 1,
-                    fontWeight: 700,
-                    fontSize: "12px",
-                    textTransform: "none",
-                    backgroundColor: "#2563eb",
-                    boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
-                    "&:hover": {
-                      backgroundColor: "#1d4ed8",
-                      boxShadow: "0 6px 16px rgba(37, 99, 235, 0.3)",
-                    },
-                  }}
-                >
-                  Call Now
-                </Button>
-              )}
+            <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
 
               {Email && Email !== "email@example.com" && (
                 <Button
                   component="a"
                   href={`mailto:${Email}`}
-                  fullWidth
                   variant="outlined"
                   startIcon={<EmailIcon sx={{ fontSize: 16 }} />}
                   sx={{
+                    flex: 1,
+                    minWidth: "80px",
                     borderRadius: "12px",
-                    py: 1,
+                    py: 0.9,
                     fontWeight: 700,
                     fontSize: "12px",
                     textTransform: "none",
@@ -369,9 +359,95 @@ const TelephoneModal = ({ open, onClose, data }) => {
                     },
                   }}
                 >
-                  Send Email
+                  Email
                 </Button>
               )}
+
+              
+
+               {Telephone && (
+                <Button
+                  component="a"
+                  href={`sms:${Telephone}`}
+                  variant="contained"
+                  startIcon={<SmsIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    flex: 1,
+                    minWidth: "80px",
+                    borderRadius: "12px",
+                    py: 0.9,
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    textTransform: "none",
+                    backgroundColor: "#0d9488",
+                    color: "#ffffff",
+                    boxShadow: "0 4px 12px rgba(13, 148, 136, 0.25)",
+                    "&:hover": {
+                      backgroundColor: "#0f766e",
+                      boxShadow: "0 6px 16px rgba(13, 148, 136, 0.35)",
+                    },
+                  }}
+                >
+                  SMS
+                </Button>
+              )}
+
+              {Telephone && (
+                <Button
+                  component="a"
+                  href={getWhatsAppUrl(Telephone)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="contained"
+                  startIcon={<WhatsAppIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    flex: 1,
+                    minWidth: "95px",
+                    borderRadius: "12px",
+                    py: 0.9,
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    textTransform: "none",
+                    backgroundColor: "#25D366",
+                    color: "#ffffff",
+                    boxShadow: "0 4px 12px rgba(37, 211, 102, 0.25)",
+                    "&:hover": {
+                      backgroundColor: "#1ebc57",
+                      boxShadow: "0 6px 16px rgba(37, 211, 102, 0.35)",
+                    },
+                  }}
+                >
+                  WhatsApp
+                </Button>
+              )}
+
+             {Telephone && (
+                <Button
+                  component="a"
+                  href={`tel:${Telephone}`}
+                  variant="contained"
+                  startIcon={<PhoneIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    flex: 1,
+                    minWidth: "80px",
+                    borderRadius: "12px",
+                    py: 0.9,
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    textTransform: "none",
+                    backgroundColor: "#2563eb",
+                    boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
+                    "&:hover": {
+                      backgroundColor: "#1d4ed8",
+                      boxShadow: "0 6px 16px rgba(37, 99, 235, 0.3)",
+                    },
+                  }}
+                >
+                  Call
+                </Button>
+              )}
+
+            
             </Box>
           )}
         </Box>
@@ -381,4 +457,6 @@ const TelephoneModal = ({ open, onClose, data }) => {
 };
 
 export default TelephoneModal;
+
+
 

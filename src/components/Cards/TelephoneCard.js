@@ -11,6 +11,7 @@ import { Typography, Box, Chip } from "@mui/material";
 import TelephoneModal from "../Utility/TelephoneModal";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -47,6 +48,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     borderBottom: 0,
   },
 }));
+
+const getWhatsAppUrl = (phone) => {
+  if (!phone) return "#";
+  let cleaned = phone.replace(/[^0-9]/g, "");
+  if (cleaned.length === 10 && cleaned.startsWith("0")) {
+    cleaned = "94" + cleaned.slice(1);
+  } else if (cleaned.length === 9 && !cleaned.startsWith("94")) {
+    cleaned = "94" + cleaned;
+  }
+  return `https://wa.me/${cleaned}`;
+};
 
 export default function TelephoneCard({ data, msg }) {
   const [open, setOpen] = useState(false);
@@ -133,15 +145,15 @@ export default function TelephoneCard({ data, msg }) {
         >
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center" sx={{ width: "20%" }}>
+              <StyledTableCell align="center" sx={{ width: "18%" }}>
                 Ext
               </StyledTableCell>
 
-              <StyledTableCell align="left" sx={{ width: "48%" }}>
+              <StyledTableCell align="left" sx={{ width: "46%" }}>
                 Name & Info
               </StyledTableCell>
 
-              <StyledTableCell align="center" sx={{ width: "32%" }}>
+              <StyledTableCell align="center" sx={{ width: "36%" }}>
                 Telephone
               </StyledTableCell>
             </TableRow>
@@ -212,38 +224,42 @@ export default function TelephoneCard({ data, msg }) {
                 {/* Telephone Column */}
                 <StyledTableCell align="center">
                   {row.Telephone ? (
-                    <Box
-                      component="a"
-                      href={`tel:${row.Telephone}`}
-                      onClick={(e) => e.stopPropagation()}
-                      sx={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 0.4,
-                        px: 0.6,
-                        py: 0.2,
-                        borderRadius: "14px",
-                        backgroundColor: "#eff6ff",
-                        color: "#2563eb",
-                        border: "1px solid #dbeafe",
-                        textDecoration: "none",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        maxWidth: "100%",
-                        overflow: "hidden",
-                        transition: "all 0.15s ease-in-out",
-                        "&:hover": {
-                          backgroundColor: "#2563eb",
-                          color: "#ffffff",
-                          borderColor: "#2563eb",
-                        },
-                      }}
-                    >
-                      <PhoneIcon sx={{ fontSize: 11, flexShrink: 0 }} />
-                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {row.Telephone}
-                      </span>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+                      <Box
+                        component="a"
+                        href={`tel:${row.Telephone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 0.4,
+                          px: 0.6,
+                          py: 0.2,
+                          borderRadius: "14px",
+                          backgroundColor: "#eff6ff",
+                          color: "#2563eb",
+                          border: "1px solid #dbeafe",
+                          textDecoration: "none",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          maxWidth: "100%",
+                          overflow: "hidden",
+                          transition: "all 0.15s ease-in-out",
+                          "&:hover": {
+                            backgroundColor: "#2563eb",
+                            color: "#ffffff",
+                            borderColor: "#2563eb",
+                          },
+                        }}
+                      >
+                        <PhoneIcon sx={{ fontSize: 11, flexShrink: 0 }} />
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {row.Telephone}
+                        </span>
+                      </Box>
+
+                   
                     </Box>
                   ) : (
                     <Typography sx={{ fontSize: "11px", color: "#94a3b8" }}>-</Typography>
@@ -271,6 +287,7 @@ export default function TelephoneCard({ data, msg }) {
     </Box>
   );
 }
+
 
 
 
