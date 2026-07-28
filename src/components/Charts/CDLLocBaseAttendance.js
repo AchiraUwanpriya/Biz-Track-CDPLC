@@ -2699,15 +2699,22 @@ const SearchBar = ({ value, onChange, placeholder }) => (
 );
 
 /* ─── DGESatt (main component) ────────────────────────────────────────────── */
-const DGESatt = ({ data = [], loading = false ,hadDate }) => {
+const DGESatt = ({ data = [], loading = false ,hadDate, activeMainTab: parentMainTab, onMainTabChange }) => {
   const theme    = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const currentYear = new Date().getFullYear().toString();
 
   const { weeklyAttendance, traineeDivision } = useSelector((state) => state.attendanceCard || {});
 
-  const [mainTab,           setMainTab]            = useState(0); 
-  const [activeMainTab,     setActiveMainTab]      = useState(0);
+  const [internalMainTab,   setInternalMainTab]    = useState(0); 
+  const mainTab = parentMainTab !== undefined ? parentMainTab : internalMainTab;
+  const setMainTab = (val) => {
+    if (onMainTabChange) {
+      onMainTabChange(val);
+    }
+    setInternalMainTab(val);
+  };
+  const [activeMainTab,     setActiveMainTab]      = useState(0); 
   const [activeDivisionTab, setActiveDivisionTab]  = useState(0); 
   const [selectedDivision,  setSelectedDivision]  = useState(null);
   const [expandedRow,       setExpandedRow]        = useState(null);
@@ -2840,60 +2847,6 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
           CDPLC Attendance Based on Division
         </Typography>
 
-        {/* Main Tab navigation: Employee vs Trainees styled as highlighted buttons */}
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1.5,
-            mb: 3,
-            p: 0.5,
-            bgcolor: "#f1f5f9",
-            borderRadius: "14px",
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <Button
-            onClick={() => setMainTab(0)}
-            fullWidth
-            sx={{
-              py: 1,
-              borderRadius: "10px",
-              fontSize: "0.88rem",
-              fontWeight: 700,
-              textTransform: "none",
-              transition: "all 0.2s ease",
-              boxShadow: mainTab === 0 ? "0 4px 12px rgba(0,74,173,0.15)" : "none",
-              bgcolor: mainTab === 0 ? "#004AAD" : "transparent",
-              color: mainTab === 0 ? "#ffffff" : "#64748b",
-              "&:hover": {
-                bgcolor: mainTab === 0 ? "#003b8a" : "#e2e8f0",
-              },
-            }}
-          >
-            Employees
-          </Button>
-          <Button
-            onClick={() => setMainTab(1)}
-            fullWidth
-            sx={{
-              py: 1,
-              borderRadius: "10px",
-              fontSize: "0.88rem",
-              fontWeight: 700,
-              textTransform: "none",
-              transition: "all 0.2s ease",
-              boxShadow: mainTab === 1 ? "0 4px 12px rgba(0,74,173,0.15)" : "none",
-              bgcolor: mainTab === 1 ? "#004AAD" : "transparent",
-              color: mainTab === 1 ? "#ffffff" : "#64748b",
-              "&:hover": {
-                bgcolor: mainTab === 1 ? "#003b8a" : "#e2e8f0",
-              },
-            }}
-          >
-            Trainees
-          </Button>
-        </Box>
-
         {mainTab === 0 ? (
           <>
             {/* Global Search Bar */}
@@ -2989,7 +2942,7 @@ const DGESatt = ({ data = [], loading = false ,hadDate }) => {
 };
 
 /* ─── Data Wrapper (exported) ─────────────────────────────────────────────── */
-export const CDLLocBaseAttendance = ({ hadDate } ) => {
+export const CDLLocBaseAttendance = ({ hadDate, activeMainTab, onMainTabChange }) => {
   const [data,    setData]    = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -3022,5 +2975,13 @@ export const CDLLocBaseAttendance = ({ hadDate } ) => {
     );
   }
 
-  return <DGESatt data={data} loading={loading} hadDate={hadDate} />;
+  return (
+    <DGESatt
+      data={data}
+      loading={loading}
+      hadDate={hadDate}
+      activeMainTab={activeMainTab}
+      onMainTabChange={onMainTabChange}
+    />
+  );
 };

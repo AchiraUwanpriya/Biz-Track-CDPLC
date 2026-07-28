@@ -1424,6 +1424,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(0);
+  const [attendanceTypeTab, setAttendanceTypeTab] = useState(0); // 0 = Employees, 1 = Trainees
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -1572,6 +1573,7 @@ const Dashboard = () => {
   const handleAttendanceCardClick = (type) => {
     if (type === "CDPLC") {
       setActiveTab(0);
+      setAttendanceTypeTab(0);
       requestAnimationFrame(() => {
         cdplcChartRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -1579,6 +1581,7 @@ const Dashboard = () => {
     }
     if (type === "Trainee") {
       setActiveTab(0);
+      setAttendanceTypeTab(1);
       requestAnimationFrame(() => {
         traineeTypeChartRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -1675,27 +1678,89 @@ const Dashboard = () => {
                 onCardClick={handleAttendanceCardClick}
               />
 
-              {/* ── CDPLC Breakdown ── */}
-              <Box ref={cdplcChartRef} sx={{ mb: "24px" }}>
-                {loadingStates.divisionData ? (
-                  <ChartSkeleton height={300} />
-                ) : (
-                  <CDPLCBreakdown hadDate={selectedDate} />
-                )}
-              </Box>
-              
-              {/* ── Trainee Type Chart ── */}
-              <Box ref={traineeTypeChartRef} sx={{ mb: "24px" }}>
-                {loadingStates.traineeTypes ? (
-                  <ChartSkeleton height={300} />
-                ) : (
-                  <EmployeeTypeChart employeeTypeData={employeeTypeData} />
-                )}
+              {/* ── Employees / Trainees Tab Filter Strip ── */}
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1.5,
+                  my: 3,
+                  p: 0.5,
+                  bgcolor: "#ffffff",
+                  borderRadius: "14px",
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 2px 8px rgba(0,74,173,0.04)",
+                }}
+              >
+                <Button
+                  onClick={() => setAttendanceTypeTab(0)}
+                  fullWidth
+                  sx={{
+                    py: 1.2,
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    transition: "all 0.2s ease",
+                    boxShadow: attendanceTypeTab === 0 ? "0 4px 12px rgba(0,74,173,0.15)" : "none",
+                    bgcolor: attendanceTypeTab === 0 ? "#004AAD" : "transparent",
+                    color: attendanceTypeTab === 0 ? "#ffffff" : "#64748b",
+                    "&:hover": {
+                      bgcolor: attendanceTypeTab === 0 ? "#003b8a" : "#f1f5f9",
+                    },
+                  }}
+                >
+                  Employees
+                </Button>
+                <Button
+                  onClick={() => setAttendanceTypeTab(1)}
+                  fullWidth
+                  sx={{
+                    py: 1.2,
+                    borderRadius: "10px",
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    transition: "all 0.2s ease",
+                    boxShadow: attendanceTypeTab === 1 ? "0 4px 12px rgba(0,74,173,0.15)" : "none",
+                    bgcolor: attendanceTypeTab === 1 ? "#004AAD" : "transparent",
+                    color: attendanceTypeTab === 1 ? "#ffffff" : "#64748b",
+                    "&:hover": {
+                      bgcolor: attendanceTypeTab === 1 ? "#003b8a" : "#f1f5f9",
+                    },
+                  }}
+                >
+                  Trainees
+                </Button>
               </Box>
 
-              {/* ── CDLLocationChart ── */}
+              {/* ── Breakdown Chart (Filtered by Tab) ── */}
+              {attendanceTypeTab === 0 ? (
+                /* ── CDPLC Breakdown (Employees) ── */
+                <Box ref={cdplcChartRef} sx={{ mb: "24px" }}>
+                  {loadingStates.divisionData ? (
+                    <ChartSkeleton height={300} />
+                  ) : (
+                    <CDPLCBreakdown hadDate={selectedDate} />
+                  )}
+                </Box>
+              ) : (
+                /* ── Trainee Type Chart (Trainees) ── */
+                <Box ref={traineeTypeChartRef} sx={{ mb: "24px" }}>
+                  {loadingStates.traineeTypes ? (
+                    <ChartSkeleton height={300} />
+                  ) : (
+                    <EmployeeTypeChart employeeTypeData={employeeTypeData} />
+                  )}
+                </Box>
+              )}
+
+              {/* ── CDLLocationChart / CDLLocBaseAttendance (Filtered by Tab) ── */}
               <Box sx={{ mb: "24px" }}>
-                <CDLLocBaseAttendance hadDate={selectedDate} />
+                <CDLLocBaseAttendance
+                  hadDate={selectedDate}
+                  activeMainTab={attendanceTypeTab}
+                  onMainTabChange={setAttendanceTypeTab}
+                />
               </Box>
 
               
