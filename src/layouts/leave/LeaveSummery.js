@@ -128,7 +128,7 @@ export default function LeaveSummery({ selectedYear }) {
           sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
         />
 
-        <Typography font={14} fontWeight={600}>
+        <Typography fontSize={14} fontWeight={600}>
           Leave summary not available
         </Typography>
 
