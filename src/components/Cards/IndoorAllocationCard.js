@@ -26,14 +26,25 @@ export default function IndoorAllocationCard({ dataList }) {
     marginLeft: "4px",
   }));
 
+  const formatValue = (val, isCurrency = false) => {
+    if (val === null || val === undefined || val === "" || val === "-") return "-";
+    if (isCurrency) {
+      const num = Number(val);
+      if (!isNaN(num)) {
+        return `Rs. ${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+    }
+    return val;
+  };
+
   const detailItems = [
-    { label: "Reference Date", value: dataList?.RefDate },
-    { label: "Auth Date", value: dataList?.AuthDate },
-    { label: "Admission Date", value: dataList?.AdmisionDate },
-    { label: "Discharge Date", value: dataList?.DischargeDate },
-    { label: "Reference No", value: dataList?.ReferenceNo },
-    { label: "Insurance Amount", value: dataList?.InsuranceAmount },
-    { label: "CDL Recovery Amount", value: dataList?.CdlRecoveryAmount },
+    { label: "Reference Date", value: formatValue(dataList?.RefDate || dataList?.ReferenceDate) },
+    { label: "Auth Date", value: formatValue(dataList?.AuthDate) },
+    { label: "Admission Date", value: formatValue(dataList?.AdmisionDate || dataList?.AdmissionDate) },
+    { label: "Discharge Date", value: formatValue(dataList?.DischargeDate) },
+    { label: "Reference No", value: formatValue(dataList?.ReferenceNo) },
+    { label: "Insurance Amount", value: formatValue(dataList?.InsuranceAmount || dataList?.Insurance, true) },
+    { label: "CDL Recovery Amount", value: formatValue(dataList?.CdlRecoveryAmount || dataList?.CdlRecovery || dataList?.CDLRecoveryAmount, true) },
   ];
 
   return (
@@ -103,7 +114,7 @@ export default function IndoorAllocationCard({ dataList }) {
             >
               Insurance:{" "}
               <span style={{ fontWeight: 700, color: "#1e293b" }}>
-                {dataList?.InsuranceAmount || "N/A"}
+                {formatValue(dataList?.InsuranceAmount || dataList?.Insurance, true)}
               </span>
             </Typography>
           </Box>
@@ -153,41 +164,55 @@ export default function IndoorAllocationCard({ dataList }) {
           }}
         >
           <Grid container spacing={1}>
-            {detailItems.map((item, idx) => (
-              <Grid item xs={12} sm={6} key={idx}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1,
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    backgroundColor: "#ffffff",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
+            {detailItems.map((item, idx) => {
+              const isLastOdd = idx === detailItems.length - 1 && detailItems.length % 2 !== 0;
+              return (
+                <Grid item xs={isLastOdd ? 12 : 6} sm={isLastOdd ? 12 : 6} key={idx}>
+                  <Paper
+                    elevation={0}
                     sx={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#64748b",
+                      p: 1.2,
+                      borderRadius: "10px",
+                      border: "1px solid #e2e8f0",
+                      backgroundColor: "#ffffff",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 0.3,
+                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02)",
+                      transition: "all 0.2s ease-in-out",
+                      "&:hover": {
+                        borderColor: "#cbd5e1",
+                        backgroundColor: "#f8fafc",
+                      },
                     }}
                   >
-                    {item.label}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: "#1e293b",
-                    }}
-                  >
-                    {item.value || "-"}
-                  </Typography>
-                </Paper>
-              </Grid>
-            ))}
+                    <Typography
+                      sx={{
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.4px",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        color: "#0f172a",
+                        wordBreak: "break-word",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {item.value}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              );
+            })}
           </Grid>
         </Box>
       </Collapse>
