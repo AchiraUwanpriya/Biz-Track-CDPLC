@@ -4993,8 +4993,8 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                 FINANCIAL SUMMARY
               </Typography>
 
-              {/* Currency selector chips if options exist */}
-              {currencyOptions.length > 1 && (
+              {/* Currency selector chips if options exist and costing completed */}
+              {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && currencyOptions.length > 1 && (
                 <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
                   {currencyOptions.map((curr) => {
                     const isSelected = selectedCurrency === curr;
@@ -5207,7 +5207,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
             </Grid>
 
             {/* Exchange rate info & quick conversion toggle banner */}
-            {currencyOptions.length > 1 && (
+            {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && currencyOptions.length > 1 && (
               <Box
                 sx={{
                   mt: 1.5,
