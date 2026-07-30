@@ -5152,7 +5152,31 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                       variant="outlined"
                       value={billedAmount}
                       onChange={(e) => {
-                        setBilledAmount(e.target.value);
+                        const raw = e.target.value;
+                        // Allow only digits, one decimal point, and commas (for deletion UX)
+                        const stripped = raw.replace(/,/g, "");
+                        // If user cleared or typed a partial decimal (e.g. "2000."), keep as-is
+                        if (stripped === "" || stripped === "." || /^\d*\.$/.test(stripped)) {
+                          setBilledAmount(stripped === "" ? "" : raw.replace(/[^0-9.]/g, ""));
+                          return;
+                        }
+                        const num = parseFloat(stripped);
+                        if (!isNaN(num)) {
+                          // Format with thousand separators; preserve decimal digits as typed
+                          const decimalMatch = stripped.match(/\.(\d*)$/);
+                          const decimalPart = decimalMatch ? decimalMatch[1] : null;
+                          if (decimalPart !== null) {
+                            // User is typing after decimal — show live digits (up to 2)
+                            const limited = decimalPart.slice(0, 2);
+                            const intPart = Math.floor(num).toLocaleString("en-US");
+                            setBilledAmount(`${intPart}.${limited}`);
+                          } else {
+                            // No decimal yet — show with thousand separators only
+                            setBilledAmount(Math.floor(num).toLocaleString("en-US"));
+                          }
+                        } else {
+                          setBilledAmount(raw);
+                        }
                       }}
                       onBlur={() => {
                         const clean = String(billedAmount).replace(/,/g, "");
