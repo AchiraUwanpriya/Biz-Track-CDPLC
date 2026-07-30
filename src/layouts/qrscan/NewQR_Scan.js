@@ -4181,6 +4181,13 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
     return target !== "LKR" && target !== "SLR" ? target : "USD";
   })();
 
+  const parseNum = (val) => {
+    if (val === undefined || val === null || val === "") return 0;
+    const clean = String(val).replace(/,/g, "").trim();
+    const num = parseFloat(clean);
+    return isNaN(num) ? 0 : num;
+  };
+
   const rawForeignAmt = responseBody?.foreign_bill_amount ?? responseBody?.foreignBillAmount ?? responseBody?.ForeignBilledAmount;
   const rawLocalAmt = responseBody?.local_bill_amount ?? responseBody?.localBillAmount ?? responseBody?.LocalBillAmount ?? responseBody?.BilledAmountLKR ?? responseBody?.LKRAmount;
 
@@ -4197,8 +4204,8 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
       0
     );
     if (isNaN(rate) || rate <= 0) {
-      const foreignNum = parseFloat(rawForeignAmt);
-      const localNum = parseFloat(rawLocalAmt ?? responseBody?.BilledAmount);
+      const foreignNum = parseNum(rawForeignAmt);
+      const localNum = parseNum(rawLocalAmt ?? responseBody?.BilledAmount);
       if (!isNaN(foreignNum) && foreignNum > 0 && !isNaN(localNum) && localNum > 0) {
         rate = localNum / foreignNum;
       } else {
@@ -4222,11 +4229,13 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
 
     if (isLKRResponse) {
       const localVal = responseBody?.local_bill_amount ?? responseBody?.BilledAmount ?? responseBody?.localBillAmount ?? "";
-      setBilledAmount(localVal !== "" && localVal !== null ? String(localVal) : "");
+      const num = parseNum(localVal);
+      setBilledAmount(localVal !== "" && localVal !== null ? num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "");
       setSelectedCurrency("LKR");
     } else {
       const foreignVal = responseBody?.foreign_bill_amount ?? responseBody?.BilledAmount ?? responseBody?.ForeignBilledAmount ?? "";
-      setBilledAmount(foreignVal !== "" && foreignVal !== null ? String(foreignVal) : "");
+      const num = parseNum(foreignVal);
+      setBilledAmount(foreignVal !== "" && foreignVal !== null ? num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "");
       setSelectedCurrency(foreignCurrencyCode);
     }
   }, [responseBody, isLKRResponse, foreignCurrencyCode]);
@@ -4237,7 +4246,7 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
       const rawVal = billedAmount !== "" 
         ? billedAmount 
         : (responseBody?.local_bill_amount ?? responseBody?.BilledAmount ?? "0.00");
-      const numericVal = parseFloat(rawVal) || 0;
+      const numericVal = parseNum(rawVal);
       return {
         amount: numericVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
         rawAmount: numericVal,
@@ -4248,10 +4257,10 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
       const rawVal = billedAmount !== "" 
         ? billedAmount 
         : (responseBody?.foreign_bill_amount ?? responseBody?.BilledAmount ?? "0.00");
-      const numericVal = parseFloat(rawVal) || 0;
+      const numericVal = parseNum(rawVal);
 
       if (selectedCurrency === "LKR") {
-        const lkrVal = rawLocalAmt ? parseFloat(rawLocalAmt) : (numericVal * exchangeRate);
+        const lkrVal = rawLocalAmt ? parseNum(rawLocalAmt) : (numericVal * exchangeRate);
         return {
           amount: lkrVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
           rawAmount: lkrVal,
@@ -4684,7 +4693,17 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
 
   const handleSendDoc = () => {
     if (responseBody?.EwoNo && serviceNo) {
-      dispatch(SendEWODetails(responseBody.EwoNo, serviceNo, remarks));
+      dispatch(
+        SendEWODetails(
+          {
+            ...responseBody,
+            editedBilledAmount: billedAmount,
+            activeExchangeRate: exchangeRate,
+          },
+          serviceNo,
+          remarks
+        )
+      );
       toast.success("Document information submitted successfully!");
       handleClose();
     } else {
@@ -5131,31 +5150,15 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                     <TextField
                       size="small"
                       variant="outlined"
-                      value={
-                        isLKRResponse
-                          ? (selectedCurrency === "LKR"
-                              ? billedAmount
-                              : (parseFloat(billedAmount || 0) / (exchangeRate || 1)).toString())
-                          : (selectedCurrency === "LKR"
-                              ? (parseFloat(billedAmount || 0) * exchangeRate).toString()
-                              : billedAmount)
-                      }
+                      value={billedAmount}
                       onChange={(e) => {
-                        const val = e.target.value;
-                        if (isLKRResponse) {
-                          if (selectedCurrency === "LKR") {
-                            setBilledAmount(val);
-                          } else {
-                            const num = parseFloat(val);
-                            setBilledAmount(!isNaN(num) ? (num * exchangeRate).toString() : val);
-                          }
-                        } else {
-                          if (selectedCurrency === "LKR") {
-                            const num = parseFloat(val);
-                            setBilledAmount(!isNaN(num) ? (num / exchangeRate).toString() : val);
-                          } else {
-                            setBilledAmount(val);
-                          }
+                        setBilledAmount(e.target.value);
+                      }}
+                      onBlur={() => {
+                        const clean = String(billedAmount).replace(/,/g, "");
+                        const num = parseFloat(clean);
+                        if (!isNaN(num) && clean !== "") {
+                          setBilledAmount(num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                         }
                       }}
                       inputProps={{ inputMode: "decimal", style: { textAlign: "center" } }}

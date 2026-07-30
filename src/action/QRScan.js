@@ -1136,11 +1136,120 @@ export const SendEWODetails =
       return Promise.reject();
     }
 
+    const resObj =
+      typeof responseBody === "object" && responseBody !== null
+        ? responseBody
+        : {};
+    const ewoNo =
+      typeof responseBody === "string"
+        ? responseBody
+        : resObj.EwoNo || resObj.ewo_no || "";
+
+    const currencyCode = (
+      resObj.currency_code ||
+      resObj.CurrencyCode ||
+      resObj.currencyCode ||
+      resObj.Currency ||
+      resObj.CurrencyType ||
+      resObj.CurrCode ||
+      resObj.p_currency_code ||
+      resObj.P_CURRENCY_CODE ||
+      "LKR"
+    )
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    const rawExchangeRate =
+      resObj.exchange_rate ??
+      resObj.ExchangeRate ??
+      resObj.exchangeRate ??
+      resObj.ex_rate ??
+      resObj.ExRate ??
+      resObj.Rate ??
+      resObj.ConversionRate ??
+      resObj.Ex_Rate ??
+      resObj.ExchRate ??
+      resObj.Exchange_Rate ??
+      resObj.EXCHANGE_RATE ??
+      resObj.p_exchange_rate ??
+      resObj.P_EXCHANGE_RATE;
+
+    const exchangeRate =
+      rawExchangeRate !== undefined && rawExchangeRate !== null
+        ? String(rawExchangeRate)
+        : "";
+
+    const rawSerialNo =
+      resObj.SerialNo ??
+      resObj.serial_no ??
+      resObj.Serial_No ??
+      resObj.P_SERIAL_NO;
+
+    const serialNoVal =
+      rawSerialNo !== undefined && rawSerialNo !== null
+        ? String(rawSerialNo)
+        : "";
+
+    const isLKR = currencyCode === "LKR" || currencyCode === "SLR";
+
+    let billedAmount = "";
+    let foreignAmount = "";
+
+    if (isLKR) {
+      const lkrVal =
+        resObj.editedBilledAmount ??
+        resObj.local_bill_amount ??
+        resObj.BilledAmount ??
+        resObj.localBillAmount ??
+        resObj.LocalBillAmount ??
+        resObj.BilledAmountLKR ??
+        resObj.LKRAmount;
+
+      billedAmount =
+        lkrVal !== "" && lkrVal !== null && lkrVal !== undefined
+          ? String(lkrVal)
+          : "";
+      foreignAmount = "";
+    } else {
+      const fVal =
+        resObj.editedBilledAmount ??
+        resObj.editedForeignAmount ??
+        resObj.foreign_bill_amount ??
+        resObj.foreignBillAmount ??
+        resObj.ForeignBilledAmount ??
+        resObj.BilledAmount;
+
+      foreignAmount =
+        fVal !== "" && fVal !== null && fVal !== undefined
+          ? String(fVal)
+          : "";
+
+      // P_BILLED_AMOUNT mirrors P_FOREIGN_AMOUNT for foreign currencies
+      billedAmount = foreignAmount;
+    }
+
+    const stripSeparatorsAndCents = (val) => {
+      if (val === undefined || val === null || val === "") return "";
+      const cleaned = String(val).replace(/,/g, "").trim();
+      if (cleaned === "") return "";
+      const num = parseFloat(cleaned);
+      if (isNaN(num)) return "";
+      return String(Math.round(num));
+    };
+
     let formData = new FormData();
-    formData.append("P_EWO_NO", responseBody.EwoNo);
-    formData.append("P_SERIAL_NO", responseBody.SerialNo || "1");
-    formData.append("P_ISERVICE_NO", serviceNo);
-    formData.append("P_REMARKS", remarks || responseBody.Remarks || "");
+    formData.append("P_EWO_NO", ewoNo);
+    formData.append("P_SERIAL_NO", serialNoVal);
+    formData.append("P_ISERVICE_NO", serviceNo || "");
+    formData.append("P_REMARKS", remarks || resObj.Remarks || resObj.remarks || "");
+
+    formData.append("P_EXCHANGE_RATE", exchangeRate);
+    formData.append("P_CURRENCY_CODE", currencyCode);
+    formData.append("P_BILLED_AMOUNT", stripSeparatorsAndCents(billedAmount));
+    formData.append("P_FOREIGN_AMOUNT", stripSeparatorsAndCents(foreignAmount));
+
+   
 
     return await QRService.SendEWODetails(formData).then(
       (data) => {
