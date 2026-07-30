@@ -3806,6 +3806,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { SendEWODetails, QRScan, GetEmployeeDetails } from "../../action/QRScan";
@@ -4150,12 +4151,125 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
   const [remarks, setRemarks] = useState("");
   const [billedAmount, setBilledAmount] = useState("");
   const [isEditingBilledAmount, setIsEditingBilledAmount] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState("LKR");
 
-  // Sync billedAmount when responseBody changes (e.g. after EWO fetch)
+  // ─── Currency & Exchange Rate Helpers ─────────────────────────────
+  const rawCurrencyCode = (
+    responseBody?.currency_code ||
+    responseBody?.CurrencyCode ||
+    responseBody?.currencyCode ||
+    responseBody?.Currency ||
+    responseBody?.CurrencyType ||
+    responseBody?.CurrCode ||
+    ""
+  ).toString().trim().toUpperCase();
+
+  const isLKRResponse = rawCurrencyCode === "LKR" || rawCurrencyCode === "SLR";
+
+  // Foreign currency code (e.g. "USD", "SGD", "EUR")
+  const foreignCurrencyCode = (() => {
+    if (!isLKRResponse && rawCurrencyCode !== "") {
+      return rawCurrencyCode;
+    }
+    const target = (
+      responseBody?.foreign_currency ||
+      responseBody?.foreign_currency_code ||
+      responseBody?.ForeignCurrency ||
+      responseBody?.TargetCurrency ||
+      "USD"
+    ).toString().trim().toUpperCase();
+    return target !== "LKR" && target !== "SLR" ? target : "USD";
+  })();
+
+  const rawForeignAmt = responseBody?.foreign_bill_amount ?? responseBody?.foreignBillAmount ?? responseBody?.ForeignBilledAmount;
+  const rawLocalAmt = responseBody?.local_bill_amount ?? responseBody?.localBillAmount ?? responseBody?.LocalBillAmount ?? responseBody?.BilledAmountLKR ?? responseBody?.LKRAmount;
+
+  // Active exchange rate directly from API response or computed ratio
+  const exchangeRate = (() => {
+    let rate = parseFloat(
+      responseBody?.exchange_rate ??
+      responseBody?.ExchangeRate ??
+      responseBody?.exchangeRate ??
+      responseBody?.ex_rate ??
+      responseBody?.ExRate ??
+      responseBody?.Rate ??
+      responseBody?.ConversionRate ??
+      0
+    );
+    if (isNaN(rate) || rate <= 0) {
+      const foreignNum = parseFloat(rawForeignAmt);
+      const localNum = parseFloat(rawLocalAmt ?? responseBody?.BilledAmount);
+      if (!isNaN(foreignNum) && foreignNum > 0 && !isNaN(localNum) && localNum > 0) {
+        rate = localNum / foreignNum;
+      } else {
+        rate = 1;
+      }
+    }
+    return rate;
+  })();
+
+  // Available currency options: Only show conversion if API response is Foreign currency
+  const currencyOptions = React.useMemo(() => {
+    if (isLKRResponse) {
+      return ["LKR"];
+    }
+    return [foreignCurrencyCode, "LKR"];
+  }, [isLKRResponse, foreignCurrencyCode]);
+
+  // Sync billedAmount and default currency when responseBody changes
   useEffect(() => {
-    setBilledAmount(responseBody?.BilledAmount ?? "");
     setIsEditingBilledAmount(false);
-  }, [responseBody?.BilledAmount]);
+
+    if (isLKRResponse) {
+      const localVal = responseBody?.local_bill_amount ?? responseBody?.BilledAmount ?? responseBody?.localBillAmount ?? "";
+      setBilledAmount(localVal !== "" && localVal !== null ? String(localVal) : "");
+      setSelectedCurrency("LKR");
+    } else {
+      const foreignVal = responseBody?.foreign_bill_amount ?? responseBody?.BilledAmount ?? responseBody?.ForeignBilledAmount ?? "";
+      setBilledAmount(foreignVal !== "" && foreignVal !== null ? String(foreignVal) : "");
+      setSelectedCurrency(foreignCurrencyCode);
+    }
+  }, [responseBody, isLKRResponse, foreignCurrencyCode]);
+
+  // Helper for displaying billed amount with active currency conversion
+  const getBilledDisplay = () => {
+    if (isLKRResponse) {
+      const rawVal = billedAmount !== "" 
+        ? billedAmount 
+        : (responseBody?.local_bill_amount ?? responseBody?.BilledAmount ?? "0.00");
+      const numericVal = parseFloat(rawVal) || 0;
+      return {
+        amount: numericVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        rawAmount: numericVal,
+        code: "LKR",
+        isConverted: false
+      };
+    } else {
+      const rawVal = billedAmount !== "" 
+        ? billedAmount 
+        : (responseBody?.foreign_bill_amount ?? responseBody?.BilledAmount ?? "0.00");
+      const numericVal = parseFloat(rawVal) || 0;
+
+      if (selectedCurrency === "LKR") {
+        const lkrVal = rawLocalAmt ? parseFloat(rawLocalAmt) : (numericVal * exchangeRate);
+        return {
+          amount: lkrVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          rawAmount: lkrVal,
+          code: "LKR",
+          isConverted: true
+        };
+      } else {
+        return {
+          amount: numericVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          rawAmount: numericVal,
+          code: selectedCurrency,
+          isConverted: false
+        };
+      }
+    }
+  };
+
+  const billedDisplay = getBilledDisplay();
 
   const dispatch = useDispatch();
 
@@ -4859,21 +4973,57 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
               border: "1px solid #e2e8f0",
             }}
           >
-            <Typography
-              variant="caption"
+            <Box
               sx={{
-                color: "#64748b",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                display: "block",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 mb: 2,
               }}
             >
-              FINANCIAL SUMMARY
-            </Typography>
-            <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-              <Grid item xs={6}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "#64748b",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                }}
+              >
+                FINANCIAL SUMMARY
+              </Typography>
+
+              {/* Currency selector chips if options exist */}
+              {currencyOptions.length > 1 && (
+                <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                  {currencyOptions.map((curr) => {
+                    const isSelected = selectedCurrency === curr;
+                    return (
+                      <Chip
+                        key={curr}
+                        label={curr}
+                        size="small"
+                        onClick={() => setSelectedCurrency(curr)}
+                        sx={{
+                          height: 22,
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          bgcolor: isSelected ? "#059669" : "#e2e8f0",
+                          color: isSelected ? "white" : "#475569",
+                          "&:hover": {
+                            bgcolor: isSelected ? "#047857" : "#cbd5e1",
+                          },
+                        }}
+                      />
+                    );
+                  })}
+                </Box>
+              )}
+            </Box>
+
+            <Grid container spacing={{ xs: 1.5, sm: 2 }} alignItems="stretch">
+              <Grid item xs={6} sx={{ display: "flex" }}>
                 <Box
                   sx={{
                     bgcolor: "white",
@@ -4882,30 +5032,55 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
                     textAlign: "center",
                     minWidth: 0,
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                  >
-                    Estimated Amount
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    fontWeight={700}
-                    color="text.primary"
+                  <Box
                     sx={{
-                      fontSize: { xs: "1rem", sm: "1.25rem" },
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: 24,
+                      mb: 0.5,
                     }}
                   >
-                    {responseBody?.EstimatedAmount || "0.00"}
-                  </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                    >
+                      Estimated Amount
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      border: "1px solid transparent",
+                      borderRadius: 1.5,
+                      py: 0.5,
+                      px: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      fontWeight={700}
+                      color="text.primary"
+                      sx={{
+                        fontSize: { xs: "0.95rem", sm: "1.2rem" },
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {responseBody?.EstimatedAmount || "0.00"}
+                    </Typography>
+                  </Box>
                 </Box>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={6} sx={{ display: "flex" }}>
                 <Box
                   sx={{
                     bgcolor: "white",
@@ -4914,40 +5089,75 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
                     textAlign: "center",
                     minWidth: 0,
-                    position: "relative",
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                  {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && (
-                    <IconButton
-                      size="small"
-                      onClick={() => setIsEditingBilledAmount((prev) => !prev)}
-                      sx={{
-                        position: "absolute",
-                        top: 4,
-                        right: 4,
-                        p: 0.25,
-                        color: isEditingBilledAmount ? "#059669" : "#64748b",
-                      }}
-                      title="Edit Billed Amount"
-                    >
-                      <EditIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  )}
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                    sx={{ mb: isEditingBilledAmount ? 0.5 : 0 }}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.5,
+                      height: 24,
+                      mb: 0.5,
+                    }}
                   >
-                    Billed Amount
-                  </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                    >
+                      Billed Amount ({billedDisplay.code})
+                    </Typography>
+                    {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setIsEditingBilledAmount((prev) => !prev)}
+                        sx={{
+                          p: 0.1,
+                          color: "#059669",
+                          "&:hover": { bgcolor: "rgba(5, 150, 105, 0.1)" },
+                        }}
+                        title="Edit Billed Amount"
+                      >
+                        <EditIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    )}
+                  </Box>
 
                   {responseBody?.EwoStatus?.toLowerCase() === "costing completed" && isEditingBilledAmount ? (
                     <TextField
                       size="small"
                       variant="outlined"
-                      value={billedAmount}
-                      onChange={(e) => setBilledAmount(e.target.value)}
+                      value={
+                        isLKRResponse
+                          ? (selectedCurrency === "LKR"
+                              ? billedAmount
+                              : (parseFloat(billedAmount || 0) / (exchangeRate || 1)).toString())
+                          : (selectedCurrency === "LKR"
+                              ? (parseFloat(billedAmount || 0) * exchangeRate).toString()
+                              : billedAmount)
+                      }
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (isLKRResponse) {
+                          if (selectedCurrency === "LKR") {
+                            setBilledAmount(val);
+                          } else {
+                            const num = parseFloat(val);
+                            setBilledAmount(!isNaN(num) ? (num * exchangeRate).toString() : val);
+                          }
+                        } else {
+                          if (selectedCurrency === "LKR") {
+                            const num = parseFloat(val);
+                            setBilledAmount(!isNaN(num) ? (num / exchangeRate).toString() : val);
+                          } else {
+                            setBilledAmount(val);
+                          }
+                        }
+                      }}
                       inputProps={{ inputMode: "decimal", style: { textAlign: "center" } }}
                       autoFocus
                       sx={{
@@ -4967,22 +5177,75 @@ export default function CustomizedDialogs({ isOpen, isOpenDetailScreen }) {
                       }}
                     />
                   ) : (
-                    <Typography
-                      variant="h6"
-                      fontWeight={700}
+                    <Box
                       sx={{
-                        color: "#059669",
-                        fontSize: { xs: "1rem", sm: "1.25rem" },
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        border: "1px solid transparent",
+                        borderRadius: 1.5,
+                        py: 0.5,
+                        px: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      {billedAmount || responseBody?.BilledAmount || "0.00"}
-                    </Typography>
+                      <Typography
+                        variant="h6"
+                        fontWeight={700}
+                        sx={{
+                          color: "#059669",
+                          fontSize: { xs: "0.95rem", sm: "1.2rem" },
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {billedDisplay.amount}
+                      </Typography>
+                    </Box>
                   )}
                 </Box>
               </Grid>
             </Grid>
+
+            {/* Exchange rate info & quick conversion toggle banner */}
+            {currencyOptions.length > 1 && (
+              <Box
+                sx={{
+                  mt: 1.5,
+                  pt: 1,
+                  borderTop: "1px dashed #cbd5e1",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontSize: "11px",
+                  color: "#64748b",
+                }}
+              >
+                <Typography variant="caption" sx={{ fontSize: "11px", color: "#64748b" }}>
+                  Ex. Rate: <strong>1 {foreignCurrencyCode} = {exchangeRate} LKR</strong>
+                </Typography>
+                <Button
+                  size="small"
+                  onClick={() =>
+                    setSelectedCurrency((prev) =>
+                      prev === "LKR" ? foreignCurrencyCode : "LKR"
+                    )
+                  }
+                  sx={{
+                    fontSize: "10px",
+                    py: 0.2,
+                    px: 1,
+                    minWidth: "auto",
+                    textTransform: "none",
+                    color: "#059669",
+                    fontWeight: 600,
+                  }}
+                >
+                  {selectedCurrency === "LKR"
+                    ? `Convert to ${foreignCurrencyCode}`
+                    : "Show in LKR"}
+                </Button>
+              </Box>
+            )}
           </Box>
 
           {/* Personnel */}
