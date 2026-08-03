@@ -11,8 +11,11 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  Chip,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import HistoryIcon from "@mui/icons-material/History";
+import CloseIcon from "@mui/icons-material/Close";
 
 const CartHistoryModal = ({ open, handleClose }) => {
   // Sample test data for cartItems
@@ -54,123 +57,230 @@ const CartHistoryModal = ({ open, handleClose }) => {
     return acc + item.quantity * item.SellingPrice;
   }, 0);
 
-  const theme = useTheme();
-
   return (
     <Modal open={open} onClose={handleClose}>
       <Box
         sx={{
-          position: "fixed",
-          width: { xs: "100%", sm: "600px" }, // Adjusted width for better display
-          height: "auto",
-          bgcolor: "background.paper",
-          boxShadow: 24,
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "92%", sm: "480px" },
+          maxHeight: "85vh",
+          bgcolor: "#ffffff",
+          borderRadius: "16px",
+          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
           display: "flex",
           flexDirection: "column",
-          overflow: "auto",
-          p: 2,
+          overflow: "hidden",
         }}
       >
-        <Typography variant="h6" mb={1.5} sx={{ fontWeight: "bold" }}>
-          History Details
-        </Typography>
+        {/* Compact Header */}
+        <Box
+          sx={{
+            p: 1.8,
+            px: 2,
+            background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+            color: "#ffffff",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <HistoryIcon sx={{ fontSize: 20 }} />
+            <Typography variant="h6" fontWeight="800" sx={{ fontSize: "0.95rem" }}>
+              Order History Details
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            sx={{
+              color: "#ffffff",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        </Box>
 
-        {cartItems.length > 0 ? (
-          <>
-            <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-              <Table stickyHeader size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        color: theme.palette.common.white,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Date
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        color: theme.palette.common.white,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                        width: "40%", // Increased width for the Item column
-                      }}
-                    >
-                      Item
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        color: theme.palette.common.white,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Qty
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        color: theme.palette.common.white,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Price
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        color: theme.palette.common.white,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Total
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {cartItems.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{item.date}</TableCell>
-                      <TableCell>{item.itemName}</TableCell>
-                      <TableCell align="center">{item.quantity}</TableCell>
-                      <TableCell align="center">
-                        {item.SellingPrice.toFixed(2)}
+        {/* Content Body */}
+        <Box sx={{ p: 1.8, flexGrow: 1, overflowY: "auto" }}>
+          {cartItems.length > 0 ? (
+            <>
+              <TableContainer
+                component={Paper}
+                elevation={0}
+                sx={{
+                  maxHeight: 300,
+                  borderRadius: "10px",
+                  border: "1px solid #e2e8f0",
+                }}
+              >
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        sx={{
+                          backgroundColor: "#1e40af",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                          fontWeight: 800,
+                          py: 0.8,
+                          px: 1,
+                        }}
+                      >
+                        Date
                       </TableCell>
-                      <TableCell align="center">
-                        {(item.quantity * item.SellingPrice).toFixed(2)}
+                      <TableCell
+                        sx={{
+                          backgroundColor: "#1e40af",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                          fontWeight: 800,
+                          py: 0.8,
+                          px: 1,
+                          width: "35%",
+                        }}
+                      >
+                        Item
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          backgroundColor: "#1e40af",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                          fontWeight: 800,
+                          py: 0.8,
+                          px: 1,
+                        }}
+                      >
+                        Qty
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{
+                          backgroundColor: "#1e40af",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                          fontWeight: 800,
+                          py: 0.8,
+                          px: 1,
+                        }}
+                      >
+                        Price
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{
+                          backgroundColor: "#1e40af",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                          fontWeight: 800,
+                          py: 0.8,
+                          px: 1,
+                        }}
+                      >
+                        Total
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
-        ) : (
-          <Typography>No Items Selected</Typography>
-        )}
+                  </TableHead>
 
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{ mt: 2 }}
-          onClick={handleClose}
-        >
-          Close
-        </Button>
+                  <TableBody>
+                    {cartItems.map((item, index) => (
+                      <TableRow
+                        key={index}
+                        sx={{
+                          "&:nth-of-type(even)": { backgroundColor: "#f8fafc" },
+                          "&:hover": { backgroundColor: "#f1f5f9" },
+                        }}
+                      >
+                        <TableCell sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#64748b", py: 0.6, px: 1 }}>
+                          {item.date}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: "0.75rem", fontWeight: 700, color: "#0f172a", py: 0.6, px: 1 }}>
+                          {item.itemName}
+                        </TableCell>
+                        <TableCell align="center" sx={{ py: 0.6, px: 1 }}>
+                          <Chip
+                            label={item.quantity}
+                            size="small"
+                            sx={{
+                              height: "18px",
+                              fontSize: "0.65rem",
+                              fontWeight: 700,
+                              backgroundColor: "#e0e7ff",
+                              color: "#3730a3",
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#334155", py: 0.6, px: 1 }}>
+                          {item.SellingPrice.toFixed(2)}
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontSize: "0.75rem", fontWeight: 800, color: "#2563eb", py: 0.6, px: 1 }}>
+                          {(item.quantity * item.SellingPrice).toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Compact Total Summary */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 1.5,
+                  p: 1,
+                  px: 1.5,
+                  borderRadius: "10px",
+                  backgroundColor: "#f0f7ff",
+                  border: "1px solid #bfdbfe",
+                }}
+              >
+                <Typography sx={{ fontWeight: 700, color: "#1e40af", fontSize: "0.8rem" }}>
+                  Total Historical Value
+                </Typography>
+                <Typography sx={{ fontWeight: 800, color: "#1d4ed8", fontSize: "0.95rem" }}>
+                  Rs. {totalAmount.toFixed(2)}
+                </Typography>
+              </Box>
+            </>
+          ) : (
+            <Typography sx={{ textAlign: "center", py: 3, color: "#94a3b8", fontSize: "0.85rem" }}>
+              No history records available
+            </Typography>
+          )}
+
+          <Button
+            variant="contained"
+            fullWidth
+            size="small"
+            onClick={handleClose}
+            sx={{
+              mt: 1.8,
+              py: 0.7,
+              borderRadius: "10px",
+              fontWeight: 700,
+              fontSize: "0.8rem",
+              textTransform: "none",
+              backgroundColor: "#475569",
+              "&:hover": { backgroundColor: "#334155" },
+            }}
+          >
+            Close
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );
 };
 
 export default CartHistoryModal;
+
+

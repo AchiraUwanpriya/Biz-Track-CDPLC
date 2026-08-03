@@ -322,8 +322,12 @@ import {
   IconButton,
   Divider,
   Button,
+  Chip,
+  Paper,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import Swal from "sweetalert2";
 
 const CartModal = ({ open, handleClose, cartItems, handleRemoveItem }) => {
@@ -334,7 +338,6 @@ const CartModal = ({ open, handleClose, cartItems, handleRemoveItem }) => {
 
   const handleProceed = () => {
     Swal.fire({
-      // title: "Proceed to History?",
       text: "Do you want to Place Order?",
       icon: "question",
       showCancelButton: true,
@@ -354,99 +357,149 @@ const CartModal = ({ open, handleClose, cartItems, handleRemoveItem }) => {
           position: "fixed",
           top: 0,
           right: 0,
-          width: { xs: "100%", sm: "400px" },
+          width: { xs: "100%", sm: "420px" },
           height: "100%",
-          bgcolor: "background.paper",
-          boxShadow: 24,
+          bgcolor: "#ffffff",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
           display: "flex",
           flexDirection: "column",
-          overflow: "auto",
+          overflow: "hidden",
         }}
       >
         {/* Header section */}
         <Box
           sx={{
-            p: 2,
+            p: 2.5,
+            background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+            color: "#ffffff",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: -3 }}>
-            Cart Items ({cartItems.length})
-          </Typography>
-          <IconButton onClick={handleClose} sx={{ mb: -3 }}>
-            <CloseIcon />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <ShoppingCartIcon sx={{ fontSize: 22 }} />
+            <Typography variant="h6" fontWeight="800" sx={{ fontSize: "1.1rem" }}>
+              My Cart
+            </Typography>
+            <Chip
+              label={`${cartItems.length} items`}
+              size="small"
+              sx={{
+                height: "22px",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                color: "#ffffff",
+                ml: 0.5,
+              }}
+            />
+          </Box>
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              color: "#ffffff",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Box>
 
-        <Divider sx={{ my: 1 }} />
-
-        {/* Cart Items */}
-        <Box sx={{ flexGrow: 1, px: 2, overflowY: "auto" }}>
+        {/* Cart Items List */}
+        <Box sx={{ flexGrow: 1, p: 2, overflowY: "auto" }}>
           {cartItems.length > 0 ? (
             cartItems.map((item, idx) => (
-              <Box
+              <Paper
                 key={idx}
+                elevation={0}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  flexWrap: "wrap",
-                  mb: 1,
-                  gap: 2,
-                  backgroundColor: "#f0f0f0",
-                  p: 2,
-                  borderRadius: 2,
+                  mb: 1.5,
+                  p: 1.5,
+                  borderRadius: "14px",
+                  backgroundColor: "#f8fafc",
+                  border: "1px solid #e2e8f0",
                 }}
               >
-                {/* Image and Item Information */}
+                {/* Item Thumbnail & Details */}
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
+                    gap: 1.5,
                     flex: 1,
                     minWidth: 0,
                   }}
                 >
-                  <Box>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: "10px",
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #f1f5f9",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      p: 0.5,
+                      flexShrink: 0,
+                    }}
+                  >
                     <img
                       src={require("../../assets/icons/food.png")}
                       alt="item"
-                      style={{ borderRadius: "10px", height: 60 }}
+                      style={{ height: "32px", objectFit: "contain" }}
                     />
-                    <Typography fontSize={8} sx={{ ml: 2 }}>
-                      {item.MaterialCode}
-                    </Typography>
-                  </Box>
+                  </Paper>
 
-                  <Box sx={{ ml: 1, minWidth: 0 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Chip
+                      label={item.MaterialCode}
+                      size="small"
+                      sx={{
+                        height: "16px",
+                        fontSize: "0.6rem",
+                        fontWeight: 700,
+                        backgroundColor: "#e2e8f0",
+                        color: "#475569",
+                        mb: 0.2,
+                      }}
+                    />
                     <Typography
-                      fontWeight="bold"
-                      sx={{ wordBreak: "break-word" }}
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        color: "#0f172a",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
                     >
-                      Item: {item.MaterialDescription}
+                      {item.MaterialDescription}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      QTY: {item.Unit || "Qty"} x {item.quantity}
-                    </Typography>
-                    <Typography mt={1}>
-                      Price: Rs {item.SellingPrice.toLocaleString("en-US")}.00
+                    <Typography variant="body2" sx={{ fontSize: "0.75rem", color: "#64748b" }}>
+                      Qty: {item.quantity} {item.Unit || ""} × Rs. {item.SellingPrice}
                     </Typography>
                   </Box>
                 </Box>
 
-                {/* Total and Remove Button for each otem */}
+                {/* Price Total & Remove Action */}
                 <Box
                   sx={{
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-end",
-                    minWidth: "fit-content",
+                    ml: 1,
+                    flexShrink: 0,
                   }}
                 >
-                  <Typography fontWeight="bold">
-                    Rs{" "}
+                  <Typography sx={{ fontWeight: 800, fontSize: "0.9rem", color: "#2563eb" }}>
+                    Rs.{" "}
                     {(item.quantity * item.SellingPrice).toLocaleString(
                       "en-US",
                       {
@@ -455,48 +508,74 @@ const CartModal = ({ open, handleClose, cartItems, handleRemoveItem }) => {
                       }
                     )}
                   </Typography>
-                  <Button
-                    variant="outlined"
-                    color="error"
+                  <IconButton
                     size="small"
-                    sx={{ mt: 1, borderRadius: 2, textTransform: "none" }}
+                    color="error"
                     onClick={() => handleRemoveItem(item.MaterialCode)}
+                    sx={{ mt: 0.5, backgroundColor: "#fee2e2", "&:hover": { backgroundColor: "#fca5a5" } }}
                   >
-                    Remove
-                  </Button>
+                    <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
                 </Box>
-              </Box>
+              </Paper>
             ))
           ) : (
-            <Typography sx={{ textAlign: "center", mt: 4 }}>
-              No items selected
-            </Typography>
+            <Box sx={{ textAlign: "center", mt: 8, color: "#94a3b8" }}>
+              <ShoppingCartIcon sx={{ fontSize: 48, opacity: 0.4, mb: 1 }} />
+              <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                Your cart is empty
+              </Typography>
+            </Box>
           )}
         </Box>
 
-        {/* Bottom Section */}
-        <Box sx={{ borderTop: "1px solid #ccc", p: 2 }}>
-          <Typography fontWeight="bold" sx={{ textAlign: "right" }}>
-            Subtotal: Rs{" "}
-            {subtotal.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </Typography>
+        {/* Bottom Panel */}
+        <Box
+          sx={{
+            borderTop: "1px solid #e2e8f0",
+            p: 2.5,
+            backgroundColor: "#f8fafc",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography sx={{ fontWeight: 600, color: "#64748b", fontSize: "0.9rem" }}>
+              Total Amount
+            </Typography>
+            <Typography sx={{ fontWeight: 800, fontSize: "1.2rem", color: "#1e293b" }}>
+              Rs.{" "}
+              {subtotal.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Typography>
+          </Box>
           <Button
             fullWidth
             variant="contained"
-            color="primary"
-            sx={{
-              mt: 2,
-              textTransform: "none",
-              fontWeight: "bold",
-              fontSize: 14,
-            }}
-            onClick={handleProceed}
             disabled={cartItems.length === 0}
+            onClick={handleProceed}
+            sx={{
+              py: 1.2,
+              borderRadius: "14px",
+              textTransform: "none",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.35)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)",
+                boxShadow: "0 6px 18px rgba(37, 99, 235, 0.45)",
+              },
+            }}
           >
-            Proceed
+            Place Order
           </Button>
         </Box>
       </Box>
@@ -505,3 +584,4 @@ const CartModal = ({ open, handleClose, cartItems, handleRemoveItem }) => {
 };
 
 export default CartModal;
+

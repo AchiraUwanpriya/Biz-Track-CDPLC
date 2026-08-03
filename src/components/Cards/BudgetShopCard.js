@@ -1,124 +1,14 @@
-// import React, { useEffect, useMemo } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { Box, Card, CardActionArea, Grid, Typography } from "@mui/material";
-// import { getGetBudgetShopPriceList } from "../../action/BudgetShop";
-// import Loader from "../Utility/Loader";
-// import NotFound from "../Utility/NotFound";
-
-// export default function BudgetShopCard({ searchTerm }) {
-//   const { responseBody, loading } = useSelector((state) => state.budgetItem);
-//   const dispatch = useDispatch();
-
-//   useEffect(() => {
-//     dispatch(getGetBudgetShopPriceList(""));
-//   }, [dispatch]);
-
-//   const filteredItems = useMemo(() => {
-//     return responseBody.filter((item) =>
-//       item.MaterialDescription.toLowerCase().includes(searchTerm.toLowerCase())
-//     );
-//   }, [responseBody, searchTerm]);
-
-//   return (
-//     <>
-//       {loading ? (
-//         <Loader />
-//       ) : (
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexWrap: "wrap",
-//             width: "100%",
-//             overflow: "auto",
-//           }}
-//         >
-//           <Grid container rowSpacing={0.1}>
-//             {filteredItems.length > 0 ? (
-//               filteredItems.map((item, index) => (
-//                 <Grid item xs={12} sx={{ padding: 1 }} key={index}>
-//                   <Card sx={{ padding: 1, boxShadow: 3 }}>
-//                     <CardActionArea>
-//                       <div
-//                         style={{
-//                           display: "flex",
-//                           alignItems: "center",
-//                           flexDirection: "row",
-//                         }}
-//                       >
-//                         <div
-//                           style={{
-//                             display: "flex",
-//                             alignItems: "center",
-//                             justifyContent: "center",
-//                             flexDirection: "column",
-//                             padding: 1,
-//                           }}
-//                         >
-//                           <img
-//                             src={require("../../assets/icons/food.png")}
-//                             alt="First slide"
-//                             style={{ borderRadius: "10px", height: 60 }}
-//                           />
-//                           <Typography gutterBottom fontSize={8}>
-//                             {item.MaterialCode}
-//                           </Typography>
-//                         </div>
-//                         <div
-//                           style={{
-//                             display: "flex",
-//                             flexDirection: "column",
-//                             width: "100%",
-//                             padding: "10px 5px",
-//                           }}
-//                         >
-//                           <Typography
-//                             gutterBottom
-//                             fontSize={12}
-//                             fontWeight={600}
-//                           >
-//                             {item.MaterialDescription}
-//                           </Typography>
-//                           <div
-//                             style={{
-//                               display: "flex",
-//                               justifyContent: "space-between",
-//                             }}
-//                           >
-//                             <Typography fontSize={12}>
-//                               Balance Qty: {item.BalanceQuantity} {item.Unit}
-//                             </Typography>
-//                             <Typography fontSize={15} fontWeight={600}>
-//                               Price: {item.SellingPrice} Rs
-//                             </Typography>
-//                           </div>
-//                         </div>
-//                       </div>
-//                     </CardActionArea>
-//                   </Card>
-//                 </Grid>
-//               ))
-//             ) : (
-//               <NotFound text="No Products Found!" />
-//             )}
-//           </Grid>
-//         </Box>
-//       )}
-//     </>
-//   );
-// }
-
-
-
 import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Card,
-  CardActionArea,
   Grid,
   Typography,
   Checkbox,
   TextField,
+  Chip,
+  Paper,
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { getGetBudgetShopPriceList } from "../../action/BudgetShop";
@@ -172,90 +62,179 @@ export default function BudgetShopCard({ searchTerm, selectedItems, setSelectedI
 
   return (
     <>
-      <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", ml: 1 }}>
-        {searchTerm ? "Search Results" : "All Results"}
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1.5,
+          px: 0.5,
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 800, color: "#1e293b", fontSize: "1.1rem" }}>
+          {searchTerm ? "Search Results" : "Available Items"}
+        </Typography>
+        {!loading && filteredItems && (
+          <Chip
+            label={`${filteredItems.length} Products`}
+            size="small"
+            sx={{
+              fontWeight: 700,
+              backgroundColor: "#e0e7ff",
+              color: "#3730a3",
+              fontSize: "0.75rem",
+            }}
+          />
+        )}
+      </Box>
 
       {loading ? (
         <Loader />
       ) : (
-        <Box sx={{ display: "flex", flexWrap: "wrap", width: "100%", overflow: "auto" }}>
-          <Grid container rowSpacing={1}>
+        <Box sx={{ width: "100%" }}>
+          <Grid container spacing={1.5}>
             {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
-                <Grid item xs={12} sx={{ padding: 1 }} key={item.MaterialCode}>
-                  <Card sx={{ padding: 1, boxShadow: 3, position: "relative" }}>
-                    <Checkbox
-                      checked={selectedItems[item.MaterialCode]?.selected || false}
-                      onChange={() => handleCheckboxChange(item.MaterialCode)}
-                      sx={{ position: "absolute", top: 30, left: 5 }}
-                    />
-                    <CardActionArea>
+              filteredItems.map((item) => {
+                const isSelected = selectedItems[item.MaterialCode]?.selected || false;
+                return (
+                  <Grid item xs={12} key={item.MaterialCode}>
+                    <Card
+                      elevation={0}
+                      sx={{
+                        borderRadius: "16px",
+                        border: isSelected ? "2px solid #2563eb" : "1px solid #e2e8f0",
+                        backgroundColor: isSelected ? "#f0f7ff" : "#ffffff",
+                        transition: "all 0.2s ease-in-out",
+                        boxShadow: isSelected
+                          ? "0 6px 20px rgba(37, 99, 235, 0.12)"
+                          : "0 2px 8px rgba(0, 0, 0, 0.04)",
+                        "&:hover": {
+                          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+                          borderColor: isSelected ? "#2563eb" : "#cbd5e1",
+                        },
+                        p: { xs: 1.5, sm: 2 },
+                        position: "relative",
+                      }}
+                    >
                       <Box
                         sx={{
                           display: "flex",
                           alignItems: "center",
-                          flexDirection: "row",
-                          paddingLeft: 5,
+                          gap: { xs: 1, sm: 1.5 },
                         }}
                       >
-                        <Box
+                        {/* Checkbox Selection */}
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={() => handleCheckboxChange(item.MaterialCode)}
+                            sx={{
+                              color: "#94a3b8",
+                              "&.Mui-checked": {
+                                color: "#2563eb",
+                              },
+                            }}
+                          />
+                        </Box>
+
+                        {/* Item Icon Thumbnail */}
+                        <Paper
+                          elevation={0}
                           sx={{
+                            width: { xs: 54, sm: 64 },
+                            height: { xs: 54, sm: 64 },
+                            borderRadius: "12px",
+                            backgroundColor: "#f8fafc",
+                            border: "1px solid #f1f5f9",
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            padding: 1,
+                            justifyContent: "center",
+                            p: 0.5,
+                            flexShrink: 0,
                           }}
                         >
                           <img
                             src={require("../../assets/icons/food.png")}
-                            alt="First slide"
-                            style={{ borderRadius: "10px", height: 60 }}
+                            alt="Item Icon"
+                            style={{ height: "36px", objectFit: "contain" }}
                           />
-                          <Typography fontSize={8}>{item.MaterialCode}</Typography>
-                        </Box>
+                        </Paper>
 
+                        {/* Item Details */}
                         <Box
                           sx={{
                             display: "flex",
                             flexDirection: "column",
-                            width: "100%",
-                            padding: "10px 5px",
+                            flexGrow: 1,
+                            minWidth: 0,
                           }}
                         >
-                          <Typography fontSize={12} fontWeight={600}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.3 }}>
+                            <Chip
+                              label={item.MaterialCode}
+                              size="small"
+                              sx={{
+                                height: "18px",
+                                fontSize: "0.65rem",
+                                fontWeight: 700,
+                                backgroundColor: "#f1f5f9",
+                                color: "#475569",
+                              }}
+                            />
+                            <Chip
+                              label={`Balance: ${item.BalanceQuantity} ${item.Unit}`}
+                              size="small"
+                              sx={{
+                                height: "18px",
+                                fontSize: "0.65rem",
+                                fontWeight: 700,
+                                backgroundColor: Number(item.BalanceQuantity) > 0 ? "#dcfce7" : "#fee2e2",
+                                color: Number(item.BalanceQuantity) > 0 ? "#15803d" : "#b91c1c",
+                              }}
+                            />
+                          </Box>
+
+                          <Typography
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                              color: "#0f172a",
+                              lineHeight: 1.3,
+                              mb: 0.5,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
                             {item.MaterialDescription}
                           </Typography>
 
-                          <Box
+                          <Typography
                             sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "flex-start",
-                              mt: -0.5,
+                              fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                              fontWeight: 800,
+                              color: "#2563eb",
                             }}
                           >
-                            <Typography fontSize={12}>
-                              Balance Qty: {item.BalanceQuantity} {item.Unit}
-                            </Typography>
-                            <Typography fontSize={15} fontWeight={600}>
-                              Price: Rs {item.SellingPrice}
-                            </Typography>
-                          </Box>
+                            Rs. {item.SellingPrice}
+                          </Typography>
                         </Box>
 
+                        {/* Quantity Input Field */}
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "flex-end",
-                            mt: 1,
+                            flexShrink: 0,
+                            ml: 0.5,
                           }}
                         >
                           <TextField
                             size="small"
                             type="number"
-                            label="Add QTY"
+                            label="QTY"
                             variant="outlined"
                             value={selectedItems[item.MaterialCode]?.quantity || ""}
                             onChange={(e) =>
@@ -265,18 +244,29 @@ export default function BudgetShopCard({ searchTerm, selectedItems, setSelectedI
                                 item.BalanceQuantity
                               )
                             }
-                            disabled={!selectedItems[item.MaterialCode]?.selected}
-                            sx={{ width: 95 }}
+                            disabled={!isSelected}
+                            sx={{
+                              width: { xs: 80, sm: 95 },
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: "10px",
+                                backgroundColor: isSelected ? "#ffffff" : "#f8fafc",
+                              },
+                              "& .MuiInputLabel-root": {
+                                fontSize: "0.8rem",
+                              },
+                            }}
                             inputProps={{ min: 1 }}
                           />
                         </Box>
                       </Box>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              ))
+                    </Card>
+                  </Grid>
+                );
+              })
             ) : (
-              <NotFound text="No Products Found!" />
+              <Grid item xs={12}>
+                <NotFound text="No Products Found!" />
+              </Grid>
             )}
           </Grid>
         </Box>
@@ -284,3 +274,4 @@ export default function BudgetShopCard({ searchTerm, selectedItems, setSelectedI
     </>
   );
 }
+
