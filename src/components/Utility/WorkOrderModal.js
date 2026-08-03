@@ -11,12 +11,14 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import PostAddIcon from "@mui/icons-material/PostAdd";
+import SaveIcon from "@mui/icons-material/Save";
 import React, { useState, useEffect } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 
@@ -158,68 +160,98 @@ function WorkOrderModal({ onClose }) {
   };
 
   return (
-    <>
-      <Typography
-        variant="h6"
-        sx={{ fontWeight: "bold", mb: 2, color: "#2196F3" }}
+    <Box sx={{ width: "100%" }}>
+      {/* Header Banner */}
+      <Box
+        sx={{
+          p: 2,
+          px: 2.5,
+          mx: -3,
+          mt: -3,
+          background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+          color: "#ffffff",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderTopLeftRadius: "18px",
+          borderTopRightRadius: "18px",
+        }}
       >
-        Temporary Work Order
-      </Typography>
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={(theme) => ({
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <PostAddIcon sx={{ fontSize: 22 }} />
+          <Typography variant="h6" fontWeight="800" sx={{ fontSize: "1.05rem" }}>
+          Temporary Work Order
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{
+            color: "#ffffff",
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.3)" },
+          }}
+        >
+          <CloseIcon sx={{ fontSize: 16 }} />
+        </IconButton>
+      </Box>
 
-      <DialogContent dividers>
+      <DialogContent sx={{ pt: 3.5, pb: 2, px: 1 }}>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  label={
-                    <span>
-                      Start Date <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
-                  value={startDate}
-                  onChange={(newValue) => {
-                    setStartDate(newValue);
-                    setEndDate(null);
-                  }}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
-              </DemoContainer>
+              <DatePicker
+                label={
+                  <span>
+                    Start Date <span style={{ color: "#ef4444" }}>*</span>
+                  </span>
+                }
+                value={startDate}
+                onChange={(newValue) => {
+                  setStartDate(newValue);
+                  setEndDate(null);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    size="small"
+                    sx={{
+                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                    }}
+                  />
+                )}
+              />
             </LocalizationProvider>
           </Grid>
 
           <Grid item xs={12} sm={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  label={
-                    <span>
-                      End Date <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
-                  value={endDate}
-                  onChange={(newValue) => setEndDate(newValue)}
-                  minDate={startDate}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
-              </DemoContainer>
+              <DatePicker
+                label={
+                  <span>
+                    End Date <span style={{ color: "#ef4444" }}>*</span>
+                  </span>
+                }
+                value={endDate}
+                onChange={(newValue) => setEndDate(newValue)}
+                minDate={startDate}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    size="small"
+                    sx={{
+                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                    }}
+                  />
+                )}
+              />
             </LocalizationProvider>
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <FormControl fullWidth>
+            <FormControl fullWidth size="small">
               <InputLabel id="cdl-job-no-label">CDL Job No</InputLabel>
               <Select
                 labelId="cdl-job-no-label"
@@ -227,10 +259,14 @@ function WorkOrderModal({ onClose }) {
                 value={cdlJobNo}
                 label="CDL Job No"
                 onChange={(e) => setCdlJobNo(e.target.value)}
+                sx={{ borderRadius: "10px" }}
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      maxHeight: 200,
+                      maxHeight: 220,
+                      maxWidth: { xs: "280px", sm: "360px" },
+                      borderRadius: "10px",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
                     },
                   },
                 }}
@@ -241,8 +277,11 @@ function WorkOrderModal({ onClose }) {
                       key={JOBNO}
                       value={JOBNO}
                       sx={{
-                        fontSize: "0.875rem",
-                        padding: "4px 8px",
+                        fontSize: "0.78rem",
+                        py: 0.8,
+                        px: 1.2,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
                       }}
                     >
                       {`${JOBNO} - ${DISCRIP}`}
@@ -258,7 +297,7 @@ function WorkOrderModal({ onClose }) {
 
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
+            <FormControl fullWidth size="small">
               <InputLabel id="location-label">Location</InputLabel>
               <Select
                 labelId="location-label"
@@ -266,17 +305,31 @@ function WorkOrderModal({ onClose }) {
                 value={p_loc}
                 label="Location"
                 onChange={(e) => setLocation(e.target.value)}
+                sx={{ borderRadius: "10px" }}
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      maxHeight: 200,
+                      maxHeight: 220,
+                      maxWidth: { xs: "280px", sm: "360px" },
+                      borderRadius: "10px",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
                     },
                   },
                 }}
               >
                 {locationOptions.length > 0 ? (
                   locationOptions.map(({ LOCCODE, LOCDISCRIP }) => (
-                    <MenuItem key={LOCCODE} value={LOCCODE}>
+                    <MenuItem
+                      key={LOCCODE}
+                      value={LOCCODE}
+                      sx={{
+                        fontSize: "0.78rem",
+                        py: 0.8,
+                        px: 1.2,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {`${LOCCODE} - ${LOCDISCRIP}`}
                     </MenuItem>
                   ))
@@ -289,39 +342,73 @@ function WorkOrderModal({ onClose }) {
 
           <Grid item xs={12} sm={6}>
             <TextField
+              size="small"
               label={
                 <span>
-                  Specification <span style={{ color: "red" }}>*</span>
+                  Specification <span style={{ color: "#ef4444" }}>*</span>
                 </span>
               }
               value={specification}
               onChange={(e) => setSpecification(e.target.value)}
               fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+              }}
             />
           </Grid>
         </Grid>
 
         <TextField
+          size="small"
           label="Remarks"
           value={p_remarks}
           onChange={(e) => setRemarks(e.target.value)}
           fullWidth
           multiline
           rows={2}
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 1,
+            "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+          }}
         />
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="secondary" variant="outlined">
+      <DialogActions sx={{ pt: 1, pb: 1, px: 1 }}>
+        <Button
+          onClick={onClose}
+          sx={{
+            borderRadius: "10px",
+            fontWeight: 700,
+            fontSize: "0.82rem",
+            textTransform: "none",
+            color: "#64748b",
+          }}
+        >
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
-          Save
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          startIcon={<SaveIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            borderRadius: "10px",
+            fontWeight: 700,
+            fontSize: "0.82rem",
+            textTransform: "none",
+            backgroundColor: "#16a34a",
+            boxShadow: "0 3px 10px rgba(22, 163, 74, 0.25)",
+            "&:hover": {
+              backgroundColor: "#15803d",
+              boxShadow: "0 4px 12px rgba(22, 163, 74, 0.35)",
+            },
+          }}
+        >
+          Save Order
         </Button>
       </DialogActions>
-    </>
+    </Box>
   );
 }
 
 export default WorkOrderModal;
+
