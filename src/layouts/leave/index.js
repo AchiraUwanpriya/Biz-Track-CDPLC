@@ -531,7 +531,7 @@ const AddLeave = () => {
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Grid container spacing={1.5} sx={{ mb: 1.8 }}>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={6}>
             <DatePicker
               label="Leave Start Date"
               value={startDate}
@@ -555,7 +555,7 @@ const AddLeave = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={6}>
             <DatePicker
               label="Leave End Date"
               value={endDate}
@@ -1013,13 +1013,31 @@ const Leave = () => {
         sx={{
           p: 0.5,
           display: "flex",
-          justifyContent: "center",
-          gap: 0.5,
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 0.3,
           borderRadius: "18px",
           backgroundColor: "#ffffff",
           border: "1px solid #f1f5f9",
           boxShadow: "0 6px 18px rgba(37, 99, 235, 0.05)",
           mb: 2,
+          overflowX: "auto",
+          "&::-webkit-scrollbar": {
+            height: "4px",
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "#f1f5f9",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#cbd5e1",
+            borderRadius: "4px",
+            "&:hover": {
+              backgroundColor: "#94a3b8",
+            },
+          },
+          scrollbarWidth: "thin",
+          scrollbarColor: "#cbd5e1 #f1f5f9",
         }}
       >
         {[
@@ -1053,8 +1071,10 @@ const Leave = () => {
               onClick={() => handleTabClick(tab.key)}
               sx={{
                 flex: 1,
-                py: 0.6,
-                px: 1,
+                whiteSpace: "nowrap",
+                minWidth: "max-content",
+                py: 0.8,
+                px: { xs: 1, sm: 1.5 },
                 fontSize: "11px",
                 fontWeight: isSelected ? 700 : 600,
                 color: isSelected ? "#ffffff" : "#64748b",
