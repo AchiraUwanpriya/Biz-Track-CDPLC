@@ -544,11 +544,20 @@ const AddLeave = () => {
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      borderRadius: "12px",
-                      fontSize: 12,
+                      borderRadius: "10px",
+                      fontSize: "11px",
+                      height: "36px",
+                    },
+                    "& .MuiOutlinedInput-input": {
+                      py: "6px",
+                      px: "10px",
+                      fontSize: "11px",
                     },
                     "& .MuiInputLabel-root": {
-                      fontSize: 12,
+                      fontSize: "11px",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      fontSize: 16,
                     },
                   }}
                 />
@@ -568,11 +577,20 @@ const AddLeave = () => {
                   size="small"
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      borderRadius: "12px",
-                      fontSize: 12,
+                      borderRadius: "10px",
+                      fontSize: "11px",
+                      height: "36px",
+                    },
+                    "& .MuiOutlinedInput-input": {
+                      py: "6px",
+                      px: "10px",
+                      fontSize: "11px",
                     },
                     "& .MuiInputLabel-root": {
-                      fontSize: 12,
+                      fontSize: "11px",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      fontSize: 16,
                     },
                   }}
                 />
