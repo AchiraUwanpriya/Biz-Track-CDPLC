@@ -1029,7 +1029,7 @@ const Leave = () => {
       <Paper
         elevation={0}
         sx={{
-          p: 0.5,
+          py: 0.5,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -1062,22 +1062,22 @@ const Leave = () => {
           {
             key: "Leave Details",
             label: "Add Leave",
-            icon: <EventNote sx={{ fontSize: 15 }} />,
+            // icon: <EventNote sx={{ fontSize: 8 }} />,
           },
           {
             key: "LeaveSummery",
             label: "Leave Summary",
-            icon: <Assessment sx={{ fontSize: 15 }} />,
+            // icon: <Assessment sx={{ fontSize: 8 }} />,
           },
           {
             key: "NotEnteredLeave",
             label: "Not Entered Leave",
-            icon: <EventBusy sx={{ fontSize: 15 }} />,
+            // icon: <EventBusy sx={{ fontSize: 8 }} />,
           },
           {
             key: "Punctuality",
             label: "Punctuality",
-            icon: <AccessTime sx={{ fontSize: 15 }} />,
+            // icon: <AccessTime sx={{ fontSize: 8 }} />,
           },
         ].map((tab) => {
           const isSelected = selectedTab === tab.key;
