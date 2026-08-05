@@ -462,8 +462,8 @@ const CartModal = ({ open, handleClose, cartItems, handleRemoveItem }) => {
                       label={item.MaterialCode}
                       size="small"
                       sx={{
-                        height: "16px",
-                        fontSize: "0.6rem",
+                        height: "20px",
+                        fontSize: "11px",
                         fontWeight: 700,
                         backgroundColor: "#e2e8f0",
                         color: "#475569",

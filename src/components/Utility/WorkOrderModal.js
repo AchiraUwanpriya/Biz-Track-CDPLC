@@ -211,13 +211,34 @@ function WorkOrderModal({ onClose }) {
                   setStartDate(newValue);
                   setEndDate(null);
                 }}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    fullWidth: true,
+                    sx: {
+                      "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        fontSize: "13px",
+                      },
+                      "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
+                        fontSize: "13px !important",
+                      },
+                    },
+                  },
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     fullWidth
                     size="small"
                     sx={{
-                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                      "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        fontSize: "13px",
+                      },
+                      "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
+                        fontSize: "13px !important",
+                      },
                     }}
                   />
                 )}
@@ -236,13 +257,34 @@ function WorkOrderModal({ onClose }) {
                 value={endDate}
                 onChange={(newValue) => setEndDate(newValue)}
                 minDate={startDate}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    fullWidth: true,
+                    sx: {
+                      "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        fontSize: "13px",
+                      },
+                      "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
+                        fontSize: "13px !important",
+                      },
+                    },
+                  },
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     fullWidth
                     size="small"
                     sx={{
-                      "& .MuiOutlinedInput-root": { borderRadius: "10px" },
+                      "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        fontSize: "13px",
+                      },
+                      "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
+                        fontSize: "13px !important",
+                      },
                     }}
                   />
                 )}

@@ -175,8 +175,8 @@ export default function BudgetShopCard({ searchTerm, selectedItems, setSelectedI
                               label={item.MaterialCode}
                               size="small"
                               sx={{
-                                height: "18px",
-                                fontSize: "0.65rem",
+                                height: "20px",
+                                fontSize: "11px",
                                 fontWeight: 700,
                                 backgroundColor: "#f1f5f9",
                                 color: "#475569",
@@ -186,8 +186,8 @@ export default function BudgetShopCard({ searchTerm, selectedItems, setSelectedI
                               label={`Balance: ${item.BalanceQuantity} ${item.Unit}`}
                               size="small"
                               sx={{
-                                height: "18px",
-                                fontSize: "0.65rem",
+                                height: "20px",
+                                fontSize: "11px",
                                 fontWeight: 700,
                                 backgroundColor: Number(item.BalanceQuantity) > 0 ? "#dcfce7" : "#fee2e2",
                                 color: Number(item.BalanceQuantity) > 0 ? "#15803d" : "#b91c1c",
@@ -248,11 +248,12 @@ export default function BudgetShopCard({ searchTerm, selectedItems, setSelectedI
                             sx={{
                               width: { xs: 80, sm: 95 },
                               "& .MuiOutlinedInput-root": {
-                                borderRadius: "10px",
+                                borderRadius: "12px",
+                                fontSize: "13px",
                                 backgroundColor: isSelected ? "#ffffff" : "#f8fafc",
                               },
                               "& .MuiInputLabel-root": {
-                                fontSize: "0.8rem",
+                                fontSize: "13px",
                               },
                             }}
                             inputProps={{ min: 1 }}

@@ -294,14 +294,14 @@ const Job_Allocation = () => {
           }}
         >
           {/* Date Picker Section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-            <CalendarTodayIcon sx={{ color: "#2563eb", fontSize: 18 }} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
+            <CalendarTodayIcon sx={{ color: "#2563eb", fontSize: 16 }} />
             <Typography
               sx={{
                 fontWeight: 700,
-                fontSize: "0.8rem",
+                fontSize: "0.75rem",
                 color: "#1e293b",
-                mr: 0.3,
+                mr: 0.2,
               }}
             >
               Date:
@@ -310,20 +310,55 @@ const Job_Allocation = () => {
               <DatePicker
                 value={selectedDate}
                 onChange={handleDateChange}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      width: 200,
+                      "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
+                        fontWeight: 600,
+                        height: "36px !important",
+                        minHeight: "36px !important",
+                        paddingRight: "2px",
+                      },
+                      "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
+                        padding: "2px 6px !important",
+                        fontSize: "0.72rem !important",
+                      },
+                      "& .MuiIconButton-root": {
+                        padding: "1px",
+                        "& .MuiSvgIcon-root": {
+                          fontSize: "13px",
+                        },
+                      },
+                    },
+                  },
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     size="small"
                     sx={{
-                      width: 115,
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "8px",
-                        fontSize: "0.78rem",
+                      width: 105,
+                      "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
                         fontWeight: 600,
-                        height: "32px",
+                        height: "26px !important",
+                        minHeight: "26px !important",
+                        paddingRight: "2px",
                       },
-                      "& .MuiOutlinedInput-input": {
-                        padding: "4px 8px",
+                      "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
+                        padding: "2px 6px !important",
+                        fontSize: "0.72rem !important",
+                      },
+                      "& .MuiIconButton-root": {
+                        padding: "1px",
+                        "& .MuiSvgIcon-root": {
+                          fontSize: "13px",
+                        },
                       },
                     }}
                   />

@@ -58,8 +58,8 @@ const JobAllocationAttendence = ({ onClose, selectedDate }) => {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: { xs: "92%", sm: "580px" },
-          maxHeight: "85vh",
+          width: { xs: "92%", sm: "620px" },
+          maxHeight: "90vh",
           bgcolor: "#ffffff",
           borderRadius: "18px",
           boxShadow: "0 24px 48px rgba(0, 0, 0, 0.2)",
@@ -143,7 +143,8 @@ const JobAllocationAttendence = ({ onClose, selectedDate }) => {
                 component={Paper}
                 elevation={0}
                 sx={{
-                  maxHeight: 360,
+                  maxHeight: "65vh",
+                  minHeight: "360px",
                   borderRadius: "12px",
                   border: "1px solid #e2e8f0",
                 }}
@@ -158,12 +159,11 @@ const JobAllocationAttendence = ({ onClose, selectedDate }) => {
                           sx={{
                             backgroundColor: "#1e40af",
                             color: "#ffffff",
-                            fontWeight: 800,
-                            fontSize: "0.7rem",
-                            py: 1,
-                            px: 1.2,
+                            fontWeight: 700,
+                            fontSize: "11px",
+                            padding: "6px 8px",
                             textTransform: "uppercase",
-                            letterSpacing: "0.4px",
+                            letterSpacing: "0.5px",
                           }}
                         >
                           {text}
@@ -174,7 +174,7 @@ const JobAllocationAttendence = ({ onClose, selectedDate }) => {
                   <TableBody>
                     {attendanceData.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} align="center" sx={{ py: 4, color: "#94a3b8", fontSize: "0.8rem" }}>
+                        <TableCell colSpan={4} align="center" sx={{ py: 2, color: "#94a3b8", fontSize: "12px" }}>
                           No attendance records found for this date.
                         </TableCell>
                       </TableRow>
@@ -187,26 +187,26 @@ const JobAllocationAttendence = ({ onClose, selectedDate }) => {
                             "&:hover": { backgroundColor: "#f0f7ff" },
                           }}
                         >
-                          <TableCell align="center" sx={{ py: 0.6, px: 1 }}>
+                          <TableCell align="center" sx={{ padding: "5px 8px" }}>
                             <Chip
                               label={row.BarCodeNo}
                               size="small"
                               sx={{
-                                height: "18px",
-                                fontSize: "0.65rem",
+                                height: "20px",
+                                fontSize: "11px",
                                 fontWeight: 700,
                                 backgroundColor: "#f1f5f9",
                                 color: "#334155",
                               }}
                             />
                           </TableCell>
-                          <TableCell sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", py: 0.6, px: 1 }}>
+                          <TableCell sx={{ fontSize: 12, fontWeight: 700, color: "#0f172a", padding: "5px 8px" }}>
                             {row.Name}
                           </TableCell>
-                          <TableCell align="center" sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#16a34a", py: 0.6, px: 1 }}>
+                          <TableCell align="center" sx={{ fontSize: 12, fontWeight: 600, color: "#16a34a", padding: "5px 8px" }}>
                             {row.InTime ? dayjs(row.InTime).format("HH:mm") : "-"}
                           </TableCell>
-                          <TableCell align="center" sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#dc2626", py: 0.6, px: 1 }}>
+                          <TableCell align="center" sx={{ fontSize: 12, fontWeight: 600, color: "#dc2626", padding: "5px 8px" }}>
                             {row.OutTime ? dayjs(row.OutTime).format("HH:mm") : "-"}
                           </TableCell>
                         </TableRow>

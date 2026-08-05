@@ -41,16 +41,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     top: 0,
     zIndex: 1,
     padding: "6px 8px",
-    fontSize: "0.7rem",
-    fontWeight: 800,
+    fontSize: "11px",
+    fontWeight: 700,
     textTransform: "uppercase",
-    letterSpacing: "0.4px",
+    letterSpacing: "0.5px",
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: "0.75rem",
+    fontSize: 12,
     wordWrap: "break-word",
     whiteSpace: "normal",
-    padding: "4px 8px",
+    padding: "5px 8px",
   },
 }));
 
@@ -439,7 +439,7 @@ export default function EMPDetails() {
           component={Paper}
           elevation={0}
           sx={{
-            maxHeight: 240,
+            maxHeight: 320,
             width: "100%",
             overflowY: "auto",
             borderRadius: "12px",
@@ -476,8 +476,8 @@ export default function EMPDetails() {
                         label={employee.AS_BarCodeNo}
                         size="small"
                         sx={{
-                          height: "18px",
-                          fontSize: "0.65rem",
+                          height: "16px",
+                          fontSize: "0.6rem",
                           fontWeight: 700,
                           backgroundColor: "#f1f5f9",
                           color: "#334155",
@@ -507,16 +507,16 @@ export default function EMPDetails() {
                       <Button
                         variant="contained"
                         size="small"
-                        startIcon={<AccessTimeIcon sx={{ fontSize: 12 }} />}
+                        startIcon={<AccessTimeIcon sx={{ fontSize: 11 }} />}
                         sx={{
-                          height: "24px",
-                          borderRadius: "12px",
+                          height: "20px",
+                          borderRadius: "10px",
                           fontWeight: 700,
-                          fontSize: "0.65rem",
+                          fontSize: "0.6rem",
                           textTransform: "none",
                           backgroundColor: "#2563eb",
                           color: "#ffffff",
-                          px: 1,
+                          px: 0.8,
                           boxShadow: "none",
                           "&:hover": {
                             backgroundColor: "#1d4ed8",
@@ -532,7 +532,7 @@ export default function EMPDetails() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 2.5, color: "#94a3b8", fontSize: "0.78rem" }}>
+                  <TableCell colSpan={5} align="center" sx={{ py: 1.5, color: "#94a3b8", fontSize: "0.72rem" }}>
                     No allocated employees found.
                   </TableCell>
                 </TableRow>
@@ -649,7 +649,7 @@ export default function EMPDetails() {
           component={Paper}
           elevation={0}
           sx={{
-            maxHeight: 320,
+            maxHeight: 450,
             width: "100%",
             overflowY: "auto",
             borderRadius: "12px",
@@ -689,13 +689,13 @@ export default function EMPDetails() {
                         backgroundColor: isChecked ? "#f0f7ff !important" : "inherit",
                       }}
                     >
-                      <StyledTableCell align="center" sx={{ py: 0.4 }}>
+                      <StyledTableCell align="center" sx={{ py: 0.2 }}>
                         <Checkbox
                           size="small"
                           checked={isChecked}
                           onChange={() => handleCheckboxChange(employee)}
                           sx={{
-                            p: 0.2,
+                            p: 0.1,
                             color: "#94a3b8",
                             "&.Mui-checked": {
                               color: "#2563eb",
@@ -709,8 +709,8 @@ export default function EMPDetails() {
                           label={employee.BarCodeNo}
                           size="small"
                           sx={{
-                            height: "18px",
-                            fontSize: "0.65rem",
+                            height: "16px",
+                            fontSize: "0.6rem",
                             fontWeight: 700,
                             backgroundColor: "#f1f5f9",
                             color: "#334155",
@@ -745,7 +745,7 @@ export default function EMPDetails() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 2.5, color: "#94a3b8", fontSize: "0.78rem" }}>
+                  <TableCell colSpan={5} align="center" sx={{ py: 1.5, color: "#94a3b8", fontSize: "0.72rem" }}>
                     No unassigned employees found matching search.
                   </TableCell>
                 </TableRow>

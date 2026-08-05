@@ -32,17 +32,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     position: "sticky",
     top: 0,
     zIndex: 1,
-    padding: "10px 12px",
-    fontSize: "0.75rem",
-    fontWeight: 800,
+    padding: "6px 8px",
+    fontSize: "11px",
+    fontWeight: 700,
     textTransform: "uppercase",
     letterSpacing: "0.5px",
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: "0.82rem",
+    fontSize: 12,
     wordWrap: "break-word",
     whiteSpace: "normal",
-    padding: "8px 12px",
+    padding: "5px 8px",
   },
 }));
 
@@ -187,13 +187,13 @@ export default function JobCard({
         component={Paper}
         elevation={0}
         sx={{
-          maxHeight: 260,
+          maxHeight: 340,
           width: "100%",
           overflowX: "auto",
-          borderRadius: "14px",
+          borderRadius: "12px",
           border: "1px solid #e2e8f0",
-          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
-          mb: 3.5,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+          mb: 2.5,
         }}
       >
         <Table stickyHeader aria-label="assigned jobs table" size="small">
@@ -221,7 +221,7 @@ export default function JobCard({
                       size="small"
                       sx={{
                         height: "20px",
-                        fontSize: "0.72rem",
+                        fontSize: "11px",
                         fontWeight: 700,
                         backgroundColor: "#f1f5f9",
                         color: "#334155",
@@ -237,7 +237,7 @@ export default function JobCard({
                       size="small"
                       sx={{
                         height: "20px",
-                        fontSize: "0.7rem",
+                        fontSize: "11px",
                         fontWeight: 700,
                         backgroundColor: "#e0f2fe",
                         color: "#0369a1",
@@ -250,7 +250,7 @@ export default function JobCard({
                       size="small"
                       sx={{
                         height: "20px",
-                        fontSize: "0.7rem",
+                        fontSize: "11px",
                         fontWeight: 700,
                         backgroundColor: "#dcfce7",
                         color: "#15803d",
@@ -261,7 +261,7 @@ export default function JobCard({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={{ py: 3, color: "#94a3b8" }}>
+                <TableCell colSpan={4} align="center" sx={{ py: 1.5, color: "#94a3b8", fontSize: "0.72rem" }}>
                   No assigned jobs found for this date.
                 </TableCell>
               </TableRow>
@@ -276,14 +276,14 @@ export default function JobCard({
           display: "flex",
           alignItems: "center",
           gap: 1,
-          mb: 1.5,
+          mb: 1.2,
           px: 0.5,
         }}
       >
-        <PendingActionsIcon sx={{ color: "#f59e0b", fontSize: 22 }} />
+        <PendingActionsIcon sx={{ color: "#f59e0b", fontSize: 20 }} />
         <Typography
           variant="h6"
-          sx={{ fontWeight: 600, color: "#0f172a", fontSize: "1.1rem" }}
+          sx={{ fontWeight: 600, color: "#0f172a", fontSize: "1rem" }}
         >
           Temporary Jobs
         </Typography>
@@ -291,8 +291,8 @@ export default function JobCard({
           label={`${temporaryJobData.length}`}
           size="small"
           sx={{
-            height: "20px",
-            fontSize: "0.7rem",
+            height: "18px",
+            fontSize: "0.65rem",
             fontWeight: 800,
             backgroundColor: "#fef3c7",
             color: "#b45309",
@@ -305,12 +305,12 @@ export default function JobCard({
         component={Paper}
         elevation={0}
         sx={{
-          maxHeight: 300,
+          maxHeight: 360,
           width: "100%",
           overflowX: "auto",
-          borderRadius: "14px",
+          borderRadius: "12px",
           border: "1px solid #e2e8f0",
-          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
         }}
       >
         <Table stickyHeader aria-label="temporary jobs table" size="small">
@@ -338,7 +338,7 @@ export default function JobCard({
                       size="small"
                       sx={{
                         height: "20px",
-                        fontSize: "0.72rem",
+                        fontSize: "11px",
                         fontWeight: 700,
                         backgroundColor: "#fef3c7",
                         color: "#92400e",
@@ -362,11 +362,12 @@ export default function JobCard({
                         }}
                         aria-label="view"
                         sx={{
+                          p: 0.3,
                           backgroundColor: "#eff6ff",
                           "&:hover": { backgroundColor: "#dbeafe" },
                         }}
                       >
-                        <VisibilityIcon sx={{ fontSize: 16 }} />
+                        <VisibilityIcon sx={{ fontSize: 14 }} />
                       </IconButton>
                       <IconButton
                         size="small"
@@ -377,12 +378,13 @@ export default function JobCard({
                         }}
                         aria-label="edit"
                         sx={{
+                          p: 0.3,
                           backgroundColor: "#fef2f2",
                           color: "#dc2626",
                           "&:hover": { backgroundColor: "#fee2e2" },
                         }}
                       >
-                        <EditIcon sx={{ fontSize: 16 }} />
+                        <EditIcon sx={{ fontSize: 14 }} />
                       </IconButton>
                     </Box>
                   </StyledTableCell>
@@ -390,7 +392,7 @@ export default function JobCard({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={{ py: 3, color: "#94a3b8" }}>
+                <TableCell colSpan={4} align="center" sx={{ py: 1.5, color: "#94a3b8", fontSize: "0.72rem" }}>
                   No temporary jobs found for this date.
                 </TableCell>
               </TableRow>

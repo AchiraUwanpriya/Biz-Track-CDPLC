@@ -126,10 +126,11 @@ const CartHistoryModal = ({ open, handleClose }) => {
                         sx={{
                           backgroundColor: "#1e40af",
                           color: "#ffffff",
-                          fontSize: "0.7rem",
-                          fontWeight: 800,
-                          py: 0.8,
-                          px: 1,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "6px 8px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                         }}
                       >
                         Date
@@ -138,10 +139,11 @@ const CartHistoryModal = ({ open, handleClose }) => {
                         sx={{
                           backgroundColor: "#1e40af",
                           color: "#ffffff",
-                          fontSize: "0.7rem",
-                          fontWeight: 800,
-                          py: 0.8,
-                          px: 1,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "6px 8px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                           width: "35%",
                         }}
                       >
@@ -152,10 +154,11 @@ const CartHistoryModal = ({ open, handleClose }) => {
                         sx={{
                           backgroundColor: "#1e40af",
                           color: "#ffffff",
-                          fontSize: "0.7rem",
-                          fontWeight: 800,
-                          py: 0.8,
-                          px: 1,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "6px 8px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                         }}
                       >
                         Qty
@@ -165,10 +168,11 @@ const CartHistoryModal = ({ open, handleClose }) => {
                         sx={{
                           backgroundColor: "#1e40af",
                           color: "#ffffff",
-                          fontSize: "0.7rem",
-                          fontWeight: 800,
-                          py: 0.8,
-                          px: 1,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "6px 8px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                         }}
                       >
                         Price
@@ -178,10 +182,11 @@ const CartHistoryModal = ({ open, handleClose }) => {
                         sx={{
                           backgroundColor: "#1e40af",
                           color: "#ffffff",
-                          fontSize: "0.7rem",
-                          fontWeight: 800,
-                          py: 0.8,
-                          px: 1,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "6px 8px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                         }}
                       >
                         Total
@@ -198,29 +203,29 @@ const CartHistoryModal = ({ open, handleClose }) => {
                           "&:hover": { backgroundColor: "#f1f5f9" },
                         }}
                       >
-                        <TableCell sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#64748b", py: 0.6, px: 1 }}>
+                        <TableCell sx={{ fontSize: 12, fontWeight: 600, color: "#64748b", padding: "5px 8px" }}>
                           {item.date}
                         </TableCell>
-                        <TableCell sx={{ fontSize: "0.75rem", fontWeight: 700, color: "#0f172a", py: 0.6, px: 1 }}>
+                        <TableCell sx={{ fontSize: 12, fontWeight: 700, color: "#0f172a", padding: "5px 8px" }}>
                           {item.itemName}
                         </TableCell>
-                        <TableCell align="center" sx={{ py: 0.6, px: 1 }}>
+                        <TableCell align="center" sx={{ padding: "5px 8px" }}>
                           <Chip
                             label={item.quantity}
                             size="small"
                             sx={{
-                              height: "18px",
-                              fontSize: "0.65rem",
+                              height: "20px",
+                              fontSize: "11px",
                               fontWeight: 700,
                               backgroundColor: "#e0e7ff",
                               color: "#3730a3",
                             }}
                           />
                         </TableCell>
-                        <TableCell align="right" sx={{ fontSize: "0.72rem", fontWeight: 600, color: "#334155", py: 0.6, px: 1 }}>
+                        <TableCell align="right" sx={{ fontSize: 12, fontWeight: 600, color: "#334155", padding: "5px 8px" }}>
                           {item.SellingPrice.toFixed(2)}
                         </TableCell>
-                        <TableCell align="right" sx={{ fontSize: "0.75rem", fontWeight: 800, color: "#2563eb", py: 0.6, px: 1 }}>
+                        <TableCell align="right" sx={{ fontSize: 12, fontWeight: 800, color: "#2563eb", padding: "5px 8px" }}>
                           {(item.quantity * item.SellingPrice).toFixed(2)}
                         </TableCell>
                       </TableRow>
