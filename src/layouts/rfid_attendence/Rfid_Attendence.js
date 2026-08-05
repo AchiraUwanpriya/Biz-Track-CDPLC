@@ -1186,6 +1186,7 @@ import {
   Grid,
   IconButton,
   Collapse,
+  Chip,
 } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -1193,6 +1194,12 @@ import Loader from "../../components/Utility/Loader";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import BadgeIcon from "@mui/icons-material/Badge";
+import BusinessIcon from "@mui/icons-material/Business";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import ContactPageIcon from "@mui/icons-material/ContactPage";
+import GroupIcon from "@mui/icons-material/Group";
 
 const Rfid_Attendence = () => {
   const [selectedTab, setSelectedTab] = useState("Tab1");
@@ -1206,7 +1213,7 @@ const Rfid_Attendence = () => {
   const [loading, setLoading] = useState(true);
   const [searchMode, setSearchMode] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
-  const [triggerSearch, setTriggerSearch] = useState(false);  
+  const [triggerSearch, setTriggerSearch] = useState(false);
 
   const handleTabChange = (tab) => {
     setSelectedTab(tab);
@@ -1322,65 +1329,115 @@ const Rfid_Attendence = () => {
     };
 
     fetchData();
-  }, [selectedDate, selectedTab, selectedLocation, searchMode, startDate, endDate, triggerSearch]); 
-  const renderSearchControls = () => (
-    <Box sx={{ mb: 2, width: "100%" }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Button
-          variant="outlined"
-          onClick={toggleSearchMode}
-          startIcon={<SearchIcon />}
-          sx={{ mr: 2 }}
+  }, [selectedDate, selectedTab, selectedLocation, searchMode, startDate, endDate, triggerSearch]);
+
+  const renderFilterToolbar = () => {
+    if (searchMode) {
+      return (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 1.2,
+            mb: 1.5,
+            borderRadius: "10px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+          }}
         >
-          {searchMode ? "Show Daily View" : "Search by Employee"}
-        </Button>
-        {searchMode && (
-          <IconButton onClick={toggleExpandSearch}>
-            {expandedSearch ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
+          <Grid container spacing={1} alignItems="center">
+            <Grid item xs={12} sm={3.5}>
+              <TextField
+                label="Start Date"
+                type="date"
+                size="small"
+                value={startDate}
+                onChange={handleStartDateChange}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3.5}>
+              <TextField
+                label="End Date"
+                type="date"
+                size="small"
+                value={endDate}
+                onChange={handleEndDateChange}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={5} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <TextField
+                label={selectedTab === "Tab1" ? "Service Number" : "User ID"}
+                size="small"
+                value={serviceNumber}
+                onChange={handleServiceNumberChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setTriggerSearch((prev) => !prev);
+                }}
+                fullWidth
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}
+              />
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => setTriggerSearch((prev) => !prev)}
+                sx={{
+                  minWidth: "36px",
+                  height: "36px",
+                  borderRadius: "8px",
+                  backgroundColor: "#2563eb",
+                  "&:hover": { backgroundColor: "#1d4ed8" },
+                }}
+              >
+                <SearchIcon sx={{ fontSize: 16, color: "#ffffff" }} />
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+      );
+    }
+
+    return (
+      <Box sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+        <TextField
+          label="Date"
+          type="date"
+          size="small"
+          value={selectedDate}
+          onChange={handleDateChange}
+          InputLabelProps={{ shrink: true }}
+          InputProps={{
+            startAdornment: <CalendarTodayIcon sx={{ fontSize: 15, color: "#64748b", mr: 0.5 }} />,
+          }}
+          sx={{
+            minWidth: 150,
+            "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+          }}
+        />
+        {selectedTab === "Tab1" && (
+          <FormControl size="small" sx={{ minWidth: 140 }}>
+            <InputLabel id="location-select-label">Location</InputLabel>
+            <Select
+              labelId="location-select-label"
+              value={selectedLocation}
+              onChange={handleLocationChange}
+              label="Location"
+              startAdornment={<LocationOnIcon sx={{ fontSize: 15, color: "#64748b", mr: 0.5 }} />}
+              sx={{ borderRadius: "8px" }}
+            >
+              <MenuItem value="Hambanthota">Hambanthota</MenuItem>
+              <MenuItem value="Trincomalee">Trincomalee</MenuItem>
+              <MenuItem value="KRY">KRY</MenuItem>
+            </Select>
+          </FormControl>
         )}
       </Box>
-
-      <Collapse in={expandedSearch && searchMode}>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={handleStartDateChange}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={handleEndDateChange}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4} sx={{ display: "flex", alignItems: "center" }}>
-            <TextField
-              label={selectedTab === "Tab1" ? "Service Number" : "User ID"}
-              value={serviceNumber}
-              onChange={handleServiceNumberChange}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") setTriggerSearch((prev) => !prev);
-              }}
-              fullWidth
-            />
-            <IconButton color="primary" onClick={() => setTriggerSearch((prev) => !prev)}>
-              <SearchIcon />
-            </IconButton>
-          </Grid>
-        </Grid>
-      </Collapse>
-    </Box>
-  );
+    );
+  };
 
   const renderComponent = () => {
     if (loading) return <Loader text="Loading Attendance Data..." />;
@@ -1389,139 +1446,144 @@ const Rfid_Attendence = () => {
       case "Tab1":
         return (
           <Box>
-            {renderSearchControls()}
-            {!searchMode && (
-              <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
-                <TextField
-                  label="Date"
-                  type="date"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ mr: 2 }}
-                />
-                <FormControl sx={{ minWidth: 120 }}>
-                  <InputLabel id="location-select-label">Location</InputLabel>
-                  <Select
-                    labelId="location-select-label"
-                    value={selectedLocation}
-                    onChange={handleLocationChange}
-                  >
-                    <MenuItem value="Hambanthota">Hambanthota</MenuItem>
-                    <MenuItem value="Trincomalee">Trincomalee</MenuItem>
-                    <MenuItem value="KRY">KRY</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-            )}
-            <Box sx={{ maxHeight: "400px", overflow: "auto" }}>
-              <Table size="small">
-                <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#1976d2" }}>
+            {renderFilterToolbar()}
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: "10px",
+                border: "1px solid #e2e8f0",
+                maxHeight: "590px",
+                overflow: "auto",
+              }}
+            >
+              <Table
+                size="small"
+                stickyHeader
+                sx={{
+                  width: "100%",
+                  "& .MuiTableCell-root": {
+                    py: 0.5,
+                    px: 0.8,
+                    fontSize: "11px",
+                    whiteSpace: "nowrap",
+                  },
+                }}
+              >
+                <TableHead>
                   <TableRow>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>#</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Service No</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Card No</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Name</TableCell>
+                    {/* <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "40px" }}></TableCell> */}
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "95px" }}>Service No</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "95px" }}>Card No</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "left", fontWeight: 700 }}>Name</TableCell>
                     {searchMode && (
-                      <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Date</TableCell>
+                      <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "70px" }}>Date</TableCell>
                     )}
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>In Time</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Out Time</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "75px" }}>In Time</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "75px" }}>Out Time</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {rfidData.length > 0 ? (
                     rfidData.map((row, i) => (
-                      <TableRow key={i}>
-                        <TableCell sx={{ textAlign: "center" }}>{i + 1}</TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>{row.Service_no}</TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>{row.Prox_no}</TableCell>
-                        <TableCell>{row.Name}</TableCell>
+                      <TableRow key={i} sx={{ "&:hover": { backgroundColor: "#f8fafc" }, transition: "background-color 0.15s ease" }}>
+                        {/* <TableCell sx={{ textAlign: "center", color: "#475569" }}>{i + 1}</TableCell> */}
+                        <TableCell sx={{ textAlign: "center", fontWeight: 600, color: "#1e293b" }}>{row.Service_no}</TableCell>
+                        <TableCell sx={{ textAlign: "center", color: "#64748b" }}>{row.Prox_no}</TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>{row.Name}</TableCell>
                         {searchMode && (
-                          <TableCell sx={{ textAlign: "center" }}>
+                          <TableCell sx={{ textAlign: "center", color: "#475569" }}>
                             {row.Intime ? dayjs(row.Intime).format("MM/DD") : "-"}
                           </TableCell>
                         )}
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "center", fontWeight: 600, color: "#16a34a" }}>
                           {row.Intime ? dayjs(row.Intime).format("HH:mm") : "-"}
                         </TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "center", fontWeight: 600, color: "#dc2626" }}>
                           {row.OutTime ? dayjs(row.OutTime).format("HH:mm") : "-"}
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={searchMode ? 7 : 6} sx={{ textAlign: "center" }}>
-                        <Typography>No data found</Typography>
+                      <TableCell colSpan={searchMode ? 7 : 6} sx={{ textAlign: "center", py: 2 }}>
+                        <Typography sx={{ color: "#64748b", fontSize: "12px" }}>No attendance data found</Typography>
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
-            </Box>
+            </Paper>
           </Box>
         );
 
       case "Tab2":
         return (
           <Box>
-            {renderSearchControls()}
-            {!searchMode && (
-              <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
-                <TextField
-                  label="Date"
-                  type="date"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Box>
-            )}
-            <Box sx={{ maxHeight: "400px", overflow: "auto" }}>
-              <Table size="small">
-                <TableHead sx={{ position: "sticky", top: 0, backgroundColor: "#1976d2" }}>
+            {renderFilterToolbar()}
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: "10px",
+                border: "1px solid #e2e8f0",
+                maxHeight: "590px",
+                overflow: "auto",
+              }}
+            >
+              <Table
+                size="small"
+                stickyHeader
+                sx={{
+                  width: "100%",
+                  "& .MuiTableCell-root": {
+                    py: 0.5,
+                    px: 0.8,
+                    fontSize: "11px",
+                    whiteSpace: "nowrap",
+                  },
+                }}
+              >
+                <TableHead>
                   <TableRow>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>#</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>User ID</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Name</TableCell>
+                    {/* <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "40px" }}></TableCell> */}
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "100px" }}>User ID</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "left", fontWeight: 700 }}>Name</TableCell>
                     {searchMode && (
-                      <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Date</TableCell>
+                      <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "70px" }}>Date</TableCell>
                     )}
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>In Time</TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center", fontWeight: "bold" }}>Out Time</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "80px" }}>In Time</TableCell>
+                    <TableCell sx={{ backgroundColor: "#1d4ed8", color: "#ffffff", textAlign: "center", fontWeight: 700, width: "80px" }}>Out Time</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {subcontractData.length > 0 ? (
                     subcontractData.map((row, i) => (
-                      <TableRow key={i}>
-                        <TableCell sx={{ textAlign: "center" }}>{i + 1}</TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>{row.Sub_UID}</TableCell>
-                        <TableCell>{row.Sub_Name}</TableCell>
+                      <TableRow key={i} sx={{ "&:hover": { backgroundColor: "#f8fafc" }, transition: "background-color 0.15s ease" }}>
+                        {/* <TableCell sx={{ textAlign: "center", color: "#475569" }}>{i + 1}</TableCell> */}
+                        <TableCell sx={{ textAlign: "center", fontWeight: 600, color: "#1e293b" }}>{row.Sub_UID}</TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>{row.Sub_Name}</TableCell>
                         {searchMode && (
-                          <TableCell sx={{ textAlign: "center" }}>
+                          <TableCell sx={{ textAlign: "center", color: "#475569" }}>
                             {row.Sub_InTime ? dayjs(row.Sub_InTime).format("MM/DD") : "-"}
                           </TableCell>
                         )}
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "center", fontWeight: 600, color: "#16a34a" }}>
                           {row.Sub_InTime ? dayjs(row.Sub_InTime).format("HH:mm") : "-"}
                         </TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "center", fontWeight: 600, color: "#dc2626" }}>
                           {row.Sub_OutTime ? dayjs(row.Sub_OutTime).format("HH:mm") : "-"}
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={searchMode ? 6 : 5} sx={{ textAlign: "center" }}>
-                        <Typography>No data found</Typography>
+                      <TableCell colSpan={searchMode ? 6 : 5} sx={{ textAlign: "center", py: 2 }}>
+                        <Typography sx={{ color: "#64748b", fontSize: "12px" }}>No attendance data found</Typography>
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
-            </Box>
+            </Paper>
           </Box>
         );
 
@@ -1531,34 +1593,111 @@ const Rfid_Attendence = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "2px", mt: 2, width: "100%", maxWidth: "500px" }}>
-        {["Tab1", "Tab2"].map((tab, idx) => (
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 0.5 }}>
+      {/* Modern Segmented Pill Tabs */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 0.3,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 0.5,
+          borderRadius: "12px",
+          backgroundColor: "#ffffff",
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 2px 8px rgba(37, 99, 235, 0.04)",
+          mb: 1,
+          width: "100%",
+          maxWidth: "500px",
+        }}
+      >
+        {[
+          { key: "Tab1", label: "CDPLC", icon: <BadgeIcon sx={{ fontSize: 14 }} /> },
+          { key: "Tab2", label: "SUBCONTRACT", icon: <BusinessIcon sx={{ fontSize: 14 }} /> },
+        ].map((tab) => {
+          const isSelected = selectedTab === tab.key;
+          return (
+            <Button
+              key={tab.key}
+              variant={isSelected ? "contained" : "text"}
+              startIcon={tab.icon}
+              onClick={() => handleTabChange(tab.key)}
+              sx={{
+                flex: 1,
+                py: 0.4,
+                px: 1.5,
+                fontSize: "12px",
+                fontWeight: isSelected ? 700 : 600,
+                color: isSelected ? "#ffffff" : "#64748b",
+                backgroundColor: isSelected ? "#2563eb" : "transparent",
+                boxShadow: isSelected ? "0 2px 6px rgba(37, 99, 235, 0.2)" : "none",
+                borderRadius: "8px",
+                textTransform: "none",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: isSelected ? "#1d4ed8" : "#f1f5f9",
+                  color: isSelected ? "#ffffff" : "#1e293b",
+                },
+              }}
+            >
+              {tab.label}
+            </Button>
+          );
+        })}
+      </Paper>
+
+      {/* Main Content Card */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 1.5,
+          width: "100%",
+          maxWidth: "1000px",
+          borderRadius: "14px",
+          border: "1px solid #f1f5f9",
+          backgroundColor: "#ffffff",
+          boxShadow: "0 4px 16px rgba(37, 99, 235, 0.04)",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 1.5, pb: 0.8, borderBottom: "1px solid #f1f5f9" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {selectedTab === "Tab1" ? (
+              <ContactPageIcon sx={{ color: "#2563eb", fontSize: 18 }} />
+            ) : (
+              <GroupIcon sx={{ color: "#2563eb", fontSize: 18 }} />
+            )}
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "14px", color: "#0f172a" }}>
+              {selectedTab === "Tab1" ? "RFID Attendance" : "FACE Recognition Attendance"}
+            </Typography>
+           
+          </Box>
           <Button
-            key={tab}
-            variant={selectedTab === tab ? "contained" : "outlined"}
-            onClick={() => handleTabChange(tab)}
+            variant={searchMode ? "contained" : "outlined"}
+            onClick={toggleSearchMode}
+            startIcon={<SearchIcon sx={{ fontSize: 15 }} />}
+            size="small"
             sx={{
-              borderRadius: idx % 2 === 0 ? "8px 0 0 8px" : "0 8px 8px 0",
-              backgroundColor: selectedTab === tab ? "#5ac8fa" : "transparent",
-              "&:hover": { backgroundColor: selectedTab === tab ? "#5ac8fa" : "#f1f1f1" },
-              p: "14px 34px",
-              fontSize: "16px",
-              width: "100%",
+              py: 0.3,
+              px: 1.5,
+              borderRadius: "8px",
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: "11px",
+              backgroundColor: searchMode ? "#2563eb" : "transparent",
+              borderColor: "#cbd5e1",
+              color: searchMode ? "#ffffff" : "#475569",
+              "&:hover": {
+                backgroundColor: searchMode ? "#1d4ed8" : "#f1f5f9",
+                borderColor: "#94a3b8",
+              },
             }}
           >
-            {tab === "Tab1" ? "CDPLC" : "SUBCONTRACT"}
+            {searchMode ? "Daily View" : "Search Employee"}
           </Button>
-        ))}
-      </Box>
-
-      <Paper elevation={1} sx={{ p: 2, mt: 2, width: "100%", maxWidth: "1000px" }}>
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="h6" sx={{ textAlign: "center", mb: 2, fontWeight: "bold" }}>
-            {selectedTab === "Tab1" ? "RFID Attendance" : "FACE Recognition Attendance"}
-          </Typography>
-          {renderComponent()}
         </Box>
+
+        {renderComponent()}
       </Paper>
     </Box>
   );
