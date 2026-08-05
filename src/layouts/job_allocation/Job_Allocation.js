@@ -286,7 +286,7 @@ const Job_Allocation = () => {
             justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: 1.5,
+            gap: 1.2,
             backgroundColor: "#ffffff",
             p: 1.5,
             borderRadius: "14px",
@@ -294,14 +294,14 @@ const Job_Allocation = () => {
           }}
         >
           {/* Date Picker Section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
-            <CalendarTodayIcon sx={{ color: "#2563eb", fontSize: 16 }} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+            <CalendarTodayIcon sx={{ color: "#2563eb", fontSize: 18 }} />
             <Typography
               sx={{
                 fontWeight: 700,
-                fontSize: "0.75rem",
+                fontSize: "0.85rem",
                 color: "#1e293b",
-                mr: 0.2,
+                mr: 0.3,
               }}
             >
               Date:
@@ -314,23 +314,22 @@ const Job_Allocation = () => {
                   textField: {
                     size: "small",
                     sx: {
-                      width: 200,
+                      width: 140,
                       "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
-                        borderRadius: "6px",
-                        fontSize: "0.72rem",
+                        borderRadius: "10px",
+                        fontSize: "13px",
                         fontWeight: 600,
                         height: "36px !important",
                         minHeight: "36px !important",
-                        paddingRight: "2px",
                       },
                       "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
-                        padding: "2px 6px !important",
-                        fontSize: "0.72rem !important",
+                        padding: "6px 8px !important",
+                        fontSize: "13px !important",
                       },
                       "& .MuiIconButton-root": {
-                        padding: "1px",
+                        padding: "4px",
                         "& .MuiSvgIcon-root": {
-                          fontSize: "13px",
+                          fontSize: "18px",
                         },
                       },
                     },
@@ -341,23 +340,22 @@ const Job_Allocation = () => {
                     {...params}
                     size="small"
                     sx={{
-                      width: 105,
+                      width: 140,
                       "& .MuiInputBase-root, & .MuiOutlinedInput-root": {
-                        borderRadius: "6px",
-                        fontSize: "0.72rem",
+                        borderRadius: "10px",
+                        fontSize: "13px",
                         fontWeight: 600,
-                        height: "26px !important",
-                        minHeight: "26px !important",
-                        paddingRight: "2px",
+                        height: "36px !important",
+                        minHeight: "36px !important",
                       },
                       "& .MuiInputBase-input, & .MuiOutlinedInput-input": {
-                        padding: "2px 6px !important",
-                        fontSize: "0.72rem !important",
+                        padding: "6px 8px !important",
+                        fontSize: "13px !important",
                       },
                       "& .MuiIconButton-root": {
-                        padding: "1px",
+                        padding: "4px",
                         "& .MuiSvgIcon-root": {
-                          fontSize: "13px",
+                          fontSize: "18px",
                         },
                       },
                     }}
@@ -368,7 +366,7 @@ const Job_Allocation = () => {
           </Box>
 
           {/* Action Buttons */}
-          <Box sx={{ display: "flex", gap: 1.2 }}>
+          <Box sx={{ display: "flex", gap: 1.2, flexWrap: "nowrap" }}>
             <Button
               variant="contained"
               startIcon={<HowToRegIcon sx={{ fontSize: 18 }} />}
@@ -382,6 +380,7 @@ const Job_Allocation = () => {
                 backgroundColor: "#f1f5f9",
                 color: "#1e293b",
                 boxShadow: "none",
+                px: 2,
                 "&:hover": {
                   backgroundColor: "#e2e8f0",
                   boxShadow: "none",
@@ -404,6 +403,7 @@ const Job_Allocation = () => {
                 backgroundColor: "#2563eb",
                 color: "#ffffff",
                 boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+                px: 2,
                 "&:hover": {
                   backgroundColor: "#1d4ed8",
                   boxShadow: "0 6px 16px rgba(37, 99, 235, 0.4)",
